@@ -1,0 +1,968 @@
+definitions:
+  node.APIGetChartBarLegend:
+    properties:
+      data:
+        items:
+          type: string
+        type: array
+    type: object
+  node.APIGetChartBarOutputs:
+    properties:
+      legend:
+        $ref: '#/definitions/node.APIGetChartBarLegend'
+        type: object
+      series:
+        items:
+          $ref: '#/definitions/node.APIGetChartBarSeries'
+        type: array
+      xAxis:
+        items:
+          $ref: '#/definitions/node.APIGetChartBarXAxis'
+        type: array
+    type: object
+  node.APIGetChartBarSeries:
+    properties:
+      data:
+        items:
+          type: integer
+        type: array
+      name:
+        type: string
+      type:
+        type: string
+    type: object
+  node.APIGetChartBarXAxis:
+    properties:
+      data:
+        items:
+          type: string
+        type: array
+      type:
+        type: string
+    type: object
+  node.APIGetChartStat:
+    properties:
+      name:
+        type: string
+      totalCpuCount:
+        type: integer
+      totalHostCount:
+        type: integer
+      unUsedCpuCount:
+        type: integer
+      unUsedHostCount:
+        type: integer
+      usedCpuCount:
+        type: integer
+      usedHostCount:
+        type: integer
+    type: object
+  node.APIGetChartStatOutputs:
+    properties:
+      name:
+        type: string
+      subStat:
+        items:
+          $ref: '#/definitions/node.APIGetChartStat'
+        type: array
+      totalCpuCount:
+        type: integer
+      totalHostCount:
+        type: integer
+      unUsedCpuCount:
+        type: integer
+      unUsedHostCount:
+        type: integer
+      usedCpuCount:
+        type: integer
+      usedHostCount:
+        type: integer
+    type: object
+  node.APIGetHostGroupListInputs:
+    properties:
+      limit:
+        type: integer
+      name:
+        type: string
+      page:
+        type: integer
+    type: object
+  node.APIGetHostGroupListOutputs:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/node.HostGroup'
+        type: array
+      totalCount:
+        type: integer
+    type: object
+  node.APIGetHostGroupMoveInputs:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      parentId:
+        type: integer
+    type: object
+  node.APIGetHostGroupTreeOutputs:
+    properties:
+      hostGroups:
+        items:
+          $ref: '#/definitions/node.HostGroup'
+        type: array
+    type: object
+  node.APIGetHostListInputs:
+    properties:
+      cpuUsage:
+        type: number
+      fsUsage:
+        type: number
+      group:
+        type: string
+      ip:
+        type: string
+      limit:
+        type: integer
+      order:
+        type: string
+      orderBy:
+        type: string
+      page:
+        type: integer
+      physicalSystem:
+        type: string
+      status:
+        type: string
+    type: object
+  node.APIGetHostListOutputs:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/node.Host'
+        type: array
+      totalCount:
+        type: integer
+    type: object
+  node.APIPostHostUpdateInputs:
+    properties:
+      devOwner:
+        type: string
+      groupIds:
+        description: Groups         [][]string `json:"groups" form:"groups"`
+        items:
+          type: integer
+        type: array
+      id:
+        type: integer
+      ip:
+        type: string
+      name:
+        type: string
+      path:
+        type: string
+      physicalSystem:
+        type: string
+    required:
+    - ip
+    type: object
+  node.APIPutHostGroupInputs:
+    properties:
+      desc:
+        type: string
+      icon:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      parentId:
+        type: integer
+      perms:
+        type: string
+    required:
+    - id
+    - name
+    - parentId
+    type: object
+  node.Host:
+    properties:
+      applyUser:
+        type: string
+      areaName:
+        type: string
+      cloudPoolCode:
+        type: string
+      cloudPoolName:
+        type: string
+      coreTotalNum:
+        type: integer
+      cpuNumber:
+        type: integer
+      cpuUsage:
+        type: number
+      databaseVersion:
+        type: string
+      department:
+        type: string
+      deployDate:
+        type: string
+      desc:
+        type: string
+      devAreaCode:
+        type: string
+      devCenterName:
+        type: string
+      devOwner:
+        type: string
+      devTypeCode:
+        type: string
+      fsUsage:
+        type: number
+      funDesc:
+        type: string
+      groups:
+        items:
+          $ref: '#/definitions/node.HostGroup'
+        type: array
+      id:
+        description: gorm.Model
+        type: integer
+      instanceId:
+        type: string
+      ip:
+        type: string
+      logicSystem:
+        type: string
+      logicSystemCnName:
+        type: string
+      manIp:
+        type: string
+      managerA:
+        type: string
+      managerB:
+        type: string
+      memorySize:
+        type: integer
+      memoryUsage:
+        type: number
+      name:
+        type: string
+      oracle:
+        type: string
+      osVersion:
+        type: string
+      partType:
+        type: string
+      partTypeCode:
+        type: string
+      physicalSystem:
+        type: string
+      physicalSystemArea:
+        type: string
+      physicalSystemCnName:
+        type: string
+      physicalSystemEnName:
+        type: string
+      servSpaceCodeList:
+        type: string
+      servSpaceNameList:
+        type: string
+      setupMode:
+        type: string
+      srvStatus:
+        type: string
+      status:
+        type: string
+      virtFcNum:
+        type: string
+      virtNetNum:
+        type: string
+    type: object
+  node.HostGroup:
+    properties:
+      children:
+        items:
+          $ref: '#/definitions/node.HostGroup'
+        type: array
+      createUser:
+        type: string
+      desc:
+        type: string
+      icon:
+        type: string
+      id:
+        type: integer
+      isLeaf:
+        type: boolean
+      isWarning:
+        type: boolean
+      name:
+        type: string
+      parent:
+        type: string
+      parentId:
+        type: integer
+      path:
+        type: string
+    type: object
+  portal.APIPostMenuUpdateInputs:
+    properties:
+      icon:
+        type: string
+      menuId:
+        type: integer
+      name:
+        type: string
+      parentId:
+        type: integer
+      type:
+        type: integer
+      url:
+        type: string
+    required:
+    - menuId
+    type: object
+  portal.Menu:
+    properties:
+      icon:
+        type: string
+      list:
+        description: Open     string `json:"open" gorm:"column:open;type:string;size:128;comment:"`
+        items:
+          $ref: '#/definitions/portal.Menu'
+        type: array
+      menuId:
+        description: gorm.Model
+        type: integer
+      name:
+        type: string
+      orderNum:
+        type: integer
+      parentId:
+        type: integer
+      perms:
+        items:
+          $ref: '#/definitions/uic.Permission'
+        type: array
+      type:
+        type: integer
+      url:
+        type: string
+    type: object
+  uic.APIGetUserListInputs:
+    properties:
+      limit:
+        description: number of reacord's limit on each page
+        type: integer
+      page:
+        description: pagging
+        type: integer
+      username:
+        type: string
+    type: object
+  uic.APIGetUserListOutputs:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/uic.User'
+        type: array
+      totalCount:
+        type: integer
+    type: object
+  uic.Permission:
+    properties:
+      cnName:
+        type: string
+      desc:
+        type: string
+      id:
+        description: gorm.Model
+        type: integer
+      name:
+        type: string
+    type: object
+  uic.User:
+    properties:
+      adUserName:
+        type: string
+      cnName:
+        type: string
+      email:
+        type: string
+      firstInstId:
+        type: string
+      id:
+        description: gorm.Model
+        type: integer
+      instId:
+        description: Image       []byte    `json:"image" gorm:"column:image;type:bytes;null;comment:头像"`
+        type: string
+      isSuperuser:
+        type: boolean
+      jgygUserId:
+        type: string
+      mobile:
+        description: Birthday    time.Time `json:"birthday" gorm:"column:birthday;type:time;null;comment:出生日期"`
+        type: string
+      password:
+        type: string
+      sex:
+        type: string
+      telephone:
+        type: string
+      username:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: 一个简单的机器管理系统
+  license: {}
+  title: rabbit
+paths:
+  /api/v1/chart/bar:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/node.APIGetChartBarOutputs'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/node.APIGetChartBarOutputs'
+      summary: 按照host_group统计host_group下的CPU个数
+  /api/v1/chart/pie:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/node.APIGetChartBarOutputs'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/node.APIGetChartBarOutputs'
+      summary: 按照host_group统计host_group下的CPU个数
+  /api/v1/chart/stat:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/node.APIGetChartStatOutputs'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/node.APIGetChartStatOutputs'
+      summary: 统计平台收纳的所有机器数/cpu数/已分配机器数/已分配cpu数
+  /api/v1/host/create:
+    post:
+      parameters:
+      - description: 创建新机器IP
+        in: formData
+        name: IP
+        required: true
+        type: string
+      - description: 创建HostName
+        in: formData
+        name: Hostname
+        type: string
+      - description: 创建HostGroup
+        in: formData
+        name: GroupID
+        type: string
+      - description: 创建Tenant
+        in: formData
+        name: Tenant
+        type: string
+      - description: 创建Env
+        in: formData
+        name: Env
+        type: string
+      - description: 创建Project
+        in: formData
+        name: Project
+        type: string
+      - description: 创建Module
+        in: formData
+        name: Module
+        type: string
+      - description: 创建DevOwner
+        in: formData
+        name: DevOwner
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/node.APIPostHostUpdateInputs'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/node.APIPostHostUpdateInputs'
+      summary: 创建新机器
+  /api/v1/host/info/:id:
+    get:
+      parameters:
+      - description: 根据机器ID获取机器详细信息
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/node.Host'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/node.Host'
+      summary: 根据机器ID获取机器详细信息
+  /api/v1/host/list:
+    get:
+      parameters:
+      - in: query
+        name: cpuUsage
+        type: number
+      - in: query
+        name: fsUsage
+        type: number
+      - in: query
+        name: group
+        type: string
+      - in: query
+        name: ip
+        type: string
+      - in: query
+        name: limit
+        type: integer
+      - in: query
+        name: order
+        type: string
+      - in: query
+        name: orderBy
+        type: string
+      - in: query
+        name: page
+        type: integer
+      - in: query
+        name: physicalSystem
+        type: string
+      - in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/node.APIGetHostListOutputs'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/node.APIGetHostListOutputs'
+      summary: 机器列表接口
+  /api/v1/host/update:
+    put:
+      parameters:
+      - description: 根据IP更新机器信息
+        in: formData
+        name: IP
+        required: true
+        type: string
+      - description: 更新HostName
+        in: formData
+        name: Hostname
+        type: string
+      - description: 更新HostGroup
+        in: formData
+        name: GroupID
+        type: string
+      - description: 更新Tenant
+        in: formData
+        name: Tenant
+        type: string
+      - description: 更新Env
+        in: formData
+        name: Env
+        type: string
+      - description: 更新Project
+        in: formData
+        name: Project
+        type: string
+      - description: 更新Module
+        in: formData
+        name: Module
+        type: string
+      - description: 更新DevOwner
+        in: formData
+        name: DevOwner
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/node.APIPostHostUpdateInputs'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/node.APIPostHostUpdateInputs'
+      summary: 更新机器信息
+  /api/v1/host_group/all:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/node.APIGetHostGroupListOutputs'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/node.APIGetHostGroupListOutputs'
+      summary: 获取所有host group信息
+  /api/v1/host_group/bind_host:
+    post:
+      parameters:
+      - description: 根据ID获取host group树状信息
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/node.APIGetHostGroupTreeOutputs'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/node.APIGetHostGroupTreeOutputs'
+      summary: 获取host group信息
+  /api/v1/host_group/children:
+    get:
+      parameters:
+      - description: 获取某个节点的所有子节点
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/node.APIGetHostGroupTreeOutputs'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/node.APIGetHostGroupTreeOutputs'
+      summary: 获取某个节点的所有子节点
+  /api/v1/host_group/create:
+    post:
+      parameters:
+      - in: query
+        name: limit
+        type: integer
+      - in: query
+        name: name
+        type: string
+      - in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/node.APIGetHostGroupTreeOutputs'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/node.APIGetHostGroupTreeOutputs'
+      summary: 创建host group信息
+  /api/v1/host_group/delete:
+    post:
+      parameters:
+      - description: 删除host group信息
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/node.APIGetHostGroupTreeOutputs'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/node.APIGetHostGroupTreeOutputs'
+      summary: 删除host group信息
+  /api/v1/host_group/get:
+    get:
+      parameters:
+      - description: 根据机器群组名称获取机器群组详细信息
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/node.APIGetHostGroupTreeOutputs'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/node.APIGetHostGroupTreeOutputs'
+      summary: 根据机器群组名称获取机器群组详细信息
+  /api/v1/host_group/hosts:
+    get:
+      parameters:
+      - description: 获取某个节点的所有机器
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/node.APIGetHostGroupTreeOutputs'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/node.APIGetHostGroupTreeOutputs'
+      summary: 获取某个节点的所有机器
+  /api/v1/host_group/list:
+    get:
+      parameters:
+      - in: query
+        name: limit
+        type: integer
+      - in: query
+        name: name
+        type: string
+      - in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/node.APIGetHostGroupListOutputs'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/node.APIGetHostGroupListOutputs'
+      summary: 更新host group信息
+  /api/v1/host_group/move:
+    post:
+      parameters:
+      - in: query
+        name: id
+        type: integer
+      - in: query
+        name: name
+        type: string
+      - in: query
+        name: parentId
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/node.APIGetHostGroupTreeOutputs'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/node.APIGetHostGroupTreeOutputs'
+      summary: 将节点ID移动到parent，作为parent的父节点
+  /api/v1/host_group/tree:
+    get:
+      parameters:
+      - description: 根据ID获取host group树状信息
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/node.APIGetHostGroupTreeOutputs'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/node.APIGetHostGroupTreeOutputs'
+      summary: 获取host group信息
+  /api/v1/host_group/tree/rebuild:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/node.HostGroup'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            items:
+              $ref: '#/definitions/node.HostGroup'
+            type: array
+      summary: 重建群组树
+  /api/v1/host_group/update:
+    put:
+      parameters:
+      - in: query
+        name: desc
+        type: string
+      - in: query
+        name: icon
+        type: string
+      - in: query
+        name: id
+        required: true
+        type: integer
+      - in: query
+        name: name
+        required: true
+        type: string
+      - in: query
+        name: parentId
+        required: true
+        type: integer
+      - in: query
+        name: perms
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/node.APIGetHostGroupTreeOutputs'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/node.APIGetHostGroupTreeOutputs'
+      summary: 更新host group信息
+  /api/v1/menu/info/:id:
+    get:
+      parameters:
+      - description: 根据ID获取菜单信息
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/portal.Menu'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/portal.Menu'
+      summary: 根据ID获取菜单信息
+  /api/v1/menu/update:
+    post:
+      parameters:
+      - description: 根据ID更新菜单信息
+        in: formData
+        name: menuId
+        required: true
+        type: string
+      - description: 更新Name
+        in: formData
+        name: name
+        type: string
+      - description: 更新Url
+        in: formData
+        name: Url
+        type: string
+      - description: 更新ParentId
+        in: formData
+        name: ParentId
+        type: string
+      - description: 更新Icon
+        in: formData
+        name: Icon
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/portal.APIPostMenuUpdateInputs'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/portal.APIPostMenuUpdateInputs'
+      summary: 更新机器信息
+  /api/v1/user/list:
+    get:
+      parameters:
+      - description: number of reacord's limit on each page
+        in: query
+        name: limit
+        type: integer
+      - description: pagging
+        in: query
+        name: page
+        type: integer
+      - in: query
+        name: username
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/uic.APIGetUserListOutputs'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/uic.APIGetUserListOutputs'
+      summary: 用户列表接口
+swagger: "2.0"

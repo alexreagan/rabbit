@@ -1,0 +1,22 @@
+syntax = "proto3";
+option go_package = "rabbit/server/proto/user";
+//option java_multiple_files = true;
+//option java_package = "io.grpc.examples.routeguide";
+//option java_outer_classname = "RouteGuideProto";
+
+package user;
+
+
+service User {
+rpc Get(UserRequest) returns (UserReply) {}
+}
+
+message UserRequest {
+  string UserName = 1;
+  string JygyUserId = 2;
+  string ADUserName = 3;
+}
+
+message UserReply {
+  string Message = 1;
+}
