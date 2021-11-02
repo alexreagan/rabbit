@@ -1,6 +1,6 @@
 package caas
 
-import "rabbit/g"
+import "github.com/alexreagan/rabbit/g"
 
 type NamespaceServiceRel struct {
 	NamespaceID int64 `json:"namespaceId" gorm:"column:namespace_id;index;comment:"`

@@ -2,9 +2,9 @@ package service
 
 import (
 	"context"
+	"github.com/alexreagan/rabbit/server/model/node"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"rabbit/server/model/node"
 	"sync"
 	"time"
 )

@@ -15,7 +15,7 @@ func (c *YangtzeClient) init(addr string) {
 }
 
 // 根据group路径获取路径下所有的host
-func (c *YangtzeClient) GetHostsByGroup(path string) ([]*node.Host, error){
+func (c *YangtzeClient) GetHostsByGroup(path string) ([]*node.Host, error) {
 	uri := "/api/v1/host_group/related_hosts"
 	req := httplib.Get(c.Addr + uri)
 	req = req.SetTimeout(1*time.Second, 5*time.Second)

@@ -17,10 +17,10 @@ package utils
 import (
 	"net/http"
 
+	h "github.com/alexreagan/rabbit/server/helper"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	h "rabbit/server/helper"
 )
 
 func AuthSessionMidd(c *gin.Context) {

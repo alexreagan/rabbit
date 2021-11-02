@@ -90,11 +90,5 @@ func ParseConfig(cfg string) {
 	lock.Lock()
 	defer lock.Unlock()
 
-	//if err := viper.Unmarshal(&config); err != nil {
-	//	log.Fatalln(err)
-	//	flag.Usage()
-	//	return
-	//}
-
 	log.Println("read config file:", cfg, "successfully")
 }

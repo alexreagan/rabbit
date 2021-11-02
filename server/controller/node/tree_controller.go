@@ -1,11 +1,11 @@
 package node
 
 import (
+	"github.com/alexreagan/rabbit/g"
+	h "github.com/alexreagan/rabbit/server/helper"
+	"github.com/alexreagan/rabbit/server/model/node"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"rabbit/g"
-	h "rabbit/server/helper"
-	"rabbit/server/model/node"
 )
 
 type APIGetHostGroupTreeInputs struct {

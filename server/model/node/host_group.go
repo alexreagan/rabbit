@@ -2,8 +2,8 @@ package node
 
 import (
 	"encoding/json"
-	"rabbit/g"
-	"rabbit/server/model/caas"
+	"github.com/alexreagan/rabbit/g"
+	"github.com/alexreagan/rabbit/server/model/caas"
 )
 
 var tree []*HostGroup

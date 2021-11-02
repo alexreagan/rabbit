@@ -1,8 +1,8 @@
 package uic
 
 import (
+	"github.com/alexreagan/rabbit/server/utils"
 	"github.com/gin-gonic/gin"
-	"rabbit/server/utils"
 )
 
 func Routes(r *gin.Engine) {
