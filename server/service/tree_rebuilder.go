@@ -35,8 +35,6 @@ func (s *TreeReBuilder) Start() {
 
 func (s *TreeReBuilder) StartReBuilder() {
 	log.Println("[TreeReBuilder] StartReBuilder...")
-	// 启动
-	node.HostGroup{}.ReBuildTree()
 
 	// 时间定时器启动
 	dur := viper.GetDuration("tree.rebuild.duration") * time.Second

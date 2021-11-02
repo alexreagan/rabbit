@@ -308,7 +308,7 @@ func HostGroupRelatedHosts(c *gin.Context) {
 
 	hostGroup := node.HostGroup{}
 	hostGroup.Path = groupPath
-	if dt := g.Con().Portal.Model(hostGroup).Where(&hostGroup); dt.Error != nil {
+	if dt := g.Con().Portal.Debug().Model(hostGroup).Where(&hostGroup).Find(&hostGroup); dt.Error != nil {
 		h.JSONR(c, h.ExpecStatus, dt.Error)
 		return
 	}

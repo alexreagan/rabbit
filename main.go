@@ -81,7 +81,7 @@ func main() {
 
 	// tree ReBuilder
 	treeReBuilder := service.InitTreeReBuilder()
-	if viper.GetBool("tree_rebuilder.enable") == true {
+	if viper.GetBool("tree.rebuild.enable") == true {
 		treeReBuilder.Start()
 	}
 
