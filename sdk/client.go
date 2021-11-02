@@ -1,17 +1,13 @@
 package sdk
 
 import (
+	"github.com/alexreagan/rabbit/server/model/node"
 	"github.com/toolkits/net/httplib"
-	"rabbit/server/model/node"
 	"time"
 )
 
 type YangtzeClient struct {
 	Addr string `json:"addr"`
-}
-
-func (c *YangtzeClient) init(addr string) {
-	c.Addr = addr
 }
 
 // 根据group路径获取路径下所有的host
