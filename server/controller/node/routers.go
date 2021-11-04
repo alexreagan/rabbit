@@ -35,6 +35,7 @@ func Routes(r *gin.Engine) {
 	chartGroup.GET("/container/stat", ChartContainerStat)
 
 	caasGroup := r.Group("/api/v1/caas")
+	caasGroup.GET("/workspace/list", CaasWorkspaceList)
 	caasGroup.GET("/namespace/list", CaasNamespaceList)
 	caasGroup.GET("/service/list", CaasServiceList)
 	caasGroup.GET("/service/refresh_pods", CaasServiceRefreshPods)

@@ -13,12 +13,9 @@ require (
 	github.com/gin-gonic/gin v1.7.0
 	github.com/go-asn1-ber/asn1-ber v1.5.3 // indirect
 	github.com/go-ldap/ldap/v3 v3.4.1
-	github.com/howeyc/fsnotify v0.9.0 // indirect
 	github.com/jonboulle/clockwork v0.2.2 // indirect
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
 	github.com/lestrrat-go/strftime v1.0.5 // indirect
-	github.com/pilu/config v0.0.0-20131214182432-3eb99e6c0b9a // indirect
-	github.com/pilu/fresh v0.0.0-20190826141211-0fa698148017 // indirect
 	github.com/satori/go.uuid v1.2.0
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/pflag v1.0.5
@@ -26,7 +23,6 @@ require (
 	github.com/stretchr/testify v1.7.0
 	github.com/swaggo/gin-swagger v1.3.1
 	github.com/swaggo/swag v1.5.1
-	github.com/toolkits/net v0.0.0-20160910085801-3f39ab6fe3ce // indirect
 	github.com/toolkits/str v0.0.0-20160913030958-f82e0f0498cb
 	google.golang.org/grpc v1.38.0
 	google.golang.org/protobuf v1.26.0

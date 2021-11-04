@@ -236,6 +236,54 @@ func CaasPodList(c *gin.Context) {
 	return
 }
 
+type APIGetCaasWorkspaceListInputs struct {
+	Name  string `json:"name" form:"name"`
+	Limit int    `json:"limit" form:"limit"`
+	Page  int    `json:"page" form:"page"`
+}
+
+type APIGetCaasWorkspaceListOutputs struct {
+	List       []*caas.WorkSpace `json:"list"`
+	TotalCount int64             `json:"totalCount"`
+}
+
+// @Summary 获取caas组织空间信息
+// @Description
+// @Produce json
+// @Param APIGetCaasWorkspaceListInputs query APIGetCaasWorkspaceListInputs true "获取caas组织空间信息"
+// @Success 200 {object} APIGetCaasWorkspaceListOutputs
+// @Failure 400 {object} APIGetCaasWorkspaceListOutputs
+// @Router /api/v1/caas/workspace/list [get]
+func CaasWorkspaceList(c *gin.Context) {
+	var inputs APIGetCaasWorkspaceListInputs
+
+	if err := c.Bind(&inputs); err != nil {
+		h.JSONR(c, h.BadStatus, err)
+		return
+	}
+
+	offset, limit, err := h.PageParser(inputs.Page, inputs.Limit)
+	if err != nil {
+		h.JSONR(c, h.BadStatus, err.Error())
+		return
+	}
+	var workspaces []*caas.WorkSpace
+	var totalCount int64
+	db := g.Con().Portal.Model(caas.WorkSpace{}).Debug()
+	if inputs.Name != "" {
+		db = db.Where("`name` regexp ?", inputs.Name)
+	}
+	db.Count(&totalCount)
+	db.Offset(offset).Limit(limit).Find(&workspaces)
+
+	resp := &APIGetCaasWorkspaceListOutputs{
+		List:       workspaces,
+		TotalCount: totalCount,
+	}
+	h.JSONR(c, http.StatusOK, resp)
+	return
+}
+
 type APIGetPodGetInputs struct {
 	ID int64 `json:"id"`
 }
