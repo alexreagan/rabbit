@@ -2,10 +2,10 @@ package uic
 
 import (
 	utils "github.com/Valiben/gin_unit_test"
+	"github.com/alexreagan/rabbit/g"
+	"github.com/alexreagan/rabbit/server/model/uic"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
-	"rabbit/g"
-	"rabbit/server/model/uic"
 	"testing"
 )
 

@@ -94,6 +94,9 @@ func (this Host) MeetWarningCondition() bool {
 	if this.CpuUsage >= viper.GetFloat64("alarm.threshold.cpu") {
 		return true
 	}
+	if this.MemoryUsage >= viper.GetFloat64("alarm.threshold.memory") {
+		return true
+	}
 	if this.FsUsage >= viper.GetFloat64("alarm.threshold.fs") {
 		return true
 	}

@@ -206,6 +206,34 @@ func (s *KunYuanSyncer) Login() (*KunYuanLoginResult, error) {
 	return lr, err
 }
 
+func (s *KunYuanSyncer) GetKunyuanBaseResult(abbr string, page int, lr *KunYuanLoginResult) (*SyncerBaseResult, error) {
+	syncerResult := &SyncerBaseResult{}
+	syncUrl := viper.GetString("kunyuan_syncer.base.url")
+	req, _ := http.NewRequest(http.MethodGet, syncUrl, nil)
+	query := req.URL.Query()
+	query.Add("areaName", "")
+	query.Add("cloudPoolCode", "PRIVATE_CLOUD")
+	query.Add("subSysEnNames", abbr)
+	query.Add("current", strconv.Itoa(page))
+	req.URL.RawQuery = query.Encode()
+	req.Header.Set("Authorization", fmt.Sprintf("%s %s", "Bearer", lr.AccessToken))
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		log.Errorln(err)
+		return syncerResult, err
+	}
+	defer resp.Body.Close()
+
+	buf, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Errorln(err)
+		return syncerResult, err
+	}
+	log.Printf("[KunyuanSync] SyncBaseResult: %s", buf)
+	err = json.Unmarshal(buf, &syncerResult)
+	return syncerResult, err
+}
+
 func (s *KunYuanSyncer) SyncBase() {
 	log.Println("SyncBase...")
 	lr, err := s.Login()
@@ -215,33 +243,10 @@ func (s *KunYuanSyncer) SyncBase() {
 	}
 
 	abbrs := viper.GetStringSlice("kunyuan_syncer.base.physical_systems")
-	syncUrl := viper.GetString("kunyuan_syncer.base.url")
 	for _, abbr := range abbrs {
 		page := 1
 		for {
-			req, _ := http.NewRequest(http.MethodGet, syncUrl, nil)
-			query := req.URL.Query()
-			query.Add("areaName", "")
-			query.Add("cloudPoolCode", "PRIVATE_CLOUD")
-			query.Add("subSysEnNames", abbr)
-			query.Add("current", strconv.Itoa(page))
-			req.URL.RawQuery = query.Encode()
-			req.Header.Set("Authorization", fmt.Sprintf("%s %s", "Bearer", lr.AccessToken))
-			resp, err := http.DefaultClient.Do(req)
-			if err != nil {
-				log.Errorln(err)
-				break
-			}
-			defer resp.Body.Close()
-
-			buf, err := ioutil.ReadAll(resp.Body)
-			if err != nil {
-				log.Errorln(err)
-				break
-			}
-			log.Printf("[KunyuanSync] SyncBaseResult: %s", buf)
-			var syncerResult SyncerBaseResult
-			err = json.Unmarshal(buf, &syncerResult)
+			syncerResult, err := s.GetKunyuanBaseResult(abbr, page, lr)
 			if err != nil {
 				log.Errorln(err)
 				break
@@ -273,6 +278,7 @@ func (s *KunYuanSyncer) SyncBase() {
 					PhysicalSystemCnName: record.SubSystemCnName,
 					PhysicalSystemArea:   record.SubSystemAreaName,
 					LogicSystemCnName:    record.LogicSystemCnName,
+					UpdateTime:           time.Now(),
 				}
 
 				var hh node.Host
@@ -299,6 +305,36 @@ func (s *KunYuanSyncer) SyncBase() {
 	}
 }
 
+func (s *KunYuanSyncer) GetKunyuanMonitorResult(abbr string, page int, lr *KunYuanLoginResult) (*SyncerMonitorResult, error) {
+	syncerResult := &SyncerMonitorResult{}
+	syncUrl := viper.GetString("kunyuan_syncer.monitor.url")
+	req, _ := http.NewRequest(http.MethodGet, syncUrl, nil)
+	query := req.URL.Query()
+	query.Add("isMine", "1")
+	//query.Add("cloudPoolName", cloudPool)
+	query.Add("subSysEnName", abbr)
+	query.Add("areaName", "")
+	query.Add("prodIp", "")
+	query.Add("page", strconv.Itoa(page))
+	req.URL.RawQuery = query.Encode()
+	req.Header.Set("Authorization", fmt.Sprintf("%s %s", "Bearer", lr.AccessToken))
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		log.Errorln(err)
+		return syncerResult, err
+	}
+	defer resp.Body.Close()
+
+	buf, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Errorln(err)
+		return syncerResult, err
+	}
+	log.Printf("[KunyuanSync] SyncMonitorResult: %s", buf)
+	err = json.Unmarshal(buf, &syncerResult)
+	return syncerResult, err
+}
+
 func (s *KunYuanSyncer) SyncMonitor() {
 	log.Println("SyncMonitor...")
 	lr, err := s.Login()
@@ -309,35 +345,10 @@ func (s *KunYuanSyncer) SyncMonitor() {
 
 	abbrs := viper.GetStringSlice("kunyuan_syncer.monitor.physical_systems")
 	//cloudPools := viper.GetStringSlice("syncer.monitor.cloud_pools")
-	syncUrl := viper.GetString("kunyuan_syncer.monitor.url")
 	for _, abbr := range abbrs {
 		page := 1
 		for {
-			req, _ := http.NewRequest(http.MethodGet, syncUrl, nil)
-			query := req.URL.Query()
-			query.Add("isMine", "1")
-			//query.Add("cloudPoolName", cloudPool)
-			query.Add("subSysEnName", abbr)
-			query.Add("areaName", "")
-			query.Add("prodIp", "")
-			query.Add("page", strconv.Itoa(page))
-			req.URL.RawQuery = query.Encode()
-			req.Header.Set("Authorization", fmt.Sprintf("%s %s", "Bearer", lr.AccessToken))
-			resp, err := http.DefaultClient.Do(req)
-			if err != nil {
-				log.Errorln(err)
-				break
-			}
-			defer resp.Body.Close()
-
-			buf, err := ioutil.ReadAll(resp.Body)
-			if err != nil {
-				log.Errorln(err)
-				break
-			}
-			log.Printf("[KunyuanSync] SyncMonitorResult: %s", buf)
-			var syncerResult SyncerMonitorResult
-			err = json.Unmarshal(buf, &syncerResult)
+			syncerResult, err := s.GetKunyuanMonitorResult(abbr, page, lr)
 			if err != nil {
 				log.Errorln(err)
 				break
@@ -389,6 +400,7 @@ func (s *KunYuanSyncer) SyncMonitor() {
 					LogicSystemCnName:    record.LogicSystemCnName,
 					VirtFcNum:            record.VirtFcNum,
 					VirtNetNum:           record.VirtNetNum,
+					UpdateTime:           time.Now(),
 				}
 
 				var hh node.Host
