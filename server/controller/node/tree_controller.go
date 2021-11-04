@@ -57,9 +57,10 @@ func Tree(c *gin.Context) {
 			h.JSONR(c, http.StatusOK, resp)
 			return
 		} else {
+			// 没有子群组，返回群组内的节点
 			switch inputs.Type {
 			case "vmGroup":
-				// 没有子群组，返回群组内的节点
+				// 虚拟机类型的群组
 				hosts := node.HostGroup{ID: inputs.ID}.RelatedHosts()
 				// 转换显示名字
 				for _, host := range hosts {
@@ -68,13 +69,13 @@ func Tree(c *gin.Context) {
 				h.JSONR(c, http.StatusOK, hosts)
 				return
 			case "containerGroup":
+				// 容器类型的群组
 				hostGroup := node.HostGroup{ID: inputs.ID}
 				g.Con().Portal.Where(hostGroup).First(&hostGroup)
 				pods := hostGroup.RelatedPods()
 				h.JSONR(c, http.StatusOK, pods)
 				return
 			}
-
 		}
 	}
 

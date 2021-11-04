@@ -1,6 +1,8 @@
 BINARY="rabbit"
-VERSION=1.0.0
+VERSION="0.0.1"
 BUILD=`date +%FT%T%z`
+flags="-X main.BinaryName=$@ -X main.GitCommit=`git rev-parse --short HEAD` -X main.Version=$(VERSION)"
+
 
 PACKAGES=`go list ./... | grep -v /vendor/`
 VETPACKAGES=`go list ./... | grep -v /vendor/ | grep -v /examples/`
@@ -17,7 +19,7 @@ export GOOS=linux
 all: rabbit
 
 rabbit:
-	go build -a
+	go build -ldflags $(flags) -x -a
 
 list:
 	@echo ${PACKAGES}
@@ -45,7 +47,7 @@ vet:
 	@go vet $(VETPACKAGES)
 
 docker:
- 	@docker build -t AlexReagan/rabbit:latest .
+ 	@docker build -t alexreagan/rabbit:latest .
 
 clean:
 	@if [ -f ${BINARY} ] ; then rm ${BINARY} ; fi

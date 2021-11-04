@@ -364,3 +364,22 @@ func HostInfo(c *gin.Context) {
 	h.JSONR(c, host)
 	return
 }
+
+// @Summary 物理子系统类别
+// @Description
+// @Produce json
+// @Success 200 {object} APIGetVariableOutputs
+// @Failure 400 {object} APIGetVariableOutputs
+// @Router /api/v1/host/physical_system_choices [get]
+func HostPhysicalSystemChoices(c *gin.Context) {
+	var data []*h.APIGetVariableItem
+	db := g.Con().Portal.Model(node.Host{}).Debug()
+	db = db.Select("distinct `physical_system` as `label`, `physical_system` as `value`")
+	db = db.Find(&data)
+	resp := h.APIGetVariableOutputs{
+		List:       data,
+		TotalCount: int64(len(data)),
+	}
+	h.JSONR(c, resp)
+	return
+}

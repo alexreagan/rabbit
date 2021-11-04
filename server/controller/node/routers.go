@@ -12,6 +12,7 @@ func Routes(r *gin.Engine) {
 	hostGroup.POST("/create", HostCreate)
 	hostGroup.PUT("/update", HostUpdate)
 	hostGroup.PUT("/batch/update", HostBatchUpdate)
+	hostGroup.GET("/physical_system_choices", HostPhysicalSystemChoices)
 
 	hgGroup := r.Group("/api/v1/host_group")
 	hgGroup.GET("/list", HostGroupList)

@@ -11,20 +11,22 @@ var nodeMap map[int64]*HostGroup
 var GroupPathSeperator = "/"
 
 type HostGroup struct {
-	ID            int64        `json:"id" gorm:"primary_key;column:id"`
-	Type          string       `json:"type" gorm:"column:type;type:enum('vmGroup','containerGroup');default:'vmGroup';comment:"`
-	Name          string       `json:"name" gorm:"column:name;type:string;size:128;comment:"`
-	ParentName    string       `json:"parentName" gorm:"column:parent_name;type:string;size:128;comment:"`
-	ParentId      int64        `json:"parentId" gorm:"column:parent_id;comment:"`
-	Path          string       `json:"path" gorm:"column:path;type:string;size:512;comment:"`
-	PathArray     string       `json:"pathArray" gorm:"column:path_array;type:json;comment:"`
-	CaasServiceId int64        `json:"caasServiceId" gorm:"column:caas_service_id;comment:"`
-	Desc          string       `json:"desc" gorm:"column:desc;type:string;size:256;comment:"`
-	Icon          string       `json:"icon" gorm:"column:icon;type:string;size:512;comment:"`
-	CreateUser    string       `json:"createUser" gorm:"column:create_user;type:string;size:32;comment:"`
-	Children      []*HostGroup `json:"children" gorm:"-"`
-	IsLeaf        bool         `json:"isLeaf" gorm:"-"`
-	IsWarning     bool         `json:"isWarning" gorm:"-"`
+	ID               int64        `json:"id" gorm:"primary_key;column:id"`
+	Type             string       `json:"type" gorm:"column:type;type:enum('vmGroup','containerGroup');default:'vmGroup';comment:"`
+	Name             string       `json:"name" gorm:"column:name;type:string;size:128;comment:"`
+	ParentName       string       `json:"parentName" gorm:"column:parent_name;type:string;size:128;comment:"`
+	ParentId         int64        `json:"parentId" gorm:"column:parent_id;comment:"`
+	Path             string       `json:"path" gorm:"column:path;type:string;size:512;comment:"`
+	PathArray        string       `json:"pathArray" gorm:"column:path_array;type:json;comment:"`
+	CaasServiceId    int64        `json:"caasServiceId" gorm:"column:caas_service_id;comment:"`
+	Desc             string       `json:"desc" gorm:"column:desc;type:string;size:256;comment:"`
+	Icon             string       `json:"icon" gorm:"column:icon;type:string;size:512;comment:"`
+	CreateUser       string       `json:"createUser" gorm:"column:create_user;type:string;size:32;comment:"`
+	Children         []*HostGroup `json:"children" gorm:"-"`
+	SubGroupCount    int          `json:"subGroupCount" gorm:"-"`
+	RelatedHostCount int          `json:"relatedHostCount" gorm:"-"`
+	RelatedPodCount  int          `json:"relatedPodCount" gorm:"-"`
+	IsWarning        bool         `json:"isWarning" gorm:"-"`
 }
 
 func (this HostGroup) TableName() string {
@@ -33,7 +35,7 @@ func (this HostGroup) TableName() string {
 
 func (this HostGroup) GetParentName() string {
 	var hostGroup HostGroup
-	db := g.Con().Portal.Table(HostGroup{}.TableName())
+	db := g.Con().Portal.Model(HostGroup{})
 	db = db.Where("id = ?", this.ParentId)
 	db.Find(&hostGroup)
 	return hostGroup.Name
@@ -56,7 +58,6 @@ func (this HostGroup) BuildTree(id int64) ([]*HostGroup, map[int64]*HostGroup) {
 	// 组建树状结构
 	for _, grp := range hostGroups {
 		// 群组默认为叶子节点，没达到报警条件
-		grp.IsLeaf = true
 		grp.IsWarning = false
 		nodeMap[grp.ID] = grp
 	}
@@ -65,7 +66,6 @@ func (this HostGroup) BuildTree(id int64) ([]*HostGroup, map[int64]*HostGroup) {
 			tree = append(tree, grp)
 		} else if _, ok := nodeMap[grp.ParentId]; ok {
 			nodeMap[grp.ParentId].Children = append(nodeMap[grp.ParentId].Children, grp)
-			nodeMap[grp.ParentId].IsLeaf = len(nodeMap[grp.ParentId].Children) == 0
 
 			// 设置报警状态
 			if grp.MeetWarningCondition() == true {
@@ -84,6 +84,12 @@ func (this HostGroup) BuildTree(id int64) ([]*HostGroup, map[int64]*HostGroup) {
 			}
 		}
 	}
+
+	for _, grp := range nodeMap {
+		grp.SubGroupCount = len(grp.Children)
+		grp.RelatedHostCount = len(HostGroup{ID: grp.ID}.RelatedHosts())
+		grp.RelatedPodCount = len(HostGroup{ID: grp.ID}.RelatedPods())
+	}
 	return tree, nodeMap
 }
 
@@ -98,7 +104,7 @@ func (this HostGroup) GetPath() []string {
 	id := this.ID
 	for {
 		hostGroup := &HostGroup{}
-		db := g.Con().Portal.Table(HostGroup{}.TableName())
+		db := g.Con().Portal.Model(HostGroup{})
 		db.Where("id=?", id).Find(&hostGroup)
 		pathArray = append(pathArray, hostGroup.Name)
 
@@ -129,13 +135,13 @@ func (this HostGroup) GetChildren() []*HostGroup {
 
 func (this HostGroup) RelatedHosts() []*Host {
 	var hostGroupRels []*HostGroupRel
-	g.Con().Portal.Table(HostGroupRel{}.TableName()).Where("`group_id` = ?", this.ID).Find(&hostGroupRels)
+	g.Con().Portal.Model(HostGroupRel{}).Where("`group_id` = ?", this.ID).Find(&hostGroupRels)
 	var hostIds []int64
 	for _, t := range hostGroupRels {
 		hostIds = append(hostIds, t.HostID)
 	}
 	var hosts []*Host
-	g.Con().Portal.Table(Host{}.TableName()).Where("id in (?)", hostIds).Find(&hosts)
+	g.Con().Portal.Model(Host{}).Where("id in (?)", hostIds).Find(&hosts)
 
 	// 添加报警标识
 	for _, host := range hosts {
