@@ -3,16 +3,16 @@
 package server
 
 import (
+	"github.com/alexreagan/rabbit/server/controller/node"
+	"github.com/alexreagan/rabbit/server/controller/portal"
+	"github.com/alexreagan/rabbit/server/controller/uic"
+	"github.com/alexreagan/rabbit/server/utils"
 	sentrygin "github.com/getsentry/sentry-go/gin"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
 	"net/http"
-	"rabbit/server/controller/node"
-	"rabbit/server/controller/portal"
-	"rabbit/server/controller/uic"
-	"rabbit/server/utils"
 
 	//_ "rabbit/docs"
 	"github.com/fvbock/endless"

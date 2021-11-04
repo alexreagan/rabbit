@@ -1,8 +1,8 @@
 package node
 
 import (
+	"github.com/alexreagan/rabbit/g"
 	"github.com/spf13/viper"
-	"rabbit/g"
 	"time"
 )
 

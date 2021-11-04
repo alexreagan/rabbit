@@ -15,7 +15,7 @@
 package node
 
 import (
-	"rabbit/g"
+	"github.com/alexreagan/rabbit/g"
 )
 
 // +---------+------------------+------+-----+---------+-------+

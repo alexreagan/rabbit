@@ -2,11 +2,11 @@ package uic
 
 import (
 	"errors"
+	"github.com/alexreagan/rabbit/g"
+	h "github.com/alexreagan/rabbit/server/helper"
+	"github.com/alexreagan/rabbit/server/model/uic"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
-	"rabbit/g"
-	h "rabbit/server/helper"
-	"rabbit/server/model/uic"
 )
 
 type APIGetDepartmentListsInputs struct {

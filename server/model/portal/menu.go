@@ -1,8 +1,8 @@
 package portal
 
 import (
-	"rabbit/g"
-	"rabbit/server/model/uic"
+	"github.com/alexreagan/rabbit/g"
+	"github.com/alexreagan/rabbit/server/model/uic"
 )
 
 type Menu struct {

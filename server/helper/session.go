@@ -7,10 +7,10 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
+	"github.com/alexreagan/rabbit/g"
+	"github.com/alexreagan/rabbit/server/model/uic"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
-	"rabbit/g"
-	"rabbit/server/model/uic"
 )
 
 type WebSession struct {

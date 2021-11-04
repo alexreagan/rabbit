@@ -2,12 +2,12 @@ package node
 
 import (
 	"encoding/json"
+	"github.com/alexreagan/rabbit/g"
+	h "github.com/alexreagan/rabbit/server/helper"
+	"github.com/alexreagan/rabbit/server/model/node"
+	u "github.com/alexreagan/rabbit/server/utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"rabbit/g"
-	h "rabbit/server/helper"
-	"rabbit/server/model/node"
-	u "rabbit/server/utils"
 	"strconv"
 	"strings"
 )
@@ -308,7 +308,7 @@ func HostGroupRelatedHosts(c *gin.Context) {
 
 	hostGroup := node.HostGroup{}
 	hostGroup.Path = groupPath
-	if dt := g.Con().Portal.Model(hostGroup).Where(&hostGroup); dt.Error != nil {
+	if dt := g.Con().Portal.Debug().Model(hostGroup).Where(&hostGroup).Find(&hostGroup); dt.Error != nil {
 		h.JSONR(c, h.ExpecStatus, dt.Error)
 		return
 	}

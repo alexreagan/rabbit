@@ -21,7 +21,7 @@ func Routes(r *gin.Engine) {
 	hgGroup.PUT("/update", HostGroupPut)
 	hgGroup.POST("/delete/:id", HostGroupDelete)
 	hgGroup.POST("/bind_host", BindHostToHostGroup)
-	hgGroup.GET("related_hosts", HostGroupRelatedHosts)
+	hgGroup.GET("/related_hosts", HostGroupRelatedHosts)
 
 	tGroup := r.Group("/api/v1/tree")
 	tGroup.GET("", Tree)

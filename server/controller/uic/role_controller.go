@@ -1,11 +1,11 @@
 package uic
 
 import (
+	"github.com/alexreagan/rabbit/g"
+	h "github.com/alexreagan/rabbit/server/helper"
+	"github.com/alexreagan/rabbit/server/model/uic"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"rabbit/g"
-	h "rabbit/server/helper"
-	"rabbit/server/model/uic"
 )
 
 type APIGetRoleSearchInputs struct {
