@@ -375,6 +375,7 @@ func HostPhysicalSystemChoices(c *gin.Context) {
 	var data []*h.APIGetVariableItem
 	db := g.Con().Portal.Model(node.Host{}).Debug()
 	db = db.Select("distinct `physical_system` as `label`, `physical_system` as `value`")
+	db = db.Order("`physical_system`")
 	db = db.Find(&data)
 	resp := h.APIGetVariableOutputs{
 		List:       data,

@@ -47,7 +47,7 @@ func HostGroupList(c *gin.Context) {
 	var totalCount int64
 	db := g.Con().Portal.Model(node.HostGroup{})
 	if inputs.Name != "" {
-		db.Where("name regexp ?", inputs.Name)
+		db.Where("path regexp ?", inputs.Name)
 	}
 	db.Count(&totalCount)
 	db.Offset(offset).Limit(limit).Find(&hostGroups)
@@ -259,6 +259,9 @@ func HostGroupPut(c *gin.Context) {
 		h.JSONR(c, h.BadStatus, dt.Error)
 		return
 	}
+
+	// 调整叶子节点
+	hostGroup.UpdateChildrenPath()
 
 	h.JSONR(c, h.OKStatus, hostGroup)
 	return

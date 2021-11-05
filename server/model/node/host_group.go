@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/alexreagan/rabbit/g"
 	"github.com/alexreagan/rabbit/server/model/caas"
+	"strings"
 )
 
 var tree []*HostGroup
@@ -31,6 +32,25 @@ type HostGroup struct {
 
 func (this HostGroup) TableName() string {
 	return "host_group"
+}
+
+func (this *HostGroup) UpdateChildrenPath() {
+	groupPathArray := this.GetPath()
+	children := this.GetRTChildren()
+	for _, child := range children {
+		tGroupPath := groupPathArray
+		tGroupPath = append(tGroupPath, child.Name)
+		groupPathArrayBytes, _ := json.Marshal(tGroupPath)
+
+		db := g.Con().Portal.Model(HostGroup{})
+		db = db.Where("id = ?", child.ID).Updates(
+			HostGroup{
+				Path:      strings.Join(tGroupPath, GroupPathSeperator),
+				PathArray: string(groupPathArrayBytes),
+			})
+		child.UpdateChildrenPath()
+	}
+	return
 }
 
 func (this HostGroup) GetParentName() string {
@@ -88,7 +108,7 @@ func (this HostGroup) BuildTree(id int64) ([]*HostGroup, map[int64]*HostGroup) {
 	for _, grp := range nodeMap {
 		grp.SubGroupCount = len(grp.Children)
 		grp.RelatedHostCount = len(HostGroup{ID: grp.ID}.RelatedHosts())
-		grp.RelatedPodCount = len(HostGroup{ID: grp.ID}.RelatedPods())
+		grp.RelatedPodCount = len(HostGroup{ID: grp.ID, CaasServiceId: grp.CaasServiceId}.RelatedPods())
 	}
 	return tree, nodeMap
 }
@@ -105,7 +125,7 @@ func (this HostGroup) GetPath() []string {
 	for {
 		hostGroup := &HostGroup{}
 		db := g.Con().Portal.Model(HostGroup{})
-		db.Where("id=?", id).Find(&hostGroup)
+		db.Where("id = ?", id).Find(&hostGroup)
 		pathArray = append(pathArray, hostGroup.Name)
 
 		if hostGroup.ParentId == 0 {
@@ -124,6 +144,13 @@ func (this HostGroup) GetJsonPath() string {
 	reversePath := this.GetPath()
 	path, _ := json.Marshal(reversePath)
 	return string(path)
+}
+
+func (this HostGroup) GetRTChildren() []*HostGroup {
+	var hostGroups []*HostGroup
+	dt := g.Con().Portal.Model(HostGroup{})
+	dt = dt.Where("parent_id = ?", this.ID).Find(&hostGroups)
+	return hostGroups
 }
 
 func (this HostGroup) GetChildren() []*HostGroup {
