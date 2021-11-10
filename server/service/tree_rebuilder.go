@@ -26,6 +26,10 @@ func (s *TreeReBuilder) Close() {
 }
 
 func (s *TreeReBuilder) Start() {
+	if viper.GetBool("tree.rebuild.enable") == true {
+		return
+	}
+
 	s.wg.Add(1)
 	go func() {
 		s.StartReBuilder()

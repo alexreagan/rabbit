@@ -239,9 +239,10 @@ type APIGetChartStatOutputs struct {
 func ChartVMStat(c *gin.Context) {
 	// 按照物理子系统统计所有机器使用情况
 	var totalStat []APIGetChartStat
-	db := g.Con().Portal.Debug().Table(node.Host{}.TableName())
+	db := g.Con().Portal.Debug().Model(node.Host{})
 	db = db.Select("`host`.`physical_system` as name, count(*) as total_host_count, sum(`host`.`cpu_number`) as total_cpu_count")
 	db = db.Group("`host`.`physical_system`")
+	db = db.Order("`host`.`physical_system`")
 	db = db.Find(&totalStat)
 
 	var totalCpuCount int64
@@ -258,17 +259,18 @@ func ChartVMStat(c *gin.Context) {
 	// 已关联到组的机器
 	//var subStatOutputs []APIGetChartStatOutputs
 	var ids []int64
-	db = g.Con().Portal.Debug().Table(node.Host{}.TableName())
+	db = g.Con().Portal.Debug().Model(node.Host{})
 	db = db.Select("distinct(`host`.`id`)")
 	db = db.Joins("left join `host_group_rel` on `host`.id=`host_group_rel`.host_id")
 	db = db.Where("`host_group_rel`.group_id is not null;")
 	db = db.Find(&ids)
 
 	// 查询所有机器
-	db = g.Con().Portal.Debug().Table(node.Host{}.TableName())
+	db = g.Con().Portal.Debug().Model(node.Host{})
 	db = db.Select("`host`.`physical_system` as `name`, count(*) as total_host_count, sum(`host`.`cpu_number`) as total_cpu_count")
 	db = db.Where("id in (?)", ids)
 	db = db.Group("`host`.`physical_system`")
+	db = db.Order("`host`.`physical_system`")
 	db = db.Find(&usedStat)
 
 	var usedCpuCount int64

@@ -9,20 +9,6 @@ import (
 	"net/http"
 )
 
-type APIGetVariableItem struct {
-	Label string `json:"label"`
-	Value string `json:"value"`
-}
-
-type APIGetVariableInputs struct {
-	Name string `json:"name"`
-}
-
-type APIGetVariableOutputs struct {
-	List       []*APIGetVariableItem `json:"list"`
-	TotalCount int64                 `json:"totalCount"`
-}
-
 func EnvList(c *gin.Context) {
 	var inputs node.APIGetEnvListInputs
 
@@ -31,9 +17,9 @@ func EnvList(c *gin.Context) {
 		return
 	}
 
-	var variables []*APIGetVariableItem
+	var variables []*h.APIGetVariableItem
 	for key, val := range viper.GetStringMapString(fmt.Sprintf("%s", inputs.Name)) {
-		variables = append(variables, &APIGetVariableItem{
+		variables = append(variables, &h.APIGetVariableItem{
 			Label: val,
 			Value: key,
 		})

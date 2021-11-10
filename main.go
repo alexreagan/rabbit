@@ -61,6 +61,7 @@ func main() {
 		g.Con().Portal.AutoMigrate(&caas.ServicePortRel{})
 		g.Con().Portal.AutoMigrate(&caas.Pod{})
 		g.Con().Portal.AutoMigrate(&caas.ServicePodRel{})
+		g.Con().Portal.AutoMigrate(&node.Alert{})
 	}
 
 	// start gin server
@@ -68,21 +69,15 @@ func main() {
 
 	// sync hosts from kunyuan
 	kunyuanSyncer := service.InitKunYuanSyncer()
-	if viper.GetBool("kunyuan_syncer.enable") == true {
-		kunyuanSyncer.Start()
-	}
+	kunyuanSyncer.Start()
 
 	// sync hosts from caas
 	caasSyncer := service.InitCaasSyncer()
-	if viper.GetBool("caas_syncer.enable") == true {
-		caasSyncer.Start()
-	}
+	caasSyncer.Start()
 
 	// tree ReBuilder
 	treeReBuilder := service.InitTreeReBuilder()
-	if viper.GetBool("tree.rebuild.enable") == true {
-		treeReBuilder.Start()
-	}
+	treeReBuilder.Start()
 
 	// process signal
 	quit := make(chan os.Signal, 1)
