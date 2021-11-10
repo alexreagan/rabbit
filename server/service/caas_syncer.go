@@ -33,6 +33,10 @@ func (s *CaasSyncer) Close() {
 }
 
 func (s *CaasSyncer) Start() {
+	if viper.GetBool("caas_syncer.enable") == false {
+		return
+	}
+
 	s.wg.Add(1)
 	go func() {
 		s.StartSyncer()

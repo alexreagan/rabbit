@@ -359,7 +359,29 @@ func HostBatchUpdate(c *gin.Context) {
 func HostInfo(c *gin.Context) {
 	id := c.Param("id")
 	host := node.Host{}
-	g.Con().Portal.Table(host.TableName()).Where("id = ?", id).First(&host)
+	g.Con().Portal.Model(host).Where("id = ?", id).First(&host)
+	host.Groups = host.RelatedGroups()
+	h.JSONR(c, host)
+	return
+}
+
+// @Summary 根据机器ID或IP获取机器详细信息
+// @Description
+// @Produce json
+// @Param id query string true "根据机器ID获取机器详细信息"
+// @Param ip query string true "根据机器IP获取机器详细信息"
+// @Success 200 {object} node.Host
+// @Failure 400 {object} node.Host
+// @Router /api/v1/host/detail [get]
+func HostDetail(c *gin.Context) {
+	id := c.Query("id")
+	ip := c.Query("ip")
+	host := node.Host{}
+	if id != "" {
+		g.Con().Portal.Model(host).Where("id = ?", id).First(&host)
+	} else if ip != "" {
+		g.Con().Portal.Model(host).Where("ip = ?", ip).First(&host)
+	}
 	host.Groups = host.RelatedGroups()
 	h.JSONR(c, host)
 	return

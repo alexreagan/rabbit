@@ -86,8 +86,8 @@ type APIPostCreateHostGroup struct {
 	CaasServiceId int64  `json:"caasServiceId" form:"caasServiceId"`
 	ParentName    string `json:"parentName" form:"parentName"`
 	ParentId      int64  `json:"parentId" form:"parentId"`
-	Icon          string `json:"icon" form:"icon"`
-	Desc          string `json:"desc" form:"desc"`
+	//Icon          string `json:"icon" form:"icon"`
+	Desc string `json:"desc" form:"desc"`
 }
 
 // @Summary 创建host group信息
@@ -119,7 +119,6 @@ func HostGroupCreate(c *gin.Context) {
 		ParentName:    inputs.ParentName,
 		ParentId:      inputs.ParentId,
 		CaasServiceId: inputs.CaasServiceId,
-		Icon:          inputs.Icon,
 		Path:          strings.Join(pGroupPathArray, node.GroupPathSeperator),
 		PathArray:     string(hostGroupPathArrayBytes),
 		Desc:          inputs.Desc,
@@ -249,7 +248,6 @@ func HostGroupPut(c *gin.Context) {
 	hostGroup.CaasServiceId = inputs.CaasServiceId
 	hostGroup.ParentName = inputs.ParentName
 	hostGroup.ParentId = inputs.ParentId
-	hostGroup.Icon = inputs.Icon
 	hostGroup.Desc = inputs.Desc
 	hostGroup.Path = strings.Join(pGroupPathArray, node.GroupPathSeperator)
 	hostGroup.PathArray = string(hostGroupPathArrayBytes)

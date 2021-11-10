@@ -8,6 +8,7 @@ func Routes(r *gin.Engine) {
 	hostGroup := r.Group("/api/v1/host")
 	hostGroup.GET("/get", HostGet)
 	hostGroup.GET("/list", HostList)
+	hostGroup.GET("/detail", HostDetail)
 	hostGroup.GET("/info/:id", HostInfo)
 	hostGroup.POST("/create", HostCreate)
 	hostGroup.PUT("/update", HostUpdate)
@@ -43,4 +44,8 @@ func Routes(r *gin.Engine) {
 	podGroup := r.Group("/api/v1/caas/pod")
 	podGroup.GET("/list", CaasPodList)
 	podGroup.GET("/:id", CaasPodGet)
+
+	alertGroup := r.Group("/api/v1/alert")
+	alertGroup.GET("/list", AlertList)
+	alertGroup.GET("/physical_system_choices", AlertPhysicalSystemChoices)
 }
