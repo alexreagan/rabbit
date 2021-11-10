@@ -223,6 +223,8 @@ func (this HostGroup) RelatedHosts() []*Host {
 
 	// 报警信息
 	for _, h := range hosts {
+		h.Type = "host"
+
 		alt, ok := alertMap[h.IP]
 		if ok {
 			h.IsWarning = alt.Resolved == false
@@ -233,6 +235,7 @@ func (this HostGroup) RelatedHosts() []*Host {
 	return hosts
 }
 
+// 判断群组是否满足报警条件
 func (this HostGroup) MeetWarningCondition() bool {
 	hosts := this.RelatedHosts()
 	for _, host := range hosts {
