@@ -9,6 +9,7 @@ import (
 	"github.com/alexreagan/rabbit/server/model/caas"
 	"github.com/alexreagan/rabbit/server/model/node"
 	"github.com/alexreagan/rabbit/server/model/portal"
+	"github.com/alexreagan/rabbit/server/model/uic"
 	"github.com/alexreagan/rabbit/server/service"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -44,9 +45,11 @@ func main() {
 		//migrate database
 		//g.Con().Uic.AutoMigrate(&uic.User{})
 		//g.Con().Uic.AutoMigrate(&uic.Session{})
-		//g.Con().Uic.AutoMigrate(&uic.Role{})
-		//g.Con().Uic.AutoMigrate(&uic.Permission{})
-		//g.Con().Uic.AutoMigrate(&uic.Department{})
+		g.Con().Portal.AutoMigrate(&uic.Role{})
+		g.Con().Portal.AutoMigrate(&uic.Perm{})
+		g.Con().Portal.AutoMigrate(&uic.RolePermRel{})
+		g.Con().Portal.AutoMigrate(&uic.UserRoleRel{})
+		//g.Con().Portal.AutoMigrate(&uic.Depart{})
 		g.Con().Portal.AutoMigrate(&portal.Menu{})
 		g.Con().Portal.AutoMigrate(&portal.MenuPermission{})
 		g.Con().Portal.AutoMigrate(&node.Host{})

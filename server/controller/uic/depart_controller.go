@@ -9,7 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type APIGetDepartmentListsInputs struct {
+type APIGetDepartListsInputs struct {
 	Name     string `json:"host" form:"name"`
 	Priority int    `json:"priority" form:"priority"`
 	Status   string `json:"status" form:"status"`
@@ -20,11 +20,11 @@ type APIGetDepartmentListsInputs struct {
 	Page int `json:"page" form:"page"`
 }
 
-func (input APIGetDepartmentListsInputs) checkInputsContain() error {
+func (input APIGetDepartListsInputs) checkInputsContain() error {
 	return nil
 }
 
-func (input APIGetDepartmentListsInputs) collectDBFilters(database *gorm.DB, tableName string, columns []string) *gorm.DB {
+func (input APIGetDepartListsInputs) collectDBFilters(database *gorm.DB, tableName string, columns []string) *gorm.DB {
 	filterDB := database.Table(tableName)
 	// nil columns mean select all columns
 	if columns != nil && len(columns) != 0 {
@@ -37,7 +37,7 @@ func (input APIGetDepartmentListsInputs) collectDBFilters(database *gorm.DB, tab
 }
 
 func DepartmentLists(c *gin.Context) {
-	var inputs APIGetDepartmentListsInputs
+	var inputs APIGetDepartListsInputs
 	//set default
 	inputs.Page = -1
 	inputs.Limit = -1
@@ -51,9 +51,9 @@ func DepartmentLists(c *gin.Context) {
 		return
 	}
 	//for get correct table name
-	f := uic.Department{}
+	f := uic.Depart{}
 	db := inputs.collectDBFilters(g.Con().Uic, f.TableName(), nil)
-	var data []uic.Department
+	var data []uic.Depart
 	//if no specific, will give return first 2000 records
 	if inputs.Page == -1 && inputs.Limit == -1 {
 		inputs.Limit = 2000

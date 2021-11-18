@@ -15,8 +15,8 @@ type Menu struct {
 	Icon     string `json:"icon" gorm:"column:icon;type:string;size:512;comment:"`
 	OrderNum int64  `json:"orderNum" gorm:"column:order_num;comment:"`
 	//Open     string `json:"open" gorm:"column:open;type:string;size:128;comment:"`
-	List  []*Menu           `json:"list" gorm:"-"`
-	Perms []*uic.Permission `json:"perms" gorm:"-"`
+	List  []*Menu     `json:"list" gorm:"-"`
+	Perms []*uic.Perm `json:"perms" gorm:"-"`
 }
 
 func (this Menu) TableName() string {

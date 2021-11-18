@@ -1,6 +1,8 @@
 package caas
 
-import "time"
+import (
+	"time"
+)
 
 type Pod struct {
 	ID          int64     `json:"id" gorm:"primary_key;column:id"`

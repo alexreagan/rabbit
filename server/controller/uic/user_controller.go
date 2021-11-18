@@ -3,6 +3,7 @@ package uic
 import (
 	"github.com/alexreagan/rabbit/g"
 	h "github.com/alexreagan/rabbit/server/helper"
+	"github.com/alexreagan/rabbit/server/model/gtime"
 	"github.com/alexreagan/rabbit/server/model/uic"
 	"github.com/alexreagan/rabbit/server/utils"
 	"github.com/gin-gonic/gin"
@@ -35,7 +36,7 @@ func (input APIGetUserListInputs) checkInputsContain() error {
 // @Success 200 {object} APIGetUserListOutputs
 // @Failure 400 {object} APIGetUserListOutputs
 // @Router /api/v1/user/list [get]
-func List(c *gin.Context) {
+func UserList(c *gin.Context) {
 	var inputs APIGetUserListInputs
 	if err := c.Bind(&inputs); err != nil {
 		h.JSONR(c, h.BadStatus, err)
@@ -71,16 +72,16 @@ func List(c *gin.Context) {
 	return
 }
 
-type APICreateUserInputs struct {
-	UserName   string    `json:"username" form:"username" binding:"required"`
-	CnName     string    `json:"cnName" form:"cn_name" binding:"required"`
-	Password   string    `json:"password" form:"password" binding:"required"`
-	JgygUserId string    `json:"jgygUserId" form:"jgyg_user_id" binding:"required"`
-	Birthday   time.Time `json:"birthday" form:"birthday"`
+type APIUserCreateInputs struct {
+	UserName   string      `json:"username" form:"username" binding:"required"`
+	CnName     string      `json:"cnName" form:"cn_name" binding:"required"`
+	Password   string      `json:"password" form:"password" binding:"required"`
+	JgygUserId string      `json:"jgygUserId" form:"jgyg_user_id" binding:"required"`
+	Birthday   gtime.GTime `json:"birthday" form:"birthday"`
 }
 
-func CreateUser(c *gin.Context) {
-	var inputs APICreateUserInputs
+func UserCreate(c *gin.Context) {
+	var inputs APIUserCreateInputs
 	err := c.Bind(&inputs)
 
 	switch {
@@ -133,13 +134,99 @@ func CreateUser(c *gin.Context) {
 	return
 }
 
-func Info(c *gin.Context) {
+type APIGetUserInfoOutputs struct {
+	User  *uic.User   `json:"user"`
+	Roles []*uic.Role `json:"roles"`
+}
+
+// @Summary 查看用户信息
+// @Description
+// @Produce json
+// @Param request query string true "查看用户信息"
+// @Success 200 {object} APIGetUserInfoOutputs
+// @Failure 400 {object} APIGetUserInfoOutputs
+// @Router /api/v1/user/info [get]
+func UserInfo(c *gin.Context) {
+	_, err := h.GetUser(c)
+	if err != nil && err.Error() != "record not found" {
+		h.JSONR(c, http.StatusBadRequest, err)
+		return
+	}
+
+	id := c.Query("id")
+	var user *uic.User
+	db := g.Con().Uic
+	db = db.Where("id = ?", id).Find(&user)
+
+	var roles []*uic.Role
+	dt := g.Con().Portal.Model(uic.Role{})
+	dt = dt.Select("`role`.*")
+	dt = dt.Joins("left join `user_role_rel` on `user_role_rel`.`role` = `role`.id")
+	dt = dt.Where("`user_role_rel`.`user` = ?", id)
+	dt = dt.Find(&roles)
+
+	resp := &APIGetUserInfoOutputs{
+		User:  user,
+		Roles: roles,
+	}
+	h.JSONR(c, http.StatusOK, resp)
+	return
+}
+
+// @Summary 查看当前用户信息
+// @Description
+// @Produce json
+// @Success 200 {object} uic.User
+// @Failure 400 {object} uic.User
+// @Router /api/v1/user/myself [get]
+func UserMyself(c *gin.Context) {
 	user, err := h.GetUser(c)
 	if err != nil && err.Error() != "record not found" {
 		h.JSONR(c, http.StatusBadRequest, err)
 		return
 	}
 
+	h.JSONR(c, http.StatusOK, user)
+	return
+}
+
+type APIPutUserUpdateInputs struct {
+	ID       int64   `json:"id" form:"id"`
+	RoleList []int64 `json:"roleList" form:"roleList"`
+}
+
+// @Summary 更新用户信息
+// @Description
+// @Produce json
+// @Param APIPutUserUpdateInputs query APIPutUserUpdateInputs true "根据查询条件分页查询用户列表"
+// @Success 200 {object} APIPutUserUpdateOutputs
+// @Failure 400 {object} APIPutUserListOutputs
+// @Router /api/v1/user/update [put]
+func UserUpdate(c *gin.Context) {
+	var inputs APIPutUserUpdateInputs
+
+	if err := c.Bind(&inputs); err != nil {
+		h.JSONR(c, h.BadStatus, err)
+		return
+	}
+	var user *uic.User
+	db := g.Con().Uic
+	db = db.Where("id = ?", inputs.ID).Find(&user)
+	if db.Error != nil {
+		h.JSONR(c, http.StatusExpectationFailed, db.Error)
+		return
+	}
+
+	var rels []*uic.UserRoleRel
+	dt := g.Con().Portal.Model(uic.UserRoleRel{})
+	dt.Where("user = ?", inputs.ID).Delete(&rels)
+
+	for _, v := range inputs.RoleList {
+		dt.Create(&uic.UserRoleRel{
+			User: inputs.ID,
+			Role: v,
+		})
+	}
 	h.JSONR(c, http.StatusOK, user)
 	return
 }

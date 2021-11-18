@@ -300,8 +300,7 @@ func HostUpdate(c *gin.Context) {
 type APIPostHostBatchUpdateInputs struct {
 	IDs      []int64 `json:"ids" form:"ids"`
 	GroupIds []int64 `json:"groupIds" form:"groupIds"`
-	//Path     string  `json:"path" form:"path"`
-	DevOwner string `json:"devOwner" form:"devOwner"`
+	DevOwner string  `json:"devOwner" form:"devOwner"`
 }
 
 // @Summary 更新机器信息
@@ -318,11 +317,9 @@ func HostBatchUpdate(c *gin.Context) {
 		h.JSONR(c, h.BadStatus, err)
 		return
 	}
-	log.Printf("%+v", inputs)
 
 	tx := g.Con().Portal.Begin()
 	for _, id := range inputs.IDs {
-		log.Println(id)
 		if dt := tx.Model(node.Host{}).Where("id = ?", id).Updates(node.Host{
 			DevOwner: inputs.DevOwner,
 		}); dt.Error != nil {
@@ -335,15 +332,17 @@ func HostBatchUpdate(c *gin.Context) {
 			dt.Rollback()
 			return
 		}
+
 		for _, grpId := range inputs.GroupIds {
 			if dt = dt.Create(&node.HostGroupRel{HostID: id, GroupID: grpId}); dt.Error != nil {
+				log.Printf("%+v", dt.Error)
 				h.JSONR(c, h.ExpecStatus, dt.Error)
 				dt.Rollback()
 				return
 			}
 		}
-		tx.Commit()
 	}
+	tx.Commit()
 
 	h.JSONR(c, h.OKStatus, inputs)
 	return

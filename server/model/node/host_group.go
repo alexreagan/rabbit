@@ -7,8 +7,8 @@ import (
 	"strings"
 )
 
-var tree []*HostGroup
-var nodeMap map[int64]*HostGroup
+var globalTree []*HostGroup
+var globalNodeMap map[int64]*HostGroup
 var GroupPathSeperator = "/"
 
 type HostGroup struct {
@@ -29,7 +29,6 @@ type HostGroup struct {
 	ChildrenHostCount int          `json:"childrenHostCount" gorm:"-"`
 	ChildrenPodCount  int          `json:"childrenPodCount" gorm:"-"`
 	IsWarning         bool         `json:"isWarning" gorm:"-"`
-	//Icon              string       `json:"icon" gorm:"column:icon;type:string;size:512;comment:"`
 }
 
 func (this HostGroup) TableName() string {
@@ -75,11 +74,11 @@ func (this HostGroup) GetParentName() string {
 }
 
 func (this HostGroup) BuildTree(id int64) ([]*HostGroup, map[int64]*HostGroup) {
-	if tree != nil {
-		return tree, nodeMap
+	if globalTree != nil {
+		return globalTree, globalNodeMap
 	}
 	var hostGroups []*HostGroup
-	nodeMap = make(map[int64]*HostGroup)
+	globalNodeMap = make(map[int64]*HostGroup)
 
 	db := g.Con().Portal.Debug().Model(HostGroup{})
 	if id != 0 {
@@ -92,13 +91,13 @@ func (this HostGroup) BuildTree(id int64) ([]*HostGroup, map[int64]*HostGroup) {
 	for _, grp := range hostGroups {
 		// 群组默认为叶子节点，没达到报警条件
 		grp.IsWarning = false
-		nodeMap[grp.ID] = grp
+		globalNodeMap[grp.ID] = grp
 	}
 	for _, grp := range hostGroups {
 		if grp.ParentId == 0 {
-			tree = append(tree, grp)
-		} else if _, ok := nodeMap[grp.ParentId]; ok {
-			nodeMap[grp.ParentId].Children = append(nodeMap[grp.ParentId].Children, grp)
+			globalTree = append(globalTree, grp)
+		} else if _, ok := globalNodeMap[grp.ParentId]; ok {
+			globalNodeMap[grp.ParentId].Children = append(globalNodeMap[grp.ParentId].Children, grp)
 
 			// 设置报警状态
 			if grp.MeetWarningCondition() == true {
@@ -111,14 +110,14 @@ func (this HostGroup) BuildTree(id int64) ([]*HostGroup, map[int64]*HostGroup) {
 					if t.ParentId == 0 {
 						break
 					}
-					nodeMap[t.ParentId].IsWarning = true
-					t = nodeMap[t.ParentId]
+					globalNodeMap[t.ParentId].IsWarning = true
+					t = globalNodeMap[t.ParentId]
 				}
 			}
 		}
 	}
 
-	for _, grp := range nodeMap {
+	for _, grp := range globalNodeMap {
 		grp.SubGroupCount = len(grp.Children)
 		grp.RelatedHostCount = len(HostGroup{ID: grp.ID}.RelatedHosts())
 		grp.RelatedPodCount = len(HostGroup{ID: grp.ID, CaasServiceId: grp.CaasServiceId}.RelatedPods())
@@ -133,19 +132,19 @@ func (this HostGroup) BuildTree(id int64) ([]*HostGroup, map[int64]*HostGroup) {
 				if t.ParentId == 0 {
 					break
 				}
-				nodeMap[t.ParentId].ChildrenHostCount += grp.ChildrenHostCount
-				nodeMap[t.ParentId].ChildrenPodCount += grp.ChildrenPodCount
+				globalNodeMap[t.ParentId].ChildrenHostCount += grp.ChildrenHostCount
+				globalNodeMap[t.ParentId].ChildrenPodCount += grp.ChildrenPodCount
 
-				t = nodeMap[t.ParentId]
+				t = globalNodeMap[t.ParentId]
 			}
 		}
 	}
-	return tree, nodeMap
+	return globalTree, globalNodeMap
 }
 
 func (this HostGroup) ReBuildTree() ([]*HostGroup, map[int64]*HostGroup) {
-	tree = nil
-	nodeMap = nil
+	globalTree = nil
+	globalNodeMap = nil
 	return this.BuildTree(0)
 }
 
@@ -184,10 +183,10 @@ func (this HostGroup) GetRTChildren() []*HostGroup {
 }
 
 func (this HostGroup) GetChildren() []*HostGroup {
-	if nodeMap == nil {
+	if globalNodeMap == nil {
 		this.BuildTree(0)
 	}
-	return nodeMap[this.ID].Children
+	return globalNodeMap[this.ID].Children
 }
 
 func (this HostGroup) RelatedHosts() []*Host {

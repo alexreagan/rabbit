@@ -16,6 +16,10 @@ func NewGTime(v time.Time) GTime {
 	return GTime{Time: v}
 }
 
+func Now() GTime {
+	return GTime{Time: time.Now()}
+}
+
 func (t GTime) MarshalJSON() ([]byte, error) {
 	var zeroTime time.Time
 	if t.Time.UnixNano() == zeroTime.UnixNano() {

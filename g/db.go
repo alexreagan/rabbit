@@ -27,7 +27,7 @@ func InitDBPool() (err error) {
 		return
 	}
 	uicdDB, err := uicd.DB()
-	uicdDB.SetMaxIdleConns(10)
+	uicdDB.SetMaxIdleConns(100)
 	uicdDB.SetMaxOpenConns(100)
 	uicdDB.SetConnMaxLifetime(time.Minute)
 	dbp.Uic = uicd
@@ -38,7 +38,7 @@ func InitDBPool() (err error) {
 		return
 	}
 	dashdDB, err := dashd.DB()
-	dashdDB.SetMaxIdleConns(10)
+	dashdDB.SetMaxIdleConns(100)
 	dashdDB.SetMaxOpenConns(100)
 	dashdDB.SetConnMaxLifetime(time.Minute)
 	dbp.Portal = dashd

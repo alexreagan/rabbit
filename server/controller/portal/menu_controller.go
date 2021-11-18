@@ -13,8 +13,8 @@ type APIGetMenuNavListInputs struct {
 }
 
 type APIGetMenuNavListOutputs struct {
-	Menus       []*portal.Menu    `json:"menus"`
-	Permissions []*uic.Permission `json:"permissions"`
+	Menus       []*portal.Menu `json:"menus"`
+	Permissions []*uic.Perm    `json:"permissions"`
 }
 
 func MenuNav(c *gin.Context) {
@@ -24,8 +24,8 @@ func MenuNav(c *gin.Context) {
 		return
 	}
 
-	var permissions []*uic.Permission
-	g.Con().Portal.Table(uic.Permission{}.TableName()).Find(&permissions)
+	var permissions []*uic.Perm
+	g.Con().Portal.Table(uic.Perm{}.TableName()).Find(&permissions)
 
 	resp := &APIGetMenuNavListOutputs{
 		Menus:       portal.Menu{}.BuildTree(),

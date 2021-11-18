@@ -1402,7 +1402,7 @@ var doc = `{
                 "perms": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/uic.Permission"
+                        "$ref": "#/definitions/uic.Perm"
                     }
                 },
                 "type": {
@@ -1443,7 +1443,7 @@ var doc = `{
                 }
             }
         },
-        "uic.Permission": {
+        "uic.Perm": {
             "type": "object",
             "properties": {
                 "cnName": {

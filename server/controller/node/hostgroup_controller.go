@@ -23,10 +23,10 @@ type APIGetHostGroupListOutputs struct {
 	TotalCount int64             `json:"totalCount"`
 }
 
-// @Summary 更新host group信息
+// @Summary 获取host group列表
 // @Description
 // @Produce json
-// @Param APIGetHostGroupListInputs query APIGetHostGroupListInputs true "更新host group信息"
+// @Param APIGetHostGroupListInputs query APIGetHostGroupListInputs true "获取host group列表"
 // @Success 200 {object} APIGetHostGroupListOutputs
 // @Failure 400 {object} APIGetHostGroupListOutputs
 // @Router /api/v1/host_group/list [get]
@@ -86,8 +86,7 @@ type APIPostCreateHostGroup struct {
 	CaasServiceId int64  `json:"caasServiceId" form:"caasServiceId"`
 	ParentName    string `json:"parentName" form:"parentName"`
 	ParentId      int64  `json:"parentId" form:"parentId"`
-	//Icon          string `json:"icon" form:"icon"`
-	Desc string `json:"desc" form:"desc"`
+	Desc          string `json:"desc" form:"desc"`
 }
 
 // @Summary 创建host group信息
