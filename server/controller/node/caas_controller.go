@@ -18,9 +18,9 @@ type APIGetEnvListInputs struct {
 }
 
 type APIGetCaasServiceListInputs struct {
-	Name  string `json:"name" form:"name"`
-	Limit int    `json:"limit" form:"limit"`
-	Page  int    `json:"page" form:"page"`
+	ServiceName string `json:"serviceName" form:"serviceName"`
+	Limit       int    `json:"limit" form:"limit"`
+	Page        int    `json:"page" form:"page"`
 }
 
 type APIGetCaasServiceListOutputs struct {
@@ -62,8 +62,8 @@ func CaasServiceList(c *gin.Context) {
 	db = db.Select("`caas_service`.*, `caas_namespace`.`namespace`, `caas_namespace`.`workspace_name`, `caas_namespace`.`cluster_name`, `caas_namespace`.`physical_system_name`")
 	db = db.Joins("left join `caas_namespace_service_rel` on `service_id` = `caas_service`.`id`")
 	db = db.Joins("left join `caas_namespace` on `caas_namespace`.`id` = `caas_namespace_service_rel`.`namespace_id`")
-	if inputs.Name != "" {
-		db.Where("`caas_service`.`service_name` regexp ?", inputs.Name)
+	if inputs.ServiceName != "" {
+		db.Where("`caas_service`.`service_name` regexp ?", inputs.ServiceName)
 	}
 	db.Count(&totalCount)
 	db.Offset(offset).Limit(limit).Find(&services)
@@ -183,10 +183,13 @@ func CaasNamespaceList(c *gin.Context) {
 }
 
 type APIGetPodListInputs struct {
-	Limit   int    `json:"limit" form:"limit"`
-	Page    int    `json:"page" form:"page"`
-	OrderBy string `json:"orderBy" form:"orderBy"`
-	Order   string `json:"order" form:"order"`
+	Name        string `json:"name" form:"name"`
+	Namespace   string `json:"namespace" form:"namespace"`
+	ServiceName string `json:"serviceName" form:"serviceName"`
+	Limit       int    `json:"limit" form:"limit"`
+	Page        int    `json:"page" form:"page"`
+	OrderBy     string `json:"orderBy" form:"orderBy"`
+	Order       string `json:"order" form:"order"`
 }
 
 type APIGetPodListOutputs struct {
@@ -200,13 +203,16 @@ type APIGetPodListOutputs struct {
 // @Param APIGetPodListInputs query APIGetPodListInputs true "根据查询条件分页查询机器列表"
 // @Success 200 {object} APIGetHostListOutputs
 // @Failure 400 {object} APIGetHostListOutputs
-// @Router /api/v1/pod/list [get]
+// @Router /api/v1/caas/pod/list [get]
 func CaasPodList(c *gin.Context) {
 	var inputs APIGetPodListInputs
-	inputs.Page = -1
-	inputs.Limit = -1
 
 	if err := c.Bind(&inputs); err != nil {
+		h.JSONR(c, h.BadStatus, err)
+		return
+	}
+	offset, limit, err := h.PageParser(inputs.Page, inputs.Limit)
+	if err != nil {
 		h.JSONR(c, h.BadStatus, err)
 		return
 	}
@@ -215,16 +221,19 @@ func CaasPodList(c *gin.Context) {
 	var totalCount int64
 	db := g.Con().Portal.Debug().Model(caas.Pod{})
 	db = db.Select("distinct `caas_pod`.*")
-
-	db.Count(&totalCount)
-	offset, limit, err := h.PageParser(inputs.Page, inputs.Limit)
-	if err != nil {
-		h.JSONR(c, h.BadStatus, err)
-		return
+	if inputs.Name != "" {
+		db = db.Where("name regexp ?", inputs.Name)
+	}
+	if inputs.Namespace != "" {
+		db = db.Where("namespace = ?", inputs.Namespace)
+	}
+	if inputs.ServiceName != "" {
+		db = db.Where("service_name = ?", inputs.ServiceName)
 	}
 	if inputs.OrderBy != "" {
 		db = db.Order(utils.Camel2Case(inputs.OrderBy) + " " + inputs.Order)
 	}
+	db.Count(&totalCount)
 	db = db.Offset(offset).Limit(limit)
 	db.Find(&pods)
 
@@ -303,5 +312,24 @@ func CaasPodGet(c *gin.Context) {
 	db.Model(f).Where("id = ?", id).First(&f)
 	f.AdditionalAttrs()
 	h.JSONR(c, f)
+	return
+}
+
+// @Summary 获取service详细信息
+// @Description
+// @Produce json
+// @Param id query int64 true "获取service详细信息"
+// @Success 200 {object} caas.Service
+// @Failure 400 {object} caas.Service
+// @Router /api/v1/caas/service/info [get]
+func CaasServiceInfo(c *gin.Context) {
+	id := c.Query("id")
+
+	var srv *caas.Service
+	db := g.Con().Portal.Model(caas.Service{})
+	db = db.Where("id = ?", id)
+	db = db.Find(&srv)
+
+	h.JSONR(c, http.StatusOK, srv)
 	return
 }

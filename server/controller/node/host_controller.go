@@ -76,7 +76,7 @@ func HostList(c *gin.Context) {
 	}
 	if inputs.Group != "" {
 		db = db.Joins("left join `host_group` on `host_group_rel`.`group_id`=`host_group`.`id`")
-		db = db.Where("`host_group`.`name` regexp ?", inputs.Group)
+		db = db.Where("`host_group`.`path` regexp ?", inputs.Group)
 	}
 	if inputs.IP != "" {
 		db = db.Where("`host`.`ip` regexp ?", inputs.IP)

@@ -155,7 +155,7 @@ func ChartBar(c *gin.Context) {
 	//	legend = append(legend, gnChart.GroupName)
 	//	data, _ := strconv.ParseInt(gnChart.NodeCount, 10, 64)
 	//	series = append(series, APIGetChartBarSeries{
-	//		Name: gnChart.GroupName,
+	//		ServiceName: gnChart.GroupName,
 	//		Type: "bar",
 	//		Data: []int64{data},
 	//	})
@@ -199,7 +199,7 @@ func ChartPie(c *gin.Context) {
 	for _, gnChart := range gnCharts {
 		data, _ := strconv.ParseInt(gnChart.NodeCount, 10, 64)
 		seriesData = append(seriesData, APIGetChartPieSeriesItem{
-			//Name:  gnChart.GroupName,
+			//ServiceName:  gnChart.GroupName,
 			Name:  gnChart.GroupPath,
 			Value: data,
 		})

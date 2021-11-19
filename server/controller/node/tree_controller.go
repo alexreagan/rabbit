@@ -146,7 +146,7 @@ func TreeRebuild(c *gin.Context) {
 //	}
 //	hosts := hostGroup.RelatedHosts()
 //	for _, host := range hosts {
-//		host.Name = host.IP
+//		host.ServiceName = host.IP
 //		host.IsWarning = host.MeetWarningCondition()
 //		resp = append(resp, host)
 //	}
@@ -156,7 +156,7 @@ func TreeRebuild(c *gin.Context) {
 //
 //type APIGetHostGroupMoveInputs struct {
 //	Id       int64  `json:"id" form:"id"`
-//	Name     string `json:"name" form:"name"`
+//	ServiceName     string `json:"name" form:"name"`
 //	ParentId int64  `json:"parentId" form:"parentId"`
 //}
 //
