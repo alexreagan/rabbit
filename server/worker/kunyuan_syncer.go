@@ -1,10 +1,11 @@
-package service
+package worker
 
 import (
 	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/alexreagan/rabbit/g"
+	alert2 "github.com/alexreagan/rabbit/server/model/alert"
 	"github.com/alexreagan/rabbit/server/model/gtime"
 	"github.com/alexreagan/rabbit/server/model/node"
 	log "github.com/sirupsen/logrus"
@@ -308,6 +309,7 @@ func (s *KunYuanSyncer) SyncBase() {
 					PhysicalSystemArea:   record.SubSystemAreaName,
 					LogicSystemCnName:    record.LogicSystemCnName,
 					UpdateTime:           time.Now(),
+					State:                node.HostStatusServicing,
 				}
 
 				var hh node.Host
@@ -464,7 +466,7 @@ func (s *KunYuanSyncer) SyncAlert() {
 		for _, record := range syncerResult.Data.Alerts {
 			firingTime, _ := time.ParseInLocation(timeFormat, record.FiringTime, time.Local)
 			resolvedTime, _ := time.ParseInLocation(timeFormat, record.ResolvedTime, time.Local)
-			al := &node.Alert{
+			al := &alert2.Alert{
 				ID:            record.ID,
 				AlertLevel:    record.AlertLevel,
 				AlertName:     record.AlertName,
@@ -483,13 +485,13 @@ func (s *KunYuanSyncer) SyncAlert() {
 				UpdateTime:    gtime.NewGTime(time.Now()),
 			}
 
-			var alert node.Alert
+			var alert alert2.Alert
 			if record.ID != 0 {
-				db.Model(alert).Where(node.Alert{ID: record.ID}).First(&alert)
+				db.Model(alert).Where(alert2.Alert{ID: record.ID}).First(&alert)
 				if alert.ID == 0 {
 					db.Model(alert).Create(al)
 				} else {
-					db.Model(alert).Where(node.Alert{ID: record.ID}).Updates(al)
+					db.Model(alert).Where(alert2.Alert{ID: record.ID}).Updates(al)
 				}
 			}
 		}
@@ -555,6 +557,7 @@ func (s *KunYuanSyncer) SyncMonitor() {
 					VirtFcNum:            record.VirtFcNum,
 					VirtNetNum:           record.VirtNetNum,
 					UpdateTime:           time.Now(),
+					State:                node.HostStatusServicing,
 					//ApplyUser:            record.ApplyUser,
 					//AreaName:             record.AreaName,
 					//CpuNumber:            record.CpuNumber,

@@ -5,11 +5,14 @@ import (
 	"github.com/alexreagan/rabbit/g"
 	h "github.com/alexreagan/rabbit/server/helper"
 	"github.com/alexreagan/rabbit/server/model/node"
+	"github.com/alexreagan/rabbit/server/service"
 	"github.com/alexreagan/rabbit/server/utils"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"net/http"
+	"sort"
 	"strconv"
+	"strings"
 )
 
 type OrderBy struct {
@@ -28,13 +31,15 @@ type APIGetHostListInputs struct {
 	FsUsageLowerLimit     float64 `json:"fsUsageLowerLimit" form:"fsUsageLowerLimit"`
 	MemoryUsageUpperLimit float64 `json:"memoryUsageUpperLimit" form:"memoryUsageUpperLimit"`
 	MemoryUsageLowerLimit float64 `json:"memoryUsageLowerLimit" form:"memoryUsageLowerLimit"`
-	Group                 string  `json:"group" form:"group"`
-	BoundGroup            string  `json:"boundGroup" form:"boundGroup"`
-	Status                string  `json:"status" form:"status"`
-	Limit                 int     `json:"limit" form:"limit"`
-	Page                  int     `json:"page" form:"page"`
-	OrderBy               string  `json:"orderBy" form:"orderBy"`
-	Order                 string  `json:"order" form:"order"`
+	//Group                 string  `json:"group" form:"group"`
+	//BoundGroup            string  `json:"boundGroup" form:"boundGroup"`
+	TagIDs     []int64 `json:"tagIDs[]" form:"tagIDs[]"`
+	RelatedTag string  `json:"relatedTag" form:"relatedTag"`
+	Status     string  `json:"status" form:"status"`
+	Limit      int     `json:"limit" form:"limit"`
+	Page       int     `json:"page" form:"page"`
+	OrderBy    string  `json:"orderBy" form:"orderBy"`
+	Order      string  `json:"order" form:"order"`
 }
 
 type APIGetHostListOutputs struct {
@@ -55,8 +60,6 @@ func (input APIGetHostListInputs) checkInputsContain() error {
 // @Router /api/v1/host/list [get]
 func HostList(c *gin.Context) {
 	var inputs APIGetHostListInputs
-	inputs.Page = -1
-	inputs.Limit = -1
 
 	if err := c.Bind(&inputs); err != nil {
 		h.JSONR(c, h.BadStatus, err)
@@ -66,18 +69,17 @@ func HostList(c *gin.Context) {
 		h.JSONR(c, h.BadStatus, err)
 		return
 	}
+	offset, limit, err := h.PageParser(inputs.Page, inputs.Limit)
+	if err != nil {
+		h.JSONR(c, h.BadStatus, err)
+		return
+	}
 
 	var hosts []*node.Host
 	var totalCount int64
 	db := g.Con().Portal.Debug().Model(node.Host{})
-	db = db.Select("distinct `host`.*")
-	if inputs.Group != "" || inputs.BoundGroup != "" {
-		db = db.Joins("left join `host_group_rel` on `host`.id=`host_group_rel`.`host_id`")
-	}
-	if inputs.Group != "" {
-		db = db.Joins("left join `host_group` on `host_group_rel`.`group_id`=`host_group`.`id`")
-		db = db.Where("`host_group`.`path` regexp ?", inputs.Group)
-	}
+	db = db.Distinct("`host`.*")
+	db = db.Joins("left join `host_tag_rel` on `host`.id=`host_tag_rel`.`host`")
 	if inputs.IP != "" {
 		db = db.Where("`host`.`ip` regexp ?", inputs.IP)
 	}
@@ -126,21 +128,33 @@ func HostList(c *gin.Context) {
 	if inputs.AreaName != "" {
 		db = db.Where("`host`.`area_name` = ?", inputs.AreaName)
 	}
-	if inputs.BoundGroup != "" {
-		if inputs.BoundGroup == "bound" {
-			db = db.Where("`host_group_rel`.`group_id` is not null")
+	if len(inputs.TagIDs) > 0 {
+		var tIDs []int
+		for _, i := range inputs.TagIDs {
+			tIDs = append(tIDs, int(i))
+		}
+		sort.Ints(tIDs)
 
-		} else if inputs.BoundGroup == "unbound" {
-			db = db.Where("`host_group_rel`.`group_id` is null")
+		var tmp []string
+		for _, i := range tIDs {
+			tmp = append(tmp, strconv.Itoa(i))
+		}
+		db = db.Where("`host_tag_rel`.`tag` in (?)", inputs.TagIDs)
+		db = db.Group("`host_tag_rel`.`host`")
+		db = db.Having("group_concat(`host_tag_rel`.`tag`) = ?", strings.Join(tmp, ","))
+	} else {
+		db = db.Group("`host_tag_rel`.`host`")
+	}
+	if inputs.RelatedTag != "" {
+		if inputs.RelatedTag == "related" {
+			db = db.Where("`host_tag_rel`.`tag` is not null")
+
+		} else if inputs.RelatedTag == "unrelated" {
+			db = db.Where("`host_tag_rel`.`tag` is null")
 		}
 	}
 
 	db.Count(&totalCount)
-	offset, limit, err := h.PageParser(inputs.Page, inputs.Limit)
-	if err != nil {
-		h.JSONR(c, h.BadStatus, err)
-		return
-	}
 	if inputs.OrderBy != "" {
 		db = db.Order(utils.Camel2Case(inputs.OrderBy) + " " + inputs.Order)
 	}
@@ -151,7 +165,7 @@ func HostList(c *gin.Context) {
 		host.CpuUsage, _ = strconv.ParseFloat(fmt.Sprintf("%.2f", host.CpuUsage*100), 64)
 		host.FsUsage, _ = strconv.ParseFloat(fmt.Sprintf("%.2f", host.FsUsage*100), 64)
 		host.MemoryUsage, _ = strconv.ParseFloat(fmt.Sprintf("%.2f", host.MemoryUsage*100), 64)
-		host.Groups = host.RelatedGroups()
+		host.Tags = host.RelatedTags()
 	}
 
 	resp := &APIGetHostListOutputs{
@@ -185,7 +199,7 @@ type APIPostHostUpdateInputs struct {
 	IP             string  `json:"ip" form:"ip" binding:"required"`
 	Name           string  `json:"name" form:"name"`
 	PhysicalSystem string  `json:"physicalSystem" form:"physicalSystem"`
-	GroupIds       []int64 `json:"groupIds" form:"groupIds"`
+	TagIDs         []int64 `json:"tagIDs" form:"tagIDs"`
 	Path           string  `json:"path" form:"path"`
 	DevOwner       string  `json:"devOwner" form:"devOwner"`
 }
@@ -210,7 +224,6 @@ func HostCreate(c *gin.Context) {
 		h.JSONR(c, h.BadStatus, err)
 		return
 	}
-	log.Printf("%+v", inputs)
 
 	tx := g.Con().Portal.Begin()
 
@@ -224,14 +237,14 @@ func HostCreate(c *gin.Context) {
 		h.JSONR(c, h.ExpecStatus, dt.Error)
 	}
 
-	var hostGroups []node.HostGroup
-	if dt := tx.Model(node.HostGroup{}).Where("id in (?)", inputs.GroupIds).Find(&hostGroups); dt.Error != nil {
+	var tags []node.Tag
+	if dt := tx.Model(node.Tag{}).Where("id in (?)", inputs.TagIDs).Find(&tags); dt.Error != nil {
 		h.JSONR(c, h.ExpecStatus, dt.Error)
+		return
 	}
-
-	dt := tx.Debug().Model(node.HostGroupRel{})
-	for _, grp := range hostGroups {
-		if dt = dt.Create(&node.HostGroupRel{HostID: host.ID, GroupID: grp.ID}); dt.Error != nil {
+	dt := tx.Debug().Model(node.HostTagRel{})
+	for _, tag := range tags {
+		if dt = dt.Create(&node.HostTagRel{Host: host.ID, Tag: tag.ID}); dt.Error != nil {
 			h.JSONR(c, h.ExpecStatus, dt.Error)
 			dt.Rollback()
 			return
@@ -267,25 +280,21 @@ func HostUpdate(c *gin.Context) {
 		h.JSONR(c, h.ExpecStatus, dt.Error)
 	}
 
-	var hostGroups []node.HostGroup
-	if dt := tx.Model(node.HostGroup{}).Where("id in (?)", inputs.GroupIds).Find(&hostGroups); dt.Error != nil {
-		h.JSONR(c, h.ExpecStatus, dt.Error)
-	}
-
 	if dt := tx.Model(node.Host{}).Where("ip = ?", inputs.IP).Updates(node.Host{
 		DevOwner: inputs.DevOwner,
 	}); dt.Error != nil {
 		h.JSONR(c, h.ExpecStatus, dt.Error)
 	}
 
-	dt := tx.Debug().Model(node.HostGroupRel{})
-	if dt = dt.Where(&node.HostGroupRel{HostID: host.ID}).Delete(&node.HostGroupRel{}); dt.Error != nil {
+	dt := tx.Debug().Model(node.HostTagRel{})
+	if dt = dt.Where(&node.HostTagRel{Host: host.ID}).Delete(&node.HostTagRel{}); dt.Error != nil {
 		h.JSONR(c, h.ExpecStatus, dt.Error)
 		dt.Rollback()
 		return
 	}
-	for _, grp := range hostGroups {
-		if dt = dt.Create(&node.HostGroupRel{HostID: host.ID, GroupID: grp.ID}); dt.Error != nil {
+
+	for _, tagID := range inputs.TagIDs {
+		if dt = dt.Create(&node.HostTagRel{Host: host.ID, Tag: tagID}); dt.Error != nil {
 			h.JSONR(c, h.ExpecStatus, dt.Error)
 			dt.Rollback()
 			return
@@ -293,21 +302,23 @@ func HostUpdate(c *gin.Context) {
 	}
 	tx.Commit()
 
+	// 重建tag图
+	service.TagService.ReBuildGraph()
+
 	h.JSONR(c, h.OKStatus, inputs)
 	return
 }
 
 type APIPostHostBatchUpdateInputs struct {
 	IDs      []int64 `json:"ids" form:"ids"`
-	GroupIds []int64 `json:"groupIds" form:"groupIds"`
+	TagIDs []int64 `json:"tagIDs" form:"tagIDs"`
 	DevOwner string  `json:"devOwner" form:"devOwner"`
 }
 
-// @Summary 更新机器信息
+// @Summary 更新机器标签和负责人
 // @Description
 // @Produce json
-// @Param GroupID formData string false "更新HostGroup"
-// @Param DevOwner formData string false "更新DevOwner"
+// @Param APIPostHostBatchUpdateInputs formData APIPostHostBatchUpdateInputs false "更新机器标签和负责人信息"
 // @Success 200 {object} APIPostHostBatchUpdateInputs
 // @Failure 400 {object} APIPostHostBatchUpdateInputs
 // @Router /api/v1/host/batch/update [put]
@@ -317,6 +328,8 @@ func HostBatchUpdate(c *gin.Context) {
 		h.JSONR(c, h.BadStatus, err)
 		return
 	}
+	log.Println("=========")
+	log.Printf("%+v", inputs)
 
 	tx := g.Con().Portal.Begin()
 	for _, id := range inputs.IDs {
@@ -326,15 +339,15 @@ func HostBatchUpdate(c *gin.Context) {
 			h.JSONR(c, h.ExpecStatus, dt.Error)
 		}
 
-		dt := tx.Model(node.HostGroupRel{})
-		if dt = dt.Where(&node.HostGroupRel{HostID: id}).Delete(&node.HostGroupRel{}); dt.Error != nil {
+		dt := tx.Model(node.HostTagRel{})
+		if dt = dt.Where(&node.HostTagRel{Host: id}).Delete(&node.HostTagRel{}); dt.Error != nil {
 			h.JSONR(c, h.ExpecStatus, dt.Error)
 			dt.Rollback()
 			return
 		}
 
-		for _, grpId := range inputs.GroupIds {
-			if dt = dt.Create(&node.HostGroupRel{HostID: id, GroupID: grpId}); dt.Error != nil {
+		for _, tagID := range inputs.TagIDs {
+			if dt = dt.Create(&node.HostTagRel{Host: id, Tag: tagID}); dt.Error != nil {
 				log.Printf("%+v", dt.Error)
 				h.JSONR(c, h.ExpecStatus, dt.Error)
 				dt.Rollback()
@@ -351,15 +364,16 @@ func HostBatchUpdate(c *gin.Context) {
 // @Summary 根据机器ID获取机器详细信息
 // @Description
 // @Produce json
-// @Param id path int true "根据机器ID获取机器详细信息"
+// @Param id query int true "根据机器ID获取机器详细信息"
 // @Success 200 {object} node.Host
 // @Failure 400 {object} node.Host
-// @Router /api/v1/host/info/:id [get]
+// @Router /api/v1/host/info [get]
 func HostInfo(c *gin.Context) {
-	id := c.Param("id")
+	id := c.Query("id")
 	host := node.Host{}
 	g.Con().Portal.Model(host).Where("id = ?", id).First(&host)
-	host.Groups = host.RelatedGroups()
+	//host.Groups = host.RelatedGroups()
+	host.Tags = host.RelatedTags()
 	h.JSONR(c, host)
 	return
 }
@@ -397,6 +411,26 @@ func HostPhysicalSystemChoices(c *gin.Context) {
 	db := g.Con().Portal.Model(node.Host{}).Debug()
 	db = db.Select("distinct `physical_system` as `label`, `physical_system` as `value`")
 	db = db.Order("`physical_system`")
+	db = db.Find(&data)
+	resp := h.APIGetVariableOutputs{
+		List:       data,
+		TotalCount: int64(len(data)),
+	}
+	h.JSONR(c, resp)
+	return
+}
+
+// @Summary 区域类别
+// @Description
+// @Produce json
+// @Success 200 {object} APIGetVariableOutputs
+// @Failure 400 {object} APIGetVariableOutputs
+// @Router /api/v1/host/area_choices [get]
+func HostAreaChoices(c *gin.Context) {
+	var data []*h.APIGetVariableItem
+	db := g.Con().Portal.Model(node.Host{}).Debug()
+	db = db.Select("distinct `area_name` as `label`, `area_name` as `value`")
+	db = db.Where("area_name != ''")
 	db = db.Find(&data)
 	resp := h.APIGetVariableOutputs{
 		List:       data,

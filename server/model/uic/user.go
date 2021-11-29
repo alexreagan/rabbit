@@ -80,3 +80,13 @@ type Session struct {
 func (this Session) TableName() string {
 	return "session"
 }
+
+type UserWhiteList struct {
+	ID       int64  `json:"id" gorm:"primary_key;column:id"`
+	UID      int64  `json:"UID" gorm:"column:uid;comment:用户ID"`
+	UserName string `json:"username" gorm:"column:username;type:string;size:80;unique;not null;comment:用户名"`
+}
+
+func (this UserWhiteList) TableName() string {
+	return "user_white_list"
+}

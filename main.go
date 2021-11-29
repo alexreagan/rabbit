@@ -6,11 +6,12 @@ import (
 	_ "github.com/alexreagan/rabbit/docs"
 	"github.com/alexreagan/rabbit/g"
 	"github.com/alexreagan/rabbit/server"
+	"github.com/alexreagan/rabbit/server/model/alert"
 	"github.com/alexreagan/rabbit/server/model/caas"
 	"github.com/alexreagan/rabbit/server/model/node"
-	"github.com/alexreagan/rabbit/server/model/portal"
+	"github.com/alexreagan/rabbit/server/model/sys"
 	"github.com/alexreagan/rabbit/server/model/uic"
-	"github.com/alexreagan/rabbit/server/service"
+	"github.com/alexreagan/rabbit/server/worker"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"os"
@@ -45,17 +46,28 @@ func main() {
 		//migrate database
 		//g.Con().Uic.AutoMigrate(&uic.User{})
 		//g.Con().Uic.AutoMigrate(&uic.Session{})
+		g.Con().Portal.AutoMigrate(&uic.UserWhiteList{})
 		g.Con().Portal.AutoMigrate(&uic.Role{})
 		g.Con().Portal.AutoMigrate(&uic.Perm{})
 		g.Con().Portal.AutoMigrate(&uic.RolePermRel{})
 		g.Con().Portal.AutoMigrate(&uic.UserRoleRel{})
 		//g.Con().Portal.AutoMigrate(&uic.Depart{})
-		g.Con().Portal.AutoMigrate(&portal.Menu{})
-		g.Con().Portal.AutoMigrate(&portal.MenuPermission{})
+		g.Con().Portal.AutoMigrate(&sys.Param{})
+		g.Con().Portal.AutoMigrate(&sys.Menu{})
+		g.Con().Portal.AutoMigrate(&sys.MenuPermission{})
+
+		// host tag rel
 		g.Con().Portal.AutoMigrate(&node.Host{})
 		g.Con().Portal.AutoMigrate(&node.HostGroup{})
 		g.Con().Portal.AutoMigrate(&node.HostGroupRel{})
+		g.Con().Portal.AutoMigrate(&node.Tag{})
+		g.Con().Portal.AutoMigrate(&node.TagCategory{})
+		g.Con().Portal.AutoMigrate(&node.HostTagRel{})
 
+		// host apply request
+		g.Con().Portal.AutoMigrate(&node.HostApplyRequest{})
+
+		// caas
 		g.Con().Portal.AutoMigrate(&caas.WorkSpace{})
 		g.Con().Portal.AutoMigrate(&caas.NameSpace{})
 		g.Con().Portal.AutoMigrate(&caas.Service{})
@@ -64,22 +76,22 @@ func main() {
 		g.Con().Portal.AutoMigrate(&caas.ServicePortRel{})
 		g.Con().Portal.AutoMigrate(&caas.Pod{})
 		g.Con().Portal.AutoMigrate(&caas.ServicePodRel{})
-		g.Con().Portal.AutoMigrate(&node.Alert{})
+		g.Con().Portal.AutoMigrate(&alert.Alert{})
 	}
 
 	// start gin server
 	go server.Start()
 
 	// sync hosts from kunyuan
-	kunyuanSyncer := service.InitKunYuanSyncer()
+	kunyuanSyncer := worker.InitKunYuanSyncer()
 	kunyuanSyncer.Start()
 
 	// sync hosts from caas
-	caasSyncer := service.InitCaasSyncer()
+	caasSyncer := worker.InitCaasSyncer()
 	caasSyncer.Start()
 
 	// tree ReBuilder
-	treeReBuilder := service.InitTreeReBuilder()
+	treeReBuilder := worker.InitTreeReBuilder()
 	treeReBuilder.Start()
 
 	// process signal

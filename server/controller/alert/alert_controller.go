@@ -1,9 +1,9 @@
-package node
+package alert
 
 import (
 	"github.com/alexreagan/rabbit/g"
 	h "github.com/alexreagan/rabbit/server/helper"
-	"github.com/alexreagan/rabbit/server/model/node"
+	"github.com/alexreagan/rabbit/server/model/alert"
 	"github.com/alexreagan/rabbit/server/utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -20,8 +20,8 @@ type APIGetAlertListInputs struct {
 }
 
 type APIGetAlertListOutputs struct {
-	List       []*node.Alert `json:"list"`
-	TotalCount int64         `json:"totalCount"`
+	List       []*alert.Alert `json:"list"`
+	TotalCount int64          `json:"totalCount"`
 }
 
 // @Summary 监控报警接口
@@ -44,9 +44,9 @@ func AlertList(c *gin.Context) {
 		return
 	}
 
-	var alerts []*node.Alert
+	var alerts []*alert.Alert
 	var totalCount int64
-	db := g.Con().Portal.Debug().Model(node.Alert{})
+	db := g.Con().Portal.Debug().Model(alert.Alert{})
 	db = db.Select("distinct `alert`.*")
 	if inputs.IP != "" {
 		db = db.Where("`alert`.`prod_ip` regexp ?", inputs.IP)
@@ -84,7 +84,7 @@ func AlertList(c *gin.Context) {
 // @Router /api/v1/alert/physical_system_choices [get]
 func AlertPhysicalSystemChoices(c *gin.Context) {
 	var data []*h.APIGetVariableItem
-	db := g.Con().Portal.Model(node.Alert{}).Debug()
+	db := g.Con().Portal.Model(alert.Alert{}).Debug()
 	db = db.Select("distinct `sub_sys_name` as `label`, `sub_sys_en_name` as `value`")
 	db = db.Order("`sub_sys_en_name`")
 	db = db.Find(&data)

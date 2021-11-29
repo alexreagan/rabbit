@@ -6,8 +6,10 @@ import (
 	"time"
 )
 
+const HostStatusServicing = "servicing"
+const HostStatusOffLine = "offline"
+
 type Host struct {
-	//gorm.Model
 	ID                   int64        `json:"id" gorm:"primary_key;column:id"`
 	Name                 string       `json:"name" gorm:"column:name;type:string;size:128;comment:"`
 	IP                   string       `json:"ip" gorm:"column:ip;type:string;size:128;comment:IP"`
@@ -53,6 +55,8 @@ type Host struct {
 	Desc                 string       `json:"desc" gorm:"column:desc;type:string;size:256;comment:"`
 	CreateTime           time.Time    `json:"createTime" gorm:"column:create_time;default:null;comment:"`
 	UpdateTime           time.Time    `json:"updateTime" gorm:"column:update_time;default:null;comment:"`
+	State                string       `json:"state" gorm:"column:state;type:enum('servicing','offline');default:servicing;comment:机器状态"`
+	Tags                 []*Tag       `json:"tags" gorm:"-"`
 	Groups               []*HostGroup `json:"groups" gorm:"-"`
 	IsWarning            bool         `json:"isWarning" gorm:"-"`
 	Type                 string       `json:"type" gorm:"-"`
@@ -84,12 +88,6 @@ func (this Host) RelatedGroups() []*HostGroup {
 	return hostGroups
 }
 
-func (this *Host) AdditionalAttrs() *Host {
-	this.Type = "host"
-	this.IsWarning = this.MeetWarningCondition()
-	return this
-}
-
 func (this Host) MeetWarningCondition() bool {
 	if this.CpuUsage >= viper.GetFloat64("alarm.threshold.cpu") {
 		return true
@@ -101,4 +99,33 @@ func (this Host) MeetWarningCondition() bool {
 		return true
 	}
 	return false
+}
+
+func (this Host) RelatedTags() []*Tag {
+	var tags []*Tag
+	db := g.Con().Portal.Model(Tag{}).Debug()
+	db = db.Select("`tag`.*, `tag_category`.name as category_name")
+	db = db.Joins("left join `host_tag_rel` on `host_tag_rel`.tag = `tag`.id")
+	db = db.Joins("left join `tag_category` on `tag_category`.id = `tag`.category_id")
+	db = db.Where("`host_tag_rel`.host = ?", this.ID)
+	db.Find(&tags)
+	return tags
+}
+
+func (this *Host) AdditionalAttrs() *Host {
+	this.Type = "host"
+	this.IsWarning = this.MeetWarningCondition()
+	return this
+}
+
+type Hosts []*Host
+
+func (t Hosts) Len() int { return len(t) }
+
+func (t Hosts) Less(i, j int) bool {
+	return t[i].Name < t[j].Name
+}
+
+func (t Hosts) Swap(i, j int) {
+	t[i], t[j] = t[j], t[i]
 }

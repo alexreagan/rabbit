@@ -3,6 +3,7 @@ package node
 import (
 	"encoding/json"
 	"github.com/alexreagan/rabbit/g"
+	"github.com/alexreagan/rabbit/server/model/alert"
 	"github.com/alexreagan/rabbit/server/model/caas"
 	"strings"
 )
@@ -39,7 +40,7 @@ func (this HostGroup) TableName() string {
 //	HostGroup
 //	Children          []*HostGroupPro `json:"children"`
 //	SubGroupCount     int             `json:"subGroupCount"`
-//	RelatedHostCount  int             `json:"relatedHostCount"`
+//	RelatedHostsCount  int             `json:"relatedHostCount"`
 //	RelatedPodCount   int             `json:"relatedPodCount"`
 //	ChildrenHostCount int             `json:"childrenHostCount"`
 //	ChildrenPodCount  int             `json:"childrenPodCount"`
@@ -205,8 +206,8 @@ func (this HostGroup) RelatedHosts() []*Host {
 	//}
 
 	// 报警信息
-	alerts := Alert{}.LatestRecords()
-	alertMap := make(map[string]*Alert)
+	alerts := alert.Alert{}.LatestRecords()
+	alertMap := make(map[string]*alert.Alert)
 	for _, alert := range alerts {
 		alertMap[alert.ProdIP] = alert
 	}

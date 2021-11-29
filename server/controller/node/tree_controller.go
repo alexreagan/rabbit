@@ -4,8 +4,10 @@ import (
 	"github.com/alexreagan/rabbit/g"
 	h "github.com/alexreagan/rabbit/server/helper"
 	"github.com/alexreagan/rabbit/server/model/node"
+	"github.com/alexreagan/rabbit/server/service"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"sort"
 )
 
 type APIGetHostGroupTreeInputs struct {
@@ -91,7 +93,7 @@ func Tree(c *gin.Context) {
 // @Failure 400 {object} []HostGroup
 // @Router /api/v1/tree/rebuild [get]
 func TreeRebuild(c *gin.Context) {
-	resp, _ := node.HostGroup{}.ReBuildTree()
+	resp := service.TagService.ReBuildGraph()
 	h.JSONR(c, http.StatusOK, resp)
 	return
 }
@@ -177,7 +179,7 @@ func TreeRebuild(c *gin.Context) {
 //
 //	db := g.Con().Portal.Table(node.HostGroup{}.TableName())
 //	db.Where(node.HostGroup{ID: inputs.Id}).Updates(node.HostGroup{ParentId: inputs.ParentId})
-//	node.HostGroup{}.ReBuildTree()
+//	node.HostGroup{}.ReBuildGraph()
 //
 //	h.JSONR(c, http.StatusOK, "ok")
 //	return
@@ -243,4 +245,118 @@ func TreeDragging(c *gin.Context) {
 
 	h.JSONR(c, http.StatusOK, resp)
 	return
+}
+
+type APIGetV2TreeInputs struct {
+	Params      string  `json:"params" form:"params"`
+	CategoryIDs []int64 `json:"categoryIDs[]" form:"categoryIDs[]"`
+	TagIDs      []int64 `json:"tagIDs[]" form:"tagIDs[]"`
+}
+
+// @Summary 根据tags获取tags下所有的机器
+// @Description
+// @Produce json
+// @Param id query int64 true "根据tags获取tags下所有的机器"
+// @Success 200 {object} APIGetHostGroupTreeOutputs
+// @Failure 400 {object} APIGetHostGroupTreeOutputs
+// @Router /api/v2/tree [get]
+func V2Tree(c *gin.Context) {
+	var inputs APIGetV2TreeInputs
+
+	if err := c.Bind(&inputs); err != nil {
+		h.JSONR(c, h.BadStatus, err)
+		return
+	}
+
+	//////////////// method 1
+	//globalTagRouterGraphNode := service.TagService.GlobalTagRouterGraph()
+	//if globalTagRouterGraphNode == nil {
+	//	globalTagRouterGraphNode = service.TagService.BuildGraph()
+	//}
+	//// 根节点
+	//if len(inputs.TagIDs) == 0 {
+	//	var resp []*service.TagRouterGraphNode
+	//	for _, n := range globalTagRouterGraphNode.Next {
+	//		resp = append(resp, n)
+	//	}
+	//	h.JSONR(c, http.StatusOK, resp)
+	//	return
+	//}
+	//
+	//// 其他节点
+	//// 找到inputs的末级节点
+	//graphNode := globalTagRouterGraphNode
+	//for _, id := range inputs.TagIDs {
+	//	graphNode = graphNode.Next[id]
+	//}
+	//// 下一个标签类型
+	//categoryNames, err := service.ParamService.GetTreeOrder()
+	//if err != nil {
+	//	h.JSONR(c, h.ExpecStatus, err)
+	//	return
+	//}
+	//if len(inputs.CategoryIDs) < len(categoryNames) {
+	//	// 末级节点的子节点
+	//	var resp []interface{}
+	//	for _, x := range graphNode.Next {
+	//		resp = append(resp, x)
+	//	}
+	//	for _, x := range graphNode.UnTaggedHosts {
+	//		resp = append(resp, x)
+	//	}
+	//	h.JSONR(c, h.OKStatus, resp)
+	//	return
+	//} else {
+	//	var resp []interface{}
+	//	for _, x := range graphNode.RelatedHosts {
+	//		resp = append(resp, x)
+	//	}
+	//	h.JSONR(c, h.OKStatus, resp)
+	//	return
+	//}
+
+	//////////// method 2
+	// 当前标签顺序下的所有机器
+	var hosts []*node.Host
+	if len(inputs.TagIDs) > 0 {
+		hosts = service.HostService.HostsHavingTagIDs(inputs.TagIDs)
+	} else {
+		hosts = service.HostService.HostsRelatedTags()
+	}
+
+	// 下一个标签类型
+	categoryNames, err := service.ParamService.GetTreeOrder()
+	if err != nil {
+		h.JSONR(c, h.ExpecStatus, err)
+		return
+	}
+	if len(inputs.CategoryIDs) < len(categoryNames) {
+		// 没有取全category，取下一个category
+		nextCategoryName := categoryNames[len(inputs.CategoryIDs)]
+		nextCategory := service.TagCategoryService.GetByName(nextCategoryName)
+		tags := service.TagCategoryService.GetTagsByCategory(nextCategory)
+
+		// 分桶
+		tagMap, untaggedHosts := service.BucketService.Sort(hosts, tags)
+		var nodeTags node.Tags
+		for _, x := range tagMap {
+			nodeTags = append(nodeTags, x)
+		}
+		sort.Sort(nodeTags)
+
+		var resp []interface{}
+		for _, x := range nodeTags {
+			resp = append(resp, x)
+		}
+
+		for _, x := range untaggedHosts {
+			resp = append(resp, x)
+		}
+		h.JSONR(c, h.OKStatus, resp)
+		return
+	} else {
+		// 已经拿全category，返回所有机器
+		h.JSONR(c, http.StatusOK, hosts)
+		return
+	}
 }

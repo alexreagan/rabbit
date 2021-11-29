@@ -3,8 +3,9 @@
 package server
 
 import (
+	"github.com/alexreagan/rabbit/server/controller/alert"
 	"github.com/alexreagan/rabbit/server/controller/node"
-	"github.com/alexreagan/rabbit/server/controller/portal"
+	"github.com/alexreagan/rabbit/server/controller/sys"
 	"github.com/alexreagan/rabbit/server/controller/uic"
 	"github.com/alexreagan/rabbit/server/utils"
 	sentrygin "github.com/getsentry/sentry-go/gin"
@@ -39,8 +40,9 @@ func Start() {
 
 	// set routers
 	uic.Routes(r)
-	portal.Routes(r)
+	sys.Routes(r)
 	node.Routes(r)
+	alert.Routes(r)
 
 	// start server graceful
 	endless.ListenAndServe(viper.GetString("serv.addr"), r)

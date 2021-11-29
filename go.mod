@@ -6,6 +6,7 @@ require (
 	github.com/Valiben/gin_unit_test v0.0.0-20181205064931-674aee46d090
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/antonfisher/nested-logrus-formatter v1.3.1
+	github.com/deckarep/golang-set v1.7.1 // indirect
 	github.com/fsnotify/fsnotify v1.5.1
 	github.com/fvbock/endless v0.0.0-20170109170031-447134032cb6
 	github.com/garyburd/redigo v1.6.2

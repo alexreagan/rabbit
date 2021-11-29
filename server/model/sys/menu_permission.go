@@ -1,4 +1,4 @@
-package portal
+package sys
 
 type MenuPermission struct {
 	Menu       uint `gorm:"column:menu"`

@@ -1,8 +1,8 @@
-package service
+package worker
 
 import (
 	"context"
-	"github.com/alexreagan/rabbit/server/model/node"
+	"github.com/alexreagan/rabbit/server/service"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"sync"
@@ -49,7 +49,7 @@ func (s *TreeReBuilder) StartReBuilder() {
 			log.Println("ctx done")
 			return
 		case <-ticker.C:
-			node.HostGroup{}.ReBuildTree()
+			service.TagService.ReBuildGraph()
 		}
 	}
 }

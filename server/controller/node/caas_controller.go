@@ -4,8 +4,8 @@ import (
 	"github.com/alexreagan/rabbit/g"
 	h "github.com/alexreagan/rabbit/server/helper"
 	"github.com/alexreagan/rabbit/server/model/caas"
-	"github.com/alexreagan/rabbit/server/service"
 	"github.com/alexreagan/rabbit/server/utils"
+	"github.com/alexreagan/rabbit/server/worker"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"net/http"
@@ -110,13 +110,13 @@ func CaasServiceRefreshPods(c *gin.Context) {
 	var namespace caas.NameSpace
 	db.Model(caas.NameSpace{}).Where("id = ?", rel.NamespaceID).Find(&namespace)
 
-	pods, err := service.GetPod(&namespace, &ser)
+	pods, err := worker.GetPod(&namespace, &ser)
 	if err != nil {
 		h.JSONR(c, h.BadStatus, err)
 		log.Errorln(err)
 		return
 	}
-	service.UpdatePods(&ser, pods)
+	worker.UpdatePods(&ser, pods)
 
 	h.JSONR(c, h.BadStatus, pods)
 	return
