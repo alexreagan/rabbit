@@ -13,6 +13,7 @@ import (
 
 type APIGetTagListInputs struct {
 	Name       string `json:"name" form:"name"`
+	Remark     string `json:"remark" form:"remark"`
 	CategoryID string `json:"categoryID" form:"categoryID"`
 	Limit      int    `json:"limit" form:"limit"`
 	Page       int    `json:"page" form:"page"`
@@ -64,6 +65,9 @@ func TagList(c *gin.Context) {
 	}
 	if inputs.CategoryID != "" {
 		db = db.Where("`tag`.`category_id` = ?", inputs.CategoryID)
+	}
+	if inputs.Remark != "" {
+		db = db.Where("`tag`.`remark` regexp ?", inputs.Remark)
 	}
 
 	db.Count(&totalCount)

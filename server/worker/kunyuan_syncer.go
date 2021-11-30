@@ -314,18 +314,18 @@ func (s *KunYuanSyncer) SyncBase() {
 
 				var hh node.Host
 				if record.ProdIp != "" {
-					db.Table(hh.TableName()).Where(node.Host{IP: record.ProdIp}).First(&hh)
+					db.Model(hh).Where(node.Host{IP: record.ProdIp}).First(&hh)
 					if hh.ID == 0 {
-						db.Table(hh.TableName()).Create(h)
+						db.Model(hh).Create(h)
 					} else {
-						db.Table(hh.TableName()).Where(node.Host{IP: record.ProdIp}).Updates(h)
+						db.Model(hh).Where(node.Host{IP: record.ProdIp}).Updates(h)
 					}
 				} else if record.ServPartName != "" {
-					db.Table(hh.TableName()).Where(node.Host{Name: record.ServPartName}).First(&hh)
+					db.Model(hh).Where(node.Host{Name: record.ServPartName}).First(&hh)
 					if hh.ID == 0 {
-						db.Table(hh.TableName()).Create(h)
+						db.Model(hh).Create(h)
 					} else {
-						db.Table(hh.TableName()).Where(node.Host{Name: record.ServPartName}).Updates(h)
+						db.Model(hh).Where(node.Host{Name: record.ServPartName}).Updates(h)
 					}
 				}
 			}
@@ -571,18 +571,18 @@ func (s *KunYuanSyncer) SyncMonitor() {
 
 				var hh node.Host
 				if record.ProdIp != "" {
-					db.Table(hh.TableName()).Where(node.Host{IP: record.ProdIp}).First(&hh)
+					db.Model(hh).Where(node.Host{IP: record.ProdIp}).First(&hh)
 					if hh.ID == 0 {
-						db.Table(hh.TableName()).Create(h)
+						db.Model(hh).Create(h)
 					} else {
-						db.Table(hh.TableName()).Where(node.Host{IP: record.ProdIp}).Updates(h)
+						db.Model(hh).Where(node.Host{IP: record.ProdIp}).Updates(h)
 					}
 				} else if record.ServPartName != "" {
-					db.Table(hh.TableName()).Where(node.Host{Name: record.ServPartName}).First(&hh)
+					db.Model(hh).Where(node.Host{Name: record.ServPartName}).First(&hh)
 					if hh.ID == 0 {
-						db.Table(hh.TableName()).Create(h)
+						db.Model(hh).Create(h)
 					} else {
-						db.Table(hh.TableName()).Where(node.Host{Name: record.ServPartName}).Updates(h)
+						db.Model(hh).Where(node.Host{Name: record.ServPartName}).Updates(h)
 					}
 				}
 			}

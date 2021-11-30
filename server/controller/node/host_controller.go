@@ -143,7 +143,7 @@ func HostList(c *gin.Context) {
 		db = db.Group("`host_tag_rel`.`host`")
 		db = db.Having("group_concat(`host_tag_rel`.`tag`) = ?", strings.Join(tmp, ","))
 	} else {
-		db = db.Group("`host_tag_rel`.`host`")
+		db = db.Group("`host`.`ip`")
 	}
 	if inputs.RelatedTag != "" {
 		if inputs.RelatedTag == "related" {
@@ -200,7 +200,7 @@ type APIPostHostUpdateInputs struct {
 	Name           string  `json:"name" form:"name"`
 	PhysicalSystem string  `json:"physicalSystem" form:"physicalSystem"`
 	TagIDs         []int64 `json:"tagIDs" form:"tagIDs"`
-	Path           string  `json:"path" form:"path"`
+	State          string  `json:"state" form:"state"`
 	DevOwner       string  `json:"devOwner" form:"devOwner"`
 }
 
@@ -232,6 +232,7 @@ func HostCreate(c *gin.Context) {
 		Name:           inputs.Name,
 		PhysicalSystem: inputs.PhysicalSystem,
 		DevOwner:       inputs.DevOwner,
+		State:          inputs.State,
 	}
 	if dt := tx.Model(node.Host{}).Create(&host); dt.Error != nil {
 		h.JSONR(c, h.ExpecStatus, dt.Error)
@@ -282,6 +283,7 @@ func HostUpdate(c *gin.Context) {
 
 	if dt := tx.Model(node.Host{}).Where("ip = ?", inputs.IP).Updates(node.Host{
 		DevOwner: inputs.DevOwner,
+		State:    inputs.State,
 	}); dt.Error != nil {
 		h.JSONR(c, h.ExpecStatus, dt.Error)
 	}
@@ -311,7 +313,7 @@ func HostUpdate(c *gin.Context) {
 
 type APIPostHostBatchUpdateInputs struct {
 	IDs      []int64 `json:"ids" form:"ids"`
-	TagIDs []int64 `json:"tagIDs" form:"tagIDs"`
+	TagIDs   []int64 `json:"tagIDs" form:"tagIDs"`
 	DevOwner string  `json:"devOwner" form:"devOwner"`
 }
 

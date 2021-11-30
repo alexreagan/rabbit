@@ -8,13 +8,13 @@ import (
 type TagRouterGraphNode struct {
 	node.Tag
 	// 当前tag下关联的所有机器
-	Path []int64 `json:"path" gorm:"-"`
+	Path              []int64      `json:"path" gorm:"-"`
 	RelatedHosts      []*node.Host `json:"relatedHosts" gorm:"-"`
-	RelatedHostsCount int     `json:"relatedHostsCount" gorm:"-"`
+	RelatedHostsCount int          `json:"relatedHostsCount" gorm:"-"`
 	// 当前tag下未关联到子tag的机器
 	UnTaggedHosts      []*node.Host `json:"unTaggedHosts" gorm:"-"`
-	UnTaggedHostsCount int     `json:"UnTaggedHostsCount" gorm:"-"`
-	Next map[int64]*TagRouterGraphNode
+	UnTaggedHostsCount int          `json:"UnTaggedHostsCount" gorm:"-"`
+	Next               map[int64]*TagRouterGraphNode
 }
 
 func newTagRouterGraphNode(n *node.Tag) *TagRouterGraphNode {
