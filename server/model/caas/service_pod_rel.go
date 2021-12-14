@@ -1,8 +1,8 @@
 package caas
 
 type ServicePodRel struct {
-	ServiceID int64 `json:"serviceId" gorm:"column:service_id;index;comment:"`
-	PodID     int64 `json:"podId" gorm:"column:pod_id;index;comment:"`
+	Service int64 `json:"service" gorm:"column:service;index;comment:"`
+	Pod     int64 `json:"pod" gorm:"column:pod;index;comment:"`
 }
 
 func (this ServicePodRel) TableName() string {

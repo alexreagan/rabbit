@@ -32,6 +32,12 @@ func (s *TreeReBuilder) Start() {
 
 	s.wg.Add(1)
 	go func() {
+		defer func() {
+			err := recover()
+			if err != nil {
+				log.Error(err)
+			}
+		}()
 		s.StartReBuilder()
 		defer s.wg.Done()
 	}()

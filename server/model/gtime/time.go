@@ -7,6 +7,7 @@ import (
 )
 
 const timeFormat = "2006-01-02 15:04:05"
+const timeFormatLocal = "2006-01-02T15:04:05+08:00"
 
 type GTime struct {
 	time.Time
@@ -14,6 +15,10 @@ type GTime struct {
 
 func NewGTime(v time.Time) GTime {
 	return GTime{Time: v}
+}
+
+func ZeroTime() GTime {
+	return GTime{Time: time.Time{}}
 }
 
 func Now() GTime {
@@ -27,6 +32,23 @@ func (t GTime) MarshalJSON() ([]byte, error) {
 	}
 	formatted := fmt.Sprintf("\"%s\"", t.Format(timeFormat))
 	return []byte(formatted), nil
+}
+
+func (t *GTime) UnmarshalJSON(data []byte) error {
+	if string(data) == "null" || string(data) == "" {
+		*t = ZeroTime()
+		return nil
+	}
+
+	tm, err := time.ParseInLocation(timeFormat, string(data[1:len(data)-1]), time.Local)
+	if err != nil {
+		tm, err = time.ParseInLocation(timeFormatLocal, string(data[1:len(data)-1]), time.Local)
+		*t = NewGTime(tm)
+		return err
+	} else {
+		*t = NewGTime(tm)
+		return err
+	}
 }
 
 func (t GTime) Value() (driver.Value, error) {

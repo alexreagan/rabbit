@@ -2,24 +2,25 @@ package sys
 
 import (
 	"fmt"
-	"github.com/alexreagan/rabbit/server/controller/node"
+	"github.com/alexreagan/rabbit/server/controller/caas"
 	h "github.com/alexreagan/rabbit/server/helper"
+	"github.com/alexreagan/rabbit/server/model"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 	"net/http"
 )
 
 func EnvList(c *gin.Context) {
-	var inputs node.APIGetEnvListInputs
+	var inputs caas.APIGetEnvListInputs
 
 	if err := c.Bind(&inputs); err != nil {
 		h.JSONR(c, h.BadStatus, err)
 		return
 	}
 
-	var variables []*h.APIGetVariableItem
+	var variables []*model.APIGetVariableItem
 	for key, val := range viper.GetStringMapString(fmt.Sprintf("%s", inputs.Name)) {
-		variables = append(variables, &h.APIGetVariableItem{
+		variables = append(variables, &model.APIGetVariableItem{
 			Label: val,
 			Value: key,
 		})

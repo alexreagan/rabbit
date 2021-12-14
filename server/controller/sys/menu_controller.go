@@ -96,8 +96,8 @@ func MenuUpdate(c *gin.Context) {
 // @Description
 // @Produce json
 // @Param id path int true "根据ID获取菜单信息"
-// @Success 200 {object} portal.Menu
-// @Failure 400 {object} portal.Menu
+// @Success 200 {object} sys.Menu
+// @Failure 400 {object} sys.Menu
 // @Router /api/v1/menu/info/:id [get]
 func MenuInfo(c *gin.Context) {
 	id := c.Param("id")

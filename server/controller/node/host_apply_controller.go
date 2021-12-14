@@ -1,8 +1,10 @@
 package node
 
 import (
+	"encoding/json"
 	"github.com/alexreagan/rabbit/g"
 	h "github.com/alexreagan/rabbit/server/helper"
+	"github.com/alexreagan/rabbit/server/model/app"
 	"github.com/alexreagan/rabbit/server/model/gtime"
 	"github.com/alexreagan/rabbit/server/model/node"
 	"github.com/alexreagan/rabbit/server/utils"
@@ -20,9 +22,15 @@ type APIGetHostApplyRequestListInputs struct {
 	Order   string `json:"order" form:"order"`
 }
 
+type APIGetHostApplyRequestListData struct {
+	node.HostApplyRequest
+	Hosts []*node.Host `json:"hosts"`
+	Tags  []*app.Tag   `json:"tags"`
+}
+
 type APIGetHostApplyRequestListOutputs struct {
-	List       []*node.HostApplyRequest `json:"list"`
-	TotalCount int64                    `json:"totalCount"`
+	List       []*APIGetHostApplyRequestListData `json:"list"`
+	TotalCount int64                             `json:"totalCount"`
 }
 
 // @Summary 机器资源申请列表
@@ -60,8 +68,34 @@ func HostApplyRequestList(c *gin.Context) {
 	db = db.Offset(offset).Limit(limit)
 	db.Find(&requests)
 
+	var data []*APIGetHostApplyRequestListData
+	for _, req := range requests {
+		var tags []*app.Tag
+		if req.TagIDs != "" {
+			var tagIDs []int64
+			json.Unmarshal([]byte(req.TagIDs), &tagIDs)
+
+			db = g.Con().Portal.Debug().Model(app.Tag{})
+			db.Where("id in (?)", tagIDs).Find(&tags)
+		}
+
+		var hosts []*node.Host
+		if req.HostIDs != "" {
+			var hostIDs []int64
+			json.Unmarshal([]byte(req.HostIDs), &hostIDs)
+			db = g.Con().Portal.Debug().Model(node.Host{})
+			db.Where("id in (?)", hostIDs).Find(&hosts)
+		}
+
+		data = append(data, &APIGetHostApplyRequestListData{
+			HostApplyRequest: *req,
+			Tags:             tags,
+			Hosts:            hosts,
+		})
+	}
+
 	resp := &APIGetHostApplyRequestListOutputs{
-		List:       requests,
+		List:       data,
 		TotalCount: totalCount,
 	}
 	h.JSONR(c, http.StatusOK, resp)
@@ -96,7 +130,7 @@ type APIPostHostApplyRequestCreateInputs struct {
 // @Summary 创建机器申请单
 // @Description
 // @Produce json
-// @Param APIPostHostApplyRequestCreateInputs formData APIPostHostApplyRequestCreateInputs true "创建机器申请单"
+// @Param APIPostHostApplyRequestCreateInputs body APIPostHostApplyRequestCreateInputs true "创建机器申请单"
 // @Success 200 json node.HostApplyRequest
 // @Failure 400 json error
 // @Router /api/v1/host_apply_request/create [post]
@@ -131,5 +165,65 @@ func HostApplyRequestCreate(c *gin.Context) {
 
 	h.JSONR(c, h.OKStatus, req)
 	return
+}
 
+type APIPostHostApplyRequestAssignInputs struct {
+	ID      int64   `json:"id" form:"id"`
+	TagIDs  []int64 `json:"tagIDs" form:"tagIDs"`
+	HostIDs []int64 `json:"hostIDs" form:"hostIDs"`
+	State   string  `json:"state" form:"state"`
+}
+
+// @Summary 创建机器申请单处理
+// @Description
+// @Produce json
+// @Param APIPostHostApplyRequestAssignInputs body APIPostHostApplyRequestAssignInputs true "创建机器申请单处理"
+// @Success 200 json node.HostApplyAssignRequest
+// @Failure 400 json error
+// @Router /api/v1/host_apply_request/assign [put]
+func HostApplyRequestAssign(c *gin.Context) {
+	var inputs APIPostHostApplyRequestAssignInputs
+	if err := c.Bind(&inputs); err != nil {
+		h.JSONR(c, h.BadStatus, err)
+		return
+	}
+
+	user, _ := h.GetUser(c)
+
+	hostIDArrayBytes, _ := json.Marshal(inputs.HostIDs)
+	tagIDsArrayBytes, _ := json.Marshal(inputs.TagIDs)
+	req := &node.HostApplyRequest{
+		Assigner: user.JgygUserId,
+		AssignAt: gtime.Now(),
+		State:    node.HostApplyStateSuccess,
+		HostIDs:  string(hostIDArrayBytes),
+		TagIDs:   string(tagIDsArrayBytes),
+	}
+
+	tx := g.Con().Portal.Begin().Debug()
+	if dt := tx.Model(req).Where("id = ?", inputs.ID).Updates(req); dt.Error != nil {
+		h.JSONR(c, h.ExpecStatus, dt.Error)
+		dt.Rollback()
+		return
+	}
+
+	for _, hostID := range inputs.HostIDs {
+		for _, tagID := range inputs.TagIDs {
+			rel := &node.HostTagRel{
+				Host: hostID,
+				Tag:  tagID,
+			}
+			if !rel.Existing() {
+				if dt := tx.Model(rel).Create(rel); dt.Error != nil {
+					h.JSONR(c, h.ExpecStatus, dt.Error)
+					dt.Rollback()
+					return
+				}
+			}
+		}
+	}
+	tx.Commit()
+
+	h.JSONR(c, h.OKStatus, req)
+	return
 }

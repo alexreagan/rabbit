@@ -47,17 +47,35 @@ func (s *KunYuanSyncer) Start() {
 
 	s.wg.Add(1)
 	go func() {
+		defer func() {
+			err := recover()
+			if err != nil {
+				log.Error(err)
+			}
+		}()
 		s.StartBaseSyncer()
 		defer s.wg.Done()
 	}()
 
 	s.wg.Add(1)
 	go func() {
+		defer func() {
+			err := recover()
+			if err != nil {
+				log.Error(err)
+			}
+		}()
 		s.StartMonitorSyncer()
 		defer s.wg.Done()
 	}()
 	s.wg.Add(1)
 	go func() {
+		defer func() {
+			err := recover()
+			if err != nil {
+				log.Error(err)
+			}
+		}()
 		s.StartAlertSyncer()
 		defer s.wg.Done()
 	}()
@@ -232,7 +250,7 @@ func (s *KunYuanSyncer) Login() (*KunYuanLoginResult, error) {
 
 	body, _ := ioutil.ReadAll(resp.Body)
 	err = json.Unmarshal(body, lr)
-	log.Printf("Login Result: %s", body)
+	log.Debugf("Login Result: %s", body)
 	return lr, err
 }
 
@@ -259,7 +277,7 @@ func (s *KunYuanSyncer) GetKunyuanBaseResult(abbr string, page int, lr *KunYuanL
 		log.Errorln(err)
 		return syncerResult, err
 	}
-	log.Printf("[KunyuanSync] SyncBaseResult: %s", buf)
+	log.Debugf("[KunyuanSync] SyncBaseResult: %s", buf)
 	err = json.Unmarshal(buf, &syncerResult)
 	return syncerResult, err
 }
@@ -361,7 +379,7 @@ func (s *KunYuanSyncer) GetKunyuanMonitorResult(abbr string, page int, lr *KunYu
 		log.Errorln(err)
 		return syncerResult, err
 	}
-	log.Printf("[KunyuanSync] SyncMonitorResult: %s", buf)
+	log.Debugf("[KunyuanSync] SyncMonitorResult: %s", buf)
 	err = json.Unmarshal(buf, &syncerResult)
 	return syncerResult, err
 }
@@ -423,7 +441,7 @@ func (s *KunYuanSyncer) GetKunyuanAlertResult(page int, lr *KunYuanLoginResult) 
 	query.Add("firingTimeEnd", formatTimeEnd)
 	req.URL.RawQuery = query.Encode()
 	req.Header.Set("Authorization", fmt.Sprintf("%s %s", "Bearer", lr.AccessToken))
-	log.Printf("request url: %s, params: %+v, headers: %+v", req.URL, query, req.Header)
+	log.Debugf("request url: %s, params: %+v, headers: %+v", req.URL, query, req.Header)
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		log.Errorln(err)

@@ -2,7 +2,9 @@ package node
 
 import (
 	"github.com/alexreagan/rabbit/g"
+	"github.com/alexreagan/rabbit/server/model/app"
 	"github.com/spf13/viper"
+	"sort"
 	"time"
 )
 
@@ -56,7 +58,7 @@ type Host struct {
 	CreateTime           time.Time    `json:"createTime" gorm:"column:create_time;default:null;comment:"`
 	UpdateTime           time.Time    `json:"updateTime" gorm:"column:update_time;default:null;comment:"`
 	State                string       `json:"state" gorm:"column:state;type:enum('servicing','offline');default:servicing;comment:机器状态"`
-	Tags                 []*Tag       `json:"tags" gorm:"-"`
+	Tags                 []*app.Tag   `json:"tags" gorm:"-"`
 	Groups               []*HostGroup `json:"groups" gorm:"-"`
 	IsWarning            bool         `json:"isWarning" gorm:"-"`
 	Type                 string       `json:"type" gorm:"-"`
@@ -101,9 +103,9 @@ func (this Host) MeetWarningCondition() bool {
 	return false
 }
 
-func (this Host) RelatedTags() []*Tag {
-	var tags []*Tag
-	db := g.Con().Portal.Model(Tag{}).Debug()
+func (this Host) RelatedTags() []*app.Tag {
+	var tags []*app.Tag
+	db := g.Con().Portal.Model(app.Tag{}).Debug()
 	db = db.Select("`tag`.*, `tag_category`.name as category_name")
 	db = db.Joins("left join `host_tag_rel` on `host_tag_rel`.tag = `tag`.id")
 	db = db.Joins("left join `tag_category` on `tag_category`.id = `tag`.category_id")
@@ -128,4 +130,8 @@ func (t Hosts) Less(i, j int) bool {
 
 func (t Hosts) Swap(i, j int) {
 	t[i], t[j] = t[j], t[i]
+}
+
+func (t Hosts) Sort() {
+	sort.Sort(t)
 }

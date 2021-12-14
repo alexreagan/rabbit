@@ -28,8 +28,8 @@ type APIGetParamListOutputs struct {
 // @Description
 // @Produce json
 // @Param APIGetParamListInputs query APIGetParamListInputs true "根据查询条件分页查询参数列表"
-// @Success 200 {object} APIGetHostListOutputs
-// @Failure 400 {object} APIGetHostListOutputs
+// @Success 200 {object} APIGetParamListOutputs
+// @Failure 400 {object} APIGetParamListOutputs
 // @Router /api/v1/param/list [get]
 func ParamList(c *gin.Context) {
 	var inputs APIGetParamListInputs
@@ -96,7 +96,7 @@ type APIPostParamCreateInputs struct {
 // @Summary 创建新参数
 // @Description
 // @Produce json
-// @Param APIPostParamCreateInputs formData APIPostParamCreateInputs true "创建新参数"
+// @Param APIPostParamCreateInputs body APIPostParamCreateInputs true "创建新参数"
 // @Success 200 json sys.Param
 // @Failure 400 json errors
 // @Router /api/v1/param/create [post]
@@ -125,7 +125,7 @@ func ParamCreate(c *gin.Context) {
 // @Summary 更新参数
 // @Description
 // @Produce json
-// @Param APIPostParamCreateInputs formData APIPostParamCreateInputs true "更新参数"
+// @Param APIPostParamCreateInputs body APIPostParamCreateInputs true "更新参数"
 // @Success 200 json sys.Param
 // @Failure 400 json errors
 // @Router /api/v1/param/update [put]

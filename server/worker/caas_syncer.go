@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"github.com/alexreagan/rabbit/g"
 	"github.com/alexreagan/rabbit/server/model/caas"
+	"github.com/alexreagan/rabbit/server/model/gtime"
+	"github.com/alexreagan/rabbit/server/service"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"io/ioutil"
@@ -39,9 +41,56 @@ func (s *CaasSyncer) Start() {
 
 	s.wg.Add(1)
 	go func() {
+		defer func() {
+			err := recover()
+			if err != nil {
+				log.Error(err)
+			}
+		}()
 		s.StartSyncer()
 		defer s.wg.Done()
 	}()
+
+	s.wg.Add(1)
+	go func() {
+		defer func() {
+			err := recover()
+			if err != nil {
+				log.Error(err)
+			}
+		}()
+		s.StartClean()
+		defer s.wg.Done()
+	}()
+}
+
+func (s *CaasSyncer) Clean() {
+	log.Debugf("[CaasSyncer] Clean...")
+	latestTime := service.CaasService.GetNameSpaceLatestTime()
+	oneDayBeforeLatestTime := latestTime.AddDate(0, 0, -1)
+	service.CaasService.DeleteNameSpaceBeforeTime(oneDayBeforeLatestTime)
+	service.CaasService.DeleteServiceBeforeTime(oneDayBeforeLatestTime)
+	service.CaasService.DeletePodBeforeTime(oneDayBeforeLatestTime)
+	service.CaasService.DeletePortBeforeTime(oneDayBeforeLatestTime)
+}
+
+func (s *CaasSyncer) StartClean() {
+	log.Debugf("[CaasSyncer] StartClean...")
+	// 启动
+	s.Clean()
+
+	// 清理定时器启动
+	cleanDur := viper.GetDuration("caas_syncer.clean.duration") * time.Second
+	cleanTicker := time.NewTicker(cleanDur)
+	for {
+		select {
+		case <-s.ctx.Done():
+			log.Println("ctx done")
+			return
+		case <-cleanTicker.C:
+			s.Clean()
+		}
+	}
 }
 
 func (s *CaasSyncer) StartSyncer() {
@@ -50,7 +99,7 @@ func (s *CaasSyncer) StartSyncer() {
 	s.Sync()
 
 	// 时间定时器启动
-	dur := viper.GetDuration("caas_syncer.duration") * time.Second
+	dur := viper.GetDuration("caas_syncer.sync.duration") * time.Second
 	ticker := time.NewTicker(dur)
 	for {
 		select {
@@ -83,7 +132,6 @@ func (s *CaasSyncer) Sync() {
 		return
 	}
 
-	//db := g.Con().Portal.Debug()
 	for _, ws := range wsResult.Data {
 		log.Debugf("%+v", ws)
 		// 更新数据库
@@ -98,6 +146,8 @@ func (s *CaasSyncer) Sync() {
 		for _, ns := range nsResult.Data {
 			// 更新数据库
 			UpdateNamespace(&ns)
+			// app
+			UpdateApps(&ns)
 
 			// service
 			services, err := GetService(ns)
@@ -182,6 +232,91 @@ type CaasWorkSpaceResult struct {
 	Msg  string           `json:"msg"`
 }
 
+type App struct {
+	ID          int64     `json:"Id"`
+	AppName     string    `json:"AppName"`
+	NameSpaceId int64     `json:"NamespaceID"`
+	Description string    `json:"Description"`
+	CreateTime  time.Time `json:"CreateTime"`
+}
+
+type CaasAppResult struct {
+	Code int64  `json:"code"`
+	Data []App  `json:"data"`
+	Msg  string `json:"msg"`
+}
+
+// UpdateApps 更新应用列表
+func UpdateApps(ns *caas.NameSpace) {
+	appResult, err := GetApp(ns)
+	if err != nil {
+		log.Error(err)
+		return
+	}
+	for _, app := range appResult.Data {
+		UpdateApp(&app)
+	}
+}
+
+func UpdateApp(app *App) {
+	napp := caas.App{
+		ID:          app.ID,
+		AppName:     app.AppName,
+		NameSpaceId: app.NameSpaceId,
+		Description: app.Description,
+		CreateTime:  gtime.NewGTime(app.CreateTime),
+		UpdateTime:  gtime.Now(),
+	}
+
+	db := g.Con().Portal.Debug()
+	tapp := caas.App{}
+	db.Model(napp).Debug().Where(caas.App{ID: napp.ID}).First(&tapp)
+	if tapp.ID == 0 {
+		db.Model(napp).Create(&napp)
+	} else {
+		db.Model(napp).Updates(&napp)
+	}
+}
+
+// GetApp 获取单页应用列表
+func GetApp(ns *caas.NameSpace) (*CaasAppResult, error) {
+	namespaceID := ns.ID
+	clusterID := ns.ClusterId
+	lr, err := Login()
+	if err != nil || lr.Data.Token == "" {
+		log.Errorln(err)
+		return nil, err
+	}
+	token := lr.Data.Token
+
+	log.Debugf("[CaasSyncer] GetApp...")
+	app := &CaasAppResult{}
+	appUrl := viper.GetString("caas_syncer.app.url")
+	appUrl = fmt.Sprintf(appUrl, namespaceID)
+	req, _ := http.NewRequest(http.MethodGet, appUrl, nil)
+	query := req.URL.Query()
+	//query.Add("current", strconv.Itoa(page))
+	req.URL.RawQuery = query.Encode()
+	req.Header.Add("Content-Type", "application/json;charset=UTF-8")
+	req.Header.Add("Connection", "Keep-Alive")
+	req.Header.Add("Authorization", token)
+	req.Header.Add("clusterId", strconv.FormatInt(clusterID, 10))
+	log.Debugf("request url: %s, params: %+v, headers: %+v", req.URL, query, req.Header)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		log.Errorln(err)
+		return app, err
+	}
+	defer resp.Body.Close()
+
+	body, _ := ioutil.ReadAll(resp.Body)
+	log.Debugf("[CaasSyncer] GetAppResult: %s", body)
+	err = json.Unmarshal(body, app)
+	log.Debugf("[CaasSyncer] GetAppObj: %+v", app)
+
+	return app, err
+}
+
 // GetWorkSpace 获取组织空间列表
 func GetWorkSpace() (*CaasWorkSpaceResult, error) {
 	lr, err := Login()
@@ -248,7 +383,7 @@ func GetNameSpace(workspaceId int64) (*CaasNameSpaceResult, error) {
 	body, _ := ioutil.ReadAll(resp.Body)
 	log.Debugf("[CaasSyncer] GetNameSpaceResult: %s", body)
 	err = json.Unmarshal(body, &ns)
-	log.Printf("[CaasSyncer] GetNameSpaceObj: %+v", ns)
+	log.Debugf("[CaasSyncer] GetNameSpaceObj: %+v", ns)
 
 	return ns, err
 }
@@ -261,7 +396,7 @@ type CaasServiceResult struct {
 
 // GetService 获取项目空间下的服务列表
 func GetService(ns caas.NameSpace) (*CaasServiceResult, error) {
-	namespaceId := ns.ID
+	namespaceID := ns.ID
 	clusterId := ns.ClusterId
 	lr, err := Login()
 	if err != nil || lr.Data.Token == "" {
@@ -273,7 +408,7 @@ func GetService(ns caas.NameSpace) (*CaasServiceResult, error) {
 	log.Debugf("[CaasSyncer] GetService...")
 	sr := &CaasServiceResult{}
 	serviceUrl := viper.GetString("caas_syncer.service.url")
-	serviceUrl = fmt.Sprintf(serviceUrl, namespaceId)
+	serviceUrl = fmt.Sprintf(serviceUrl, namespaceID)
 	req, _ := http.NewRequest(http.MethodGet, serviceUrl, nil)
 	query := req.URL.Query()
 	query.Add("type", "deployment")
@@ -282,7 +417,7 @@ func GetService(ns caas.NameSpace) (*CaasServiceResult, error) {
 	req.Header.Add("Connection", "Keep-Alive")
 	req.Header.Add("Authorization", token)
 	req.Header.Add("clusterId", strconv.FormatInt(clusterId, 10))
-	log.Printf("request url: %s, params: %+v, headers: %+v", req.URL, query, req.Header)
+	log.Debugf("request url: %s, params: %+v, headers: %+v", req.URL, query, req.Header)
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		log.Errorln(err)
@@ -305,7 +440,7 @@ type CaasPodResult struct {
 }
 
 func UpdateWorkspace(ws *caas.WorkSpace) {
-	ws.UpdateTime = time.Now()
+	ws.UpdateTime = gtime.NewGTime(time.Now())
 
 	db := g.Con().Portal.Debug()
 	t := caas.WorkSpace{}
@@ -318,7 +453,7 @@ func UpdateWorkspace(ws *caas.WorkSpace) {
 }
 
 func UpdateService(ser *caas.Service) {
-	ser.UpdateTime = time.Now()
+	ser.UpdateTime = gtime.Now()
 
 	db := g.Con().Portal.Debug()
 	tser := caas.Service{}
@@ -332,7 +467,7 @@ func UpdateService(ser *caas.Service) {
 }
 
 func UpdateNamespace(ns *caas.NameSpace) {
-	ns.UpdateTime = time.Now()
+	ns.UpdateTime = gtime.NewGTime(time.Now())
 
 	db := g.Con().Portal.Debug()
 	n := caas.NameSpace{}
@@ -349,7 +484,7 @@ func UpdateServicePorts(ser *caas.Service) {
 
 	var ports []int64
 	for _, p := range ser.Ports {
-		p.UpdateTime = time.Now()
+		p.UpdateTime = gtime.NewGTime(time.Now())
 
 		port := caas.Port{}
 		db.Model(port).Where(caas.Port{Host: p.Host}).First(&port)
@@ -362,17 +497,17 @@ func UpdateServicePorts(ser *caas.Service) {
 		ports = append(ports, p.ID)
 	}
 	// service port rel
-	db.Model(caas.ServicePortRel{}).Debug().Where(&caas.ServicePortRel{ServiceID: ser.ID}).Delete(&caas.ServicePortRel{})
+	db.Model(caas.ServicePortRel{}).Debug().Where(&caas.ServicePortRel{Service: ser.ID}).Delete(&caas.ServicePortRel{})
 	for _, p := range RemoveRepeated(ports) {
-		db.Model(caas.ServicePortRel{}).Debug().Create(&caas.ServicePortRel{ServiceID: ser.ID, PortID: p})
+		db.Model(caas.ServicePortRel{}).Debug().Create(&caas.ServicePortRel{Service: ser.ID, Port: p})
 	}
 }
 
 func UpdateNamespaceServiceRel(ns *caas.NameSpace, ser *caas.Service) {
 	db := g.Con().Portal.Debug()
 	rel := caas.NamespaceServiceRel{
-		NamespaceID: ns.ID,
-		ServiceID:   ser.ID,
+		NameSpace: ns.ID,
+		Service:   ser.ID,
 	}
 	if !rel.Existing() {
 		db.Model(rel).Create(&rel)
@@ -385,7 +520,7 @@ func UpdatePods(ser *caas.Service, pods *CaasPodResult) {
 	// 更新数据库
 	var podIds []int64
 	for _, p := range pods.Data {
-		p.UpdateTime = time.Now()
+		p.UpdateTime = gtime.NewGTime(time.Now())
 
 		pod := caas.Pod{}
 		db.Model(pod).Where(caas.Pod{Name: p.Name}).First(&pod)
@@ -401,9 +536,9 @@ func UpdatePods(ser *caas.Service, pods *CaasPodResult) {
 
 	// service pod rel
 	var rels []caas.ServicePodRel
-	db.Model(caas.ServicePodRel{}).Where(&caas.ServicePodRel{ServiceID: ser.ID}).Delete(&rels)
+	db.Model(caas.ServicePodRel{}).Where(&caas.ServicePodRel{Service: ser.ID}).Delete(&rels)
 	for _, p := range RemoveRepeated(podIds) {
-		db.Model(caas.ServicePodRel{}).Create(&caas.ServicePodRel{ServiceID: ser.ID, PodID: p})
+		db.Model(caas.ServicePodRel{}).Create(&caas.ServicePodRel{Service: ser.ID, Pod: p})
 	}
 }
 
@@ -429,7 +564,7 @@ func GetPod(namespace *caas.NameSpace, service *caas.Service) (*CaasPodResult, e
 	req.Header.Set("Connection", "Keep-Alive")
 	req.Header.Set("Authorization", token)
 	req.Header.Set("clusterId", strconv.FormatInt(namespace.ClusterId, 10))
-	log.Printf("request url: %s, params: %+v, headers: %+v", req.URL, query, req.Header)
+	log.Debugf("request url: %s, params: %+v, headers: %+v", req.URL, query, req.Header)
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		log.Errorln(err)

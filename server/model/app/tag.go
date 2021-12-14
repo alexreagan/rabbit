@@ -1,7 +1,8 @@
-package node
+package app
 
 import (
 	"github.com/alexreagan/rabbit/server/model/gtime"
+	"sort"
 )
 
 type TagCategory struct {
@@ -18,7 +19,7 @@ func (t TagCategory) TableName() string {
 
 type Tag struct {
 	ID           int64       `json:"id" gorm:"primary_key;column:id"`
-	Name         string      `json:"name" gorm:"column:name;unique;type:string;size:128;comment:tag名称"`
+	Name         string      `json:"name" gorm:"column:name;type:string;size:128;comment:tag名称"`
 	CnName       string      `json:"cnName" gorm:"column:cn_name;unique;type:string;size:128;comment:tag中文名称"`
 	CategoryID   int64       `json:"categoryID" gorm:"column:category_id;comment:所属类别id"`
 	Remark       string      `json:"remark" gorm:"column:remark;type:string;size:1024;comment:tag描述"`
@@ -40,4 +41,8 @@ func (t Tags) Less(i, j int) bool {
 
 func (t Tags) Swap(i, j int) {
 	t[i], t[j] = t[j], t[i]
+}
+
+func (t Tags) Sort() {
+	sort.Sort(t)
 }

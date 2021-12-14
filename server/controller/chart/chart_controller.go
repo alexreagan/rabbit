@@ -1,4 +1,4 @@
-package node
+package chart
 
 import (
 	"github.com/alexreagan/rabbit/g"
@@ -46,78 +46,69 @@ type APIGetChartPieOutputs struct {
 	Series APIGetChartPieSeries `json:"series"`
 }
 
-type GroupNodeChart struct {
-	GroupId        int64  `json:"groupId"`
-	GroupName      string `json:"groupName"`
-	GroupPath      string `json:"groupPath"`
-	GroupPathArray string `json:"groupPathArray"`
-	NodeCount      string `json:"nodeCount"`
+type TagNodeChart struct {
+	TagID   int64  `json:"tagID"`
+	TagName string `json:"tagName"`
+	//GroupPath      string `json:"groupPath"`
+	//GroupPathArray string `json:"groupPathArray"`
+	NodeCount string `json:"nodeCount"`
 }
 
-type GroupCpuChart struct {
-	GroupId        int64  `json:"groupId"`
-	GroupName      string `json:"groupName"`
-	GroupPath      string `json:"groupPath"`
-	GroupPathArray string `json:"groupPathArray"`
-	CpuCount       string `json:"cpuCount"`
+type TagCpuChart struct {
+	TagID   int64  `json:"tagID"`
+	TagName string `json:"tagName"`
+	//GroupPath      string `json:"groupPath"`
+	//GroupPathArray string `json:"groupPathArray"`
+	CpuCount string `json:"cpuCount"`
 }
 
-//func ArrayStringJoin(arr string) string {
-//	var path []string
-//	json.Unmarshal([]byte(arr), &path)
-//	return strings.Join(path, "/")
-//}
-
-// @Summary 按照host_group统计host_group下的CPU个数
+// @Summary 按照tag统计tag下的CPU个数
 // @Description
 // @Produce json
 // @Success 200 {object} APIGetChartBarOutputs
 // @Failure 400 {object} APIGetChartBarOutputs
 // @Router /api/v1/chart/bar [get]
 func ChartBar(c *gin.Context) {
-	var gnCharts []GroupNodeChart
-	db := g.Con().Portal.Debug().Table(node.HostGroupRel{}.TableName())
-	db = db.Select("`host_group_rel`.`group_id`, `host_group`.`name` as group_name, " +
-		"`host_group`.`path` as group_path, `host_group`.`path_array` as group_path_array, count(*) as node_count")
-	db = db.Joins(" left join `host_group` on `host_group_rel`.group_id = `host_group`.id")
-	db = db.Group("`host_group_rel`.group_id")
+	var tnCharts []TagNodeChart
+	db := g.Con().Portal.Debug().Model(node.HostTagRel{})
+	db = db.Select("`host_tag_rel`.`tag` as tag_id, `tag`.`name` as tag_name, count(*) as node_count")
+	db = db.Joins(" left join `tag` on `host_tag_rel`.tag = `tag`.id")
+	db = db.Group("`host_tag_rel`.tag")
 	db = db.Having("count(*)>0")
-	db = db.Order("`host_group_rel`.`group_id`")
-	db = db.Find(&gnCharts)
+	db = db.Order("`host_tag_rel`.`tag`")
+	db = db.Find(&tnCharts)
 
-	var gcCharts []GroupCpuChart
-	db = g.Con().Portal.Debug().Table(node.HostGroupRel{}.TableName())
-	db = db.Select("`host_group_rel`.`group_id`, `host_group`.`name` as group_name, " +
-		"`host_group`.`path_array` as group_path_array, `host_group`.`path` as group_path, " +
-		"sum(`host`.`cpu_number`) as cpu_count")
-	db = db.Joins(" left join `host_group` on `host_group_rel`.group_id = `host_group`.id")
-	db = db.Joins(" left join `host` on `host_group_rel`.host_id = `host`.id")
-	db = db.Group("`host_group_rel`.group_id")
+	var tcCharts []TagCpuChart
+	db = g.Con().Portal.Debug().Model(node.HostTagRel{})
+	db = db.Select("`host_tag_rel`.`tag` as tag_id, `tag`.`name` as tag_name, sum(`host`.`cpu_number`) as cpu_count")
+	db = db.Joins(" left join `tag` on `host_tag_rel`.tag = `tag`.id")
+	db = db.Joins(" left join `host` on `host_tag_rel`.host = `host`.id")
+	db = db.Group("`host_tag_rel`.`tag`")
 	db = db.Having("count(*)>0")
-	db = db.Order("`host_group_rel`.`group_id`")
-	db = db.Find(&gcCharts)
+	db = db.Order("`host_tag_rel`.`tag`")
+	db = db.Find(&tcCharts)
 
-	var gnChartDataMap map[string]int64
-	gnChartDataMap = make(map[string]int64)
-	for _, gnChart := range gnCharts {
-		cnt, _ := strconv.ParseInt(gnChart.NodeCount, 10, 64)
-		gnChartDataMap[gnChart.GroupPath] = cnt
+	var tagChartDataMap map[string]int64
+	tagChartDataMap = make(map[string]int64)
+	for _, tnChart := range tnCharts {
+		cnt, _ := strconv.ParseInt(tnChart.NodeCount, 10, 64)
+		tagChartDataMap[tnChart.TagName] = cnt
 	}
 
-	var gcChartDataMap map[string]int64
-	gcChartDataMap = make(map[string]int64)
-	for _, gcChart := range gcCharts {
-		cnt, _ := strconv.ParseInt(gcChart.CpuCount, 10, 64)
-		gcChartDataMap[gcChart.GroupPath] = cnt
+	var tcChartDataMap map[string]int64
+	tcChartDataMap = make(map[string]int64)
+	for _, tcChart := range tcCharts {
+		cnt, _ := strconv.ParseInt(tcChart.CpuCount, 10, 64)
+		tcChartDataMap[tcChart.TagName] = cnt
 	}
 
 	var xAxisData []string
-	var gnChartData []int64
-	var gcChartData []int64
-	for k, v := range gnChartDataMap {
+	var tnChartData []int64
+	var tcChartData []int64
+	for k, v := range tagChartDataMap {
 		xAxisData = append(xAxisData, k)
-		gnChartData = append(gnChartData, v)
-		gcChartData = append(gcChartData, gcChartDataMap[k])
+		tnChartData = append(tnChartData, v)
+		tcChartData = append(tcChartData, tcChartDataMap[k])
 	}
 
 	var xAxis []APIGetChartBarXAxis
@@ -131,12 +122,12 @@ func ChartBar(c *gin.Context) {
 	series = append(series, APIGetChartBarSeries{
 		Name: "机器数",
 		Type: "bar",
-		Data: gnChartData,
+		Data: tnChartData,
 	})
 	series = append(series, APIGetChartBarSeries{
 		Name: "CPU数",
 		Type: "bar",
-		Data: gcChartData,
+		Data: tcChartData,
 	})
 
 	h.JSONR(c, http.StatusOK, APIGetChartBarOutputs{
@@ -147,60 +138,30 @@ func ChartBar(c *gin.Context) {
 		Series: series,
 	})
 	return
-
-	//var legend []string
-	//var xAxis []APIGetChartBarXAxis
-	//var series []APIGetChartBarSeries
-	//for _, gnChart := range gnCharts {
-	//	legend = append(legend, gnChart.GroupName)
-	//	data, _ := strconv.ParseInt(gnChart.NodeCount, 10, 64)
-	//	series = append(series, APIGetChartBarSeries{
-	//		ServiceName: gnChart.GroupName,
-	//		Type: "bar",
-	//		Data: []int64{data},
-	//	})
-	//}
-	//
-	//xAxis = append(xAxis, APIGetChartBarXAxis{
-	//	Type: "category",
-	//	BoundaryGap: false,
-	//	Data: []string{""},
-	//})
-	//
-	//h.JSONR(c, http.StatusOK, APIGetChartBarOutputs{
-	//	Legend: APIGetChartBarLegend{
-	//		Data: legend,
-	//	},
-	//	XAxis: xAxis,
-	//	Series: series,
-	//})
-	return
 }
 
-// @Summary 按照host_group统计host_group下的CPU个数
+// @Summary 按照tag统计tag下的CPU个数
 // @Description
 // @Produce json
 // @Success 200 {object} APIGetChartBarOutputs
 // @Failure 400 {object} APIGetChartBarOutputs
 // @Router /api/v1/chart/pie [get]
 func ChartPie(c *gin.Context) {
-	var gnCharts []GroupNodeChart
-	db := g.Con().Portal.Debug().Table(node.HostGroupRel{}.TableName())
-	db = db.Select("`host_group_rel`.`group_id`, `host_group`.`name` as group_name, " +
-		"`host_group`.`path` as group_path, `host_group`.`path_array` as group_path_array, " +
-		"count(*) as node_count")
-	db = db.Joins(" left join `host_group` on `host_group_rel`.group_id = `host_group`.id")
-	db = db.Group("`host_group_rel`.group_id")
+	var tnCharts []TagNodeChart
+	db := g.Con().Portal.Debug().Model(node.HostTagRel{})
+	db = db.Select("`host_tag_rel`.`tag` as tag_id, `tag`.`name` as tag_name, count(*) as node_count")
+	db = db.Joins(" left join `tag` on `host_tag_rel`.tag = `tag`.id")
+	db = db.Group("`host_tag_rel`.tag")
 	db = db.Having("count(*)>0")
-	db = db.Order("`host_group_rel`.`group_id`")
-	db = db.Find(&gnCharts)
+	db = db.Order("`host_tag_rel`.`tag`")
+	db = db.Find(&tnCharts)
 
 	var seriesData []APIGetChartPieSeriesItem
-	for _, gnChart := range gnCharts {
-		data, _ := strconv.ParseInt(gnChart.NodeCount, 10, 64)
+	for _, tnChart := range tnCharts {
+		data, _ := strconv.ParseInt(tnChart.NodeCount, 10, 64)
 		seriesData = append(seriesData, APIGetChartPieSeriesItem{
-			//ServiceName:  gnChart.GroupName,
-			Name:  gnChart.GroupPath,
+			//ServiceName:  tnChart.TagName,
+			Name:  tnChart.TagName,
 			Value: data,
 		})
 	}
@@ -256,13 +217,11 @@ func ChartVMStat(c *gin.Context) {
 	}
 
 	var usedStat []APIGetChartStat
-	// 已关联到组的机器
-	//var subStatOutputs []APIGetChartStatOutputs
 	var ids []int64
 	db = g.Con().Portal.Debug().Model(node.Host{})
 	db = db.Select("distinct(`host`.`id`)")
-	db = db.Joins("left join `host_group_rel` on `host`.id=`host_group_rel`.host_id")
-	db = db.Where("`host_group_rel`.group_id is not null;")
+	db = db.Joins("left join `host_tag_rel` on `host`.id=`host_tag_rel`.host")
+	db = db.Where("`host_tag_rel`.tag is not null;")
 	db = db.Find(&ids)
 
 	// 查询所有机器

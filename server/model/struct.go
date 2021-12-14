@@ -1,4 +1,4 @@
-package helper
+package model
 
 type APIGetVariableItem struct {
 	Label string `json:"label"`

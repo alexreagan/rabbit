@@ -250,8 +250,8 @@ func (this HostGroup) RelatedPods() []*caas.Pod {
 	var pods []*caas.Pod
 	tx := g.Con().Portal.Model(caas.Pod{}).Debug()
 	tx = tx.Select("`caas_pod`.*")
-	tx = tx.Joins("left join `caas_service_pod_rel` on `caas_pod`.`id` = `caas_service_pod_rel`.`pod_id`")
-	tx = tx.Where("`caas_service_pod_rel`.`service_id` = ?", this.CaasServiceId)
+	tx = tx.Joins("left join `caas_service_pod_rel` on `caas_pod`.`id` = `caas_service_pod_rel`.`pod`")
+	tx = tx.Where("`caas_service_pod_rel`.`service` = ?", this.CaasServiceId)
 	tx = tx.Find(&pods)
 
 	// 添加报警标识

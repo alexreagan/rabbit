@@ -7,6 +7,7 @@ import (
 	"github.com/alexreagan/rabbit/g"
 	"github.com/alexreagan/rabbit/server"
 	"github.com/alexreagan/rabbit/server/model/alert"
+	"github.com/alexreagan/rabbit/server/model/app"
 	"github.com/alexreagan/rabbit/server/model/caas"
 	"github.com/alexreagan/rabbit/server/model/node"
 	"github.com/alexreagan/rabbit/server/model/sys"
@@ -60,8 +61,8 @@ func main() {
 		g.Con().Portal.AutoMigrate(&node.Host{})
 		g.Con().Portal.AutoMigrate(&node.HostGroup{})
 		g.Con().Portal.AutoMigrate(&node.HostGroupRel{})
-		g.Con().Portal.AutoMigrate(&node.Tag{})
-		g.Con().Portal.AutoMigrate(&node.TagCategory{})
+		g.Con().Portal.AutoMigrate(&app.Tag{})
+		g.Con().Portal.AutoMigrate(&app.TagCategory{})
 		g.Con().Portal.AutoMigrate(&node.HostTagRel{})
 
 		// host apply request
@@ -70,12 +71,14 @@ func main() {
 		// caas
 		g.Con().Portal.AutoMigrate(&caas.WorkSpace{})
 		g.Con().Portal.AutoMigrate(&caas.NameSpace{})
+		g.Con().Portal.AutoMigrate(&caas.App{})
 		g.Con().Portal.AutoMigrate(&caas.Service{})
 		g.Con().Portal.AutoMigrate(&caas.NamespaceServiceRel{})
 		g.Con().Portal.AutoMigrate(&caas.Port{})
 		g.Con().Portal.AutoMigrate(&caas.ServicePortRel{})
 		g.Con().Portal.AutoMigrate(&caas.Pod{})
 		g.Con().Portal.AutoMigrate(&caas.ServicePodRel{})
+		g.Con().Portal.AutoMigrate(&caas.ServiceTagRel{})
 		g.Con().Portal.AutoMigrate(&alert.Alert{})
 	}
 

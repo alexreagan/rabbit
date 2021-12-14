@@ -3,6 +3,7 @@ package alert
 import (
 	"github.com/alexreagan/rabbit/g"
 	h "github.com/alexreagan/rabbit/server/helper"
+	"github.com/alexreagan/rabbit/server/model"
 	"github.com/alexreagan/rabbit/server/model/alert"
 	"github.com/alexreagan/rabbit/server/utils"
 	"github.com/gin-gonic/gin"
@@ -31,7 +32,7 @@ type APIGetAlertListOutputs struct {
 // @Success 200 {object} APIGetAlertListOutputs
 // @Failure 400 {object} APIGetAlertListOutputs
 // @Router /api/v1/alert/list [get]
-func AlertList(c *gin.Context) {
+func List(c *gin.Context) {
 	var inputs APIGetAlertListInputs
 	if err := c.Bind(&inputs); err != nil {
 		h.JSONR(c, h.BadStatus, err)
@@ -79,16 +80,16 @@ func AlertList(c *gin.Context) {
 // @Summary 物理子系统类别
 // @Description
 // @Produce json
-// @Success 200 {object} APIGetVariableOutputs
-// @Failure 400 {object} APIGetVariableOutputs
+// @Success 200 {object} model.APIGetVariableOutputs
+// @Failure 400 {object} model.APIGetVariableOutputs
 // @Router /api/v1/alert/physical_system_choices [get]
-func AlertPhysicalSystemChoices(c *gin.Context) {
-	var data []*h.APIGetVariableItem
+func PhysicalSystemChoices(c *gin.Context) {
+	var data []*model.APIGetVariableItem
 	db := g.Con().Portal.Model(alert.Alert{}).Debug()
 	db = db.Select("distinct `sub_sys_name` as `label`, `sub_sys_en_name` as `value`")
 	db = db.Order("`sub_sys_en_name`")
 	db = db.Find(&data)
-	resp := h.APIGetVariableOutputs{
+	resp := model.APIGetVariableOutputs{
 		List:       data,
 		TotalCount: int64(len(data)),
 	}

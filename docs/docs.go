@@ -25,6 +25,379 @@ var doc = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/v1/alert/list": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "监控报警接口",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "ip",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "orderBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "physicalSystem",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "resolved",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/alert.APIGetAlertListOutputs"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/alert.APIGetAlertListOutputs"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/alert/physical_system_choices": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "物理子系统类别",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.APIGetVariableOutputs"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.APIGetVariableOutputs"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/caas/namespace/list": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "获取caas项目空间信息",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "clusterName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "namespace",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "physicalSystemName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "workspaceName",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/node.APIGetCaasNamespaceListOutputs"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/node.APIGetCaasNamespaceListOutputs"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/caas/pod/:id": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "根据机器ID获取机器详细信息",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "根据机器ID获取机器详细信息",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/caas.Pod"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/caas.Pod"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/caas/pod/list": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "pod列表接口",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "namespace",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "orderBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "serviceName",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/node.APIGetHostListOutputs"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/node.APIGetHostListOutputs"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/caas/service/info": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "获取service详细信息",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "获取service详细信息",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/caas.Service"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/caas.Service"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/caas/service/list": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "更新host group信息",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "serviceName",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/node.APIGetCaasServiceListOutputs"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/node.APIGetCaasServiceListOutputs"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/caas/service/refresh_pods": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "更新service下的pods信息",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "serviceName",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/node.APIGetCaasServiceListOutputs"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/node.APIGetCaasServiceListOutputs"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/caas/workspace/list": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "获取caas组织空间信息",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/node.APIGetCaasWorkspaceListOutputs"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/node.APIGetCaasWorkspaceListOutputs"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/chart/bar": {
             "get": {
                 "produces": [
@@ -42,6 +415,28 @@ var doc = `{
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/node.APIGetChartBarOutputs"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/chart/container/stat": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "统计平台收纳的容器使用量/cpu数/已分配机器数/已分配cpu数",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/node.APIGetChartStatOutputs"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/node.APIGetChartStatOutputs"
                         }
                     }
                 }
@@ -69,7 +464,7 @@ var doc = `{
                 }
             }
         },
-        "/api/v1/chart/stat": {
+        "/api/v1/chart/vm/stat": {
             "get": {
                 "produces": [
                     "application/json"
@@ -86,6 +481,60 @@ var doc = `{
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/node.APIGetChartStatOutputs"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/host/area_choices": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "区域类别",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.APIGetVariableOutputs"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.APIGetVariableOutputs"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/host/batch/update": {
+            "put": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "更新机器标签和负责人",
+                "parameters": [
+                    {
+                        "description": "更新机器标签和负责人信息",
+                        "name": "APIPostHostBatchUpdateInputs",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/node.APIPostHostBatchUpdateInputs"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/node.APIPostHostBatchUpdateInputs"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/node.APIPostHostBatchUpdateInputs"
                         }
                     }
                 }
@@ -164,7 +613,45 @@ var doc = `{
                 }
             }
         },
-        "/api/v1/host/info/:id": {
+        "/api/v1/host/detail": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "根据机器ID或IP获取机器详细信息",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "根据机器ID获取机器详细信息",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "根据机器IP获取机器详细信息",
+                        "name": "ip",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/node.Host"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/node.Host"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/host/info": {
             "get": {
                 "produces": [
                     "application/json"
@@ -175,7 +662,7 @@ var doc = `{
                         "type": "integer",
                         "description": "根据机器ID获取机器详细信息",
                         "name": "id",
-                        "in": "path",
+                        "in": "query",
                         "required": true
                     }
                 ],
@@ -203,18 +690,33 @@ var doc = `{
                 "summary": "机器列表接口",
                 "parameters": [
                     {
-                        "type": "number",
-                        "name": "cpuUsage",
-                        "in": "query"
-                    },
-                    {
-                        "type": "number",
-                        "name": "fsUsage",
-                        "in": "query"
-                    },
-                    {
                         "type": "string",
-                        "name": "group",
+                        "name": "areaName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "cpuNumber",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "name": "cpuUsageLowerLimit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "name": "cpuUsageUpperLimit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "name": "fsUsageLowerLimit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "name": "fsUsageUpperLimit",
                         "in": "query"
                     },
                     {
@@ -225,6 +727,16 @@ var doc = `{
                     {
                         "type": "integer",
                         "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "name": "memoryUsageLowerLimit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "name": "memoryUsageUpperLimit",
                         "in": "query"
                     },
                     {
@@ -249,7 +761,21 @@ var doc = `{
                     },
                     {
                         "type": "string",
+                        "name": "relatedTag",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
                         "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "description": "Group                 string  ` + "`" + `json:\"group\" form:\"group\"` + "`" + `\nBoundGroup            string  ` + "`" + `json:\"boundGroup\" form:\"boundGroup\"` + "`" + `",
+                        "name": "tagIDs[]",
                         "in": "query"
                     }
                 ],
@@ -264,6 +790,28 @@ var doc = `{
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/node.APIGetHostListOutputs"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/host/physical_system_choices": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "物理子系统类别",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.APIGetVariableOutputs"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.APIGetVariableOutputs"
                         }
                     }
                 }
@@ -297,30 +845,6 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "更新Tenant",
-                        "name": "Tenant",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "更新Env",
-                        "name": "Env",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "更新Project",
-                        "name": "Project",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "更新Module",
-                        "name": "Module",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
                         "description": "更新DevOwner",
                         "name": "DevOwner",
                         "in": "formData"
@@ -337,6 +861,119 @@ var doc = `{
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/node.APIPostHostUpdateInputs"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/host_apply_request/create": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "创建机器申请单",
+                "parameters": [
+                    {
+                        "description": "创建机器申请单",
+                        "name": "APIPostHostApplyRequestCreateInputs",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/node.APIPostHostApplyRequestCreateInputs"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "json"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "json"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/host_apply_request/info": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "根据请求单ID获取详细信息",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "根据请求单ID获取详细信息",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/node.Host"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/node.Host"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/host_apply_request/list": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "机器资源申请列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "applier",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "orderBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/node.APIGetHostApplyRequestListOutputs"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/node.APIGetHostApplyRequestListOutputs"
                         }
                     }
                 }
@@ -374,37 +1011,6 @@ var doc = `{
                     {
                         "type": "integer",
                         "description": "根据ID获取host group树状信息",
-                        "name": "id",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/node.APIGetHostGroupTreeOutputs"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/node.APIGetHostGroupTreeOutputs"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/host_group/children": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "获取某个节点的所有子节点",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "获取某个节点的所有子节点",
                         "name": "id",
                         "in": "query",
                         "required": true
@@ -527,43 +1133,12 @@ var doc = `{
                 }
             }
         },
-        "/api/v1/host_group/hosts": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "获取某个节点的所有机器",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "获取某个节点的所有机器",
-                        "name": "id",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/node.APIGetHostGroupTreeOutputs"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/node.APIGetHostGroupTreeOutputs"
-                        }
-                    }
-                }
-            }
-        },
         "/api/v1/host_group/list": {
             "get": {
                 "produces": [
                     "application/json"
                 ],
-                "summary": "更新host group信息",
+                "summary": "获取host group列表",
                 "parameters": [
                     {
                         "type": "integer",
@@ -597,56 +1172,17 @@ var doc = `{
                 }
             }
         },
-        "/api/v1/host_group/move": {
-            "post": {
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "将节点ID移动到parent，作为parent的父节点",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "name": "id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "name": "name",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "name": "parentId",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/node.APIGetHostGroupTreeOutputs"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/node.APIGetHostGroupTreeOutputs"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/host_group/tree": {
+        "/api/v1/host_group/related_hosts": {
             "get": {
                 "produces": [
                     "application/json"
                 ],
-                "summary": "获取host group信息",
+                "summary": "根据group路径获取group下所有的host",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "根据ID获取host group树状信息",
-                        "name": "id",
+                        "type": "string",
+                        "description": "group路径",
+                        "name": "path",
                         "in": "query",
                         "required": true
                     }
@@ -662,34 +1198,6 @@ var doc = `{
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/node.APIGetHostGroupTreeOutputs"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/host_group/tree/rebuild": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "重建群组树",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/node.HostGroup"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/node.HostGroup"
-                            }
                         }
                     }
                 }
@@ -703,13 +1211,13 @@ var doc = `{
                 "summary": "更新host group信息",
                 "parameters": [
                     {
-                        "type": "string",
-                        "name": "desc",
+                        "type": "integer",
+                        "name": "caasServiceId",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "name": "icon",
+                        "name": "desc",
                         "in": "query"
                     },
                     {
@@ -727,13 +1235,18 @@ var doc = `{
                     {
                         "type": "integer",
                         "name": "parentId",
-                        "in": "query",
-                        "required": true
+                        "in": "query"
                     },
                     {
                         "type": "string",
-                        "name": "perms",
+                        "name": "parentName",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "type",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -771,13 +1284,35 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/portal.Menu"
+                            "$ref": "#/definitions/sys.Menu"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/portal.Menu"
+                            "$ref": "#/definitions/sys.Menu"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/menu/nav": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "menu列表",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/sys.APIGetMenuNavListOutputs"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "json"
                         }
                     }
                 }
@@ -826,13 +1361,964 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/portal.APIPostMenuUpdateInputs"
+                            "$ref": "#/definitions/sys.APIPostMenuUpdateInputs"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/portal.APIPostMenuUpdateInputs"
+                            "$ref": "#/definitions/sys.APIPostMenuUpdateInputs"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/param/create": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "创建新参数",
+                "parameters": [
+                    {
+                        "description": "创建新参数",
+                        "name": "APIPostParamCreateInputs",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/sys.APIPostParamCreateInputs"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "json"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "json"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/param/info": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "参数详情",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "param id",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/sys.Param"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "json"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/param/list": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "参数列表接口",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "key",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "orderBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/sys.APIGetParamListOutputs"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/sys.APIGetParamListOutputs"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/param/update": {
+            "put": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "更新参数",
+                "parameters": [
+                    {
+                        "description": "更新参数",
+                        "name": "APIPostParamCreateInputs",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/sys.APIPostParamCreateInputs"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "json"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "json"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/perm/create": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "新建权限接口",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "cnName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "remark",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/uic.APIGetPermCreateOutputs"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/uic.APIGetPermCreateOutputs"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/perm/info": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "查看权限接口",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "查看权限接口",
+                        "name": "request",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/uic.APIGetPermInfoOutputs"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/uic.APIGetPermInfoOutputs"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/perm/list": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "权限列表接口",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "cnName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "orderBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/uic.APIGetPermListOutputs"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/uic.APIGetPermListOutputs"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/perm/myself": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "查看当前用户的权限",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/uic.APIGetPermInfoOutputs"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/uic.APIGetPermInfoOutputs"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/perm/update": {
+            "put": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "更新权限接口",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "cnName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "remark",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/uic.APIGetPermCreateOutputs"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/uic.APIGetPermCreateOutputs"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/role/create": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "新建权限接口",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "cnName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "name": "permList",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "remark",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/uic.APIGetRoleCreateOutputs"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/uic.APIGetRoleCreateOutputs"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/role/info": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "查看权限接口",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "查看权限接口",
+                        "name": "request",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/uic.APIGetRoleInfoOutputs"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/uic.APIGetRoleInfoOutputs"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/role/list": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "角色列表接口",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "orderBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/uic.APIGetRoleListOutputs"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/uic.APIGetRoleListOutputs"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/role/update": {
+            "put": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "更新角色接口",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "cnName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "name": "permList",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "remark",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/uic.APIGetRoleCreateOutputs"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/uic.APIGetRoleCreateOutputs"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/tag/create": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "创建新tag",
+                "parameters": [
+                    {
+                        "description": "创建新tag",
+                        "name": "APIPostTagCreateInputs",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/node.APIPostTagCreateInputs"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/node.APIPostTagCreateInputs"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/node.APIPostTagCreateInputs"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/tag/info": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "tag 详情",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "tag id",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/node.TagCategory"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "json"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/tag/list": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "tag列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "categoryID",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "orderBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "remark",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/node.APIGetTagListOutputs"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/node.APIGetTagListOutputs"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/tag/update": {
+            "put": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "更新tag",
+                "parameters": [
+                    {
+                        "description": "更新tag",
+                        "name": "APIPostTagCreateInputs",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/node.APIPostTagCreateInputs"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/node.APIPostTagCreateInputs"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/node.APIPostTagCreateInputs"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/tag_category/create": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "创建tag category",
+                "parameters": [
+                    {
+                        "description": "创建tag category",
+                        "name": "APIPostTagCategoryCreateInputs",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/node.APIPostTagCategoryCreateInputs"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/node.TagCategory"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/node.TagCategory"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/tag_category/info": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "tag category 详情",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "tag category id",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/node.TagCategory"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "json"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/tag_category/list": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "tag category列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "orderBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/node.APIGetTagCategoryListOutputs"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/node.APIGetTagCategoryListOutputs"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/tag_category/tags": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "查看某一tag category下的tag",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "categoryID",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "categoryName",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/node.APIGetTagCategoryTagsOutputs"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "json"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/tag_category/update": {
+            "put": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "更新tag category",
+                "parameters": [
+                    {
+                        "description": "更新tag category",
+                        "name": "APIPostTagCategoryCreateInputs",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/node.APIPostTagCategoryCreateInputs"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/node.TagCategory"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/node.TagCategory"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/tree": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "获取host group信息",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "根据ID获取host group树状信息",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/node.APIGetHostGroupTreeOutputs"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/node.APIGetHostGroupTreeOutputs"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/tree/rebuild": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "重建群组树",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/node.HostGroup"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/node.HostGroup"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/user/info": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "查看用户信息",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "查看用户信息",
+                        "name": "request",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/uic.APIGetUserInfoOutputs"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/uic.APIGetUserInfoOutputs"
                         }
                     }
                 }
@@ -878,9 +2364,563 @@ var doc = `{
                     }
                 }
             }
+        },
+        "/api/v1/user/myself": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "查看当前用户信息",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/uic.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/uic.User"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/user/update": {
+            "put": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "更新用户信息",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "name": "id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "name": "roleList",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/uic.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/uic.User"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v2/tree": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "根据tags获取tags下所有的机器",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "根据tags获取tags下所有的机器",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/node.APIGetHostGroupTreeOutputs"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/node.APIGetHostGroupTreeOutputs"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "alert.APIGetAlertListInputs": {
+            "type": "object",
+            "properties": {
+                "ip": {
+                    "type": "string"
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "order": {
+                    "type": "string"
+                },
+                "orderBy": {
+                    "type": "string"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "physicalSystem": {
+                    "type": "string"
+                },
+                "resolved": {
+                    "type": "string"
+                }
+            }
+        },
+        "alert.APIGetAlertListOutputs": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/alert.Alert"
+                    }
+                },
+                "totalCount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "alert.Alert": {
+            "type": "object",
+            "properties": {
+                "alertLevel": {
+                    "type": "string"
+                },
+                "alertName": {
+                    "type": "string"
+                },
+                "cloudPoolName": {
+                    "type": "string"
+                },
+                "firingTime": {
+                    "type": "object",
+                    "$ref": "#/definitions/gtime.GTime"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "prodIp": {
+                    "type": "string"
+                },
+                "resolved": {
+                    "type": "boolean"
+                },
+                "resolvedTime": {
+                    "type": "object",
+                    "$ref": "#/definitions/gtime.GTime"
+                },
+                "strategyId": {
+                    "type": "integer"
+                },
+                "strategyName": {
+                    "type": "string"
+                },
+                "strategyType": {
+                    "type": "string"
+                },
+                "subSysEnName": {
+                    "type": "string"
+                },
+                "subSysName": {
+                    "type": "string"
+                },
+                "u1": {
+                    "type": "string"
+                },
+                "u2": {
+                    "type": "string"
+                },
+                "updateTime": {
+                    "type": "object",
+                    "$ref": "#/definitions/gtime.GTime"
+                }
+            }
+        },
+        "caas.NameSpace": {
+            "type": "object",
+            "properties": {
+                "clusterId": {
+                    "type": "integer"
+                },
+                "clusterName": {
+                    "type": "string"
+                },
+                "cpu": {
+                    "type": "integer"
+                },
+                "createTime": {
+                    "type": "string"
+                },
+                "gpu": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "localVolume": {
+                    "type": "integer"
+                },
+                "memory": {
+                    "type": "integer"
+                },
+                "metaData": {
+                    "type": "string"
+                },
+                "namespace": {
+                    "type": "string"
+                },
+                "phSubSystemId": {
+                    "type": "integer"
+                },
+                "phSubSystemName": {
+                    "type": "string"
+                },
+                "sharedVolume": {
+                    "type": "integer"
+                },
+                "updateTime": {
+                    "type": "string"
+                },
+                "workspaceId": {
+                    "type": "integer"
+                },
+                "workspaceName": {
+                    "type": "string"
+                },
+                "zones": {
+                    "type": "string"
+                }
+            }
+        },
+        "caas.Pod": {
+            "type": "object",
+            "properties": {
+                "createTime": {
+                    "type": "string"
+                },
+                "hostIp": {
+                    "type": "string"
+                },
+                "hostName": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "isWarning": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "namespace": {
+                    "type": "string"
+                },
+                "podIp": {
+                    "type": "string"
+                },
+                "serviceName": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "updateTime": {
+                    "type": "string"
+                }
+            }
+        },
+        "caas.Port": {
+            "type": "object",
+            "properties": {
+                "containerPort": {
+                    "type": "string"
+                },
+                "host": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "nodePort": {
+                    "type": "string"
+                },
+                "protocol": {
+                    "type": "string"
+                },
+                "updateTime": {
+                    "type": "string"
+                }
+            }
+        },
+        "caas.Service": {
+            "type": "object",
+            "properties": {
+                "activeDeadlineSeconds": {
+                    "type": "integer"
+                },
+                "affinityType": {
+                    "type": "string"
+                },
+                "appId": {
+                    "type": "integer"
+                },
+                "appName": {
+                    "type": "string"
+                },
+                "clusterIP": {
+                    "type": "string"
+                },
+                "completions": {
+                    "description": "Command               string    ` + "`" + `json:\"command\" gorm:\"column:command;type:string;size:128;comment:\"` + "`" + `\nArg                   string    ` + "`" + `json:\"arg\" gorm:\"column:arg;type:string;size:128;comment:\"` + "`" + `",
+                    "type": "integer"
+                },
+                "cpu": {
+                    "type": "integer"
+                },
+                "createTime": {
+                    "type": "string"
+                },
+                "duration": {
+                    "type": "string"
+                },
+                "externalTrafficPolicy": {
+                    "description": "HostAliases           string    ` + "`" + `json:\"hostAliases\" gorm:\"column:host_aliases;type:string;size:128;comment:\"` + "`" + `",
+                    "type": "string"
+                },
+                "finishTime": {
+                    "type": "string"
+                },
+                "gpu": {
+                    "type": "integer"
+                },
+                "headlessName": {
+                    "description": "NodeSelectorLabel     string    ` + "`" + `json:\"nodeSelectorLabel\" gorm:\"column:node_selector_label;type:string;size:128;comment:\"` + "`" + `\nZones                 string    ` + "`" + `json:\"zones\" gorm:\"column:zones;type:string;size:128;comment:\"` + "`" + `\nReadinessProbeInfo    string    ` + "`" + `json:\"readinessProbeInfo\" gorm:\"column:readiness_probe_info;type:string;size:128;comment:\"` + "`" + `\nLivenessProbeInfo     string    ` + "`" + `json:\"livenessProbeInfo\" gorm:\"column:liveness_probe_info;type:string;size:128;comment:\"` + "`" + `",
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "imageName": {
+                    "description": "Envs         *Envs  ` + "`" + `json:\"envs,omitempty\" gorm:\"foreignkey:app_id;association_foreignkey:id;association_autoupdate:false\"` + "`" + `",
+                    "type": "string"
+                },
+                "imageTag": {
+                    "type": "string"
+                },
+                "memory": {
+                    "type": "integer"
+                },
+                "nowReplicas": {
+                    "type": "integer"
+                },
+                "parallelism": {
+                    "type": "integer"
+                },
+                "ports": {
+                    "description": "Ports        []*Port ` + "`" + `json:\"ports,omitempty\" gorm:\"many2many:caas_service_port_rel;foreignkey:service_name;association_foreignkey:host;association_jointable_foreignkey:host;jointable_foreignkey:service_name;\"` + "`" + `",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/caas.Port"
+                    }
+                },
+                "pullPolicy": {
+                    "type": "string"
+                },
+                "replicas": {
+                    "type": "integer"
+                },
+                "serviceName": {
+                    "type": "string"
+                },
+                "srvLbType": {
+                    "description": "VolumeList            string    ` + "`" + `json:\"volumeList\" gorm:\"column:volume_list;type:string;size:128;comment:\"` + "`" + `\nLocalVolumeList       string    ` + "`" + `json:\"localVolumeList\" gorm:\"column:local_volume_list;type:string;size:128;comment:\"` + "`" + `\nConfigMapVolumeList   string    ` + "`" + `json:\"configMapVolumeList\" gorm:\"column:config_map_volume_list;type:string;size:128;comment:\"` + "`" + `",
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "updateTime": {
+                    "type": "string"
+                }
+            }
+        },
+        "caas.WorkSpace": {
+            "type": "object",
+            "properties": {
+                "deleted": {
+                    "type": "integer"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "nsCount": {
+                    "type": "integer"
+                },
+                "orgName": {
+                    "type": "string"
+                },
+                "orgProposer": {
+                    "type": "string"
+                },
+                "updateTime": {
+                    "type": "string"
+                },
+                "zones": {
+                    "type": "string"
+                }
+            }
+        },
+        "gtime.GTime": {
+            "type": "object"
+        },
+        "model.APIGetVariableItem": {
+            "type": "object",
+            "properties": {
+                "label": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.APIGetVariableOutputs": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.APIGetVariableItem"
+                    }
+                },
+                "totalCount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "node.APIGetCaasNamespaceListInputs": {
+            "type": "object",
+            "properties": {
+                "clusterName": {
+                    "type": "string"
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "namespace": {
+                    "type": "string"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "physicalSystemName": {
+                    "type": "string"
+                },
+                "workspaceName": {
+                    "type": "string"
+                }
+            }
+        },
+        "node.APIGetCaasNamespaceListOutputs": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/caas.NameSpace"
+                    }
+                },
+                "totalCount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "node.APIGetCaasServiceListInputs": {
+            "type": "object",
+            "properties": {
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "serviceName": {
+                    "type": "string"
+                }
+            }
+        },
+        "node.APIGetCaasServiceListOutputs": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/node.CaasService"
+                    }
+                },
+                "totalCount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "node.APIGetCaasWorkspaceListInputs": {
+            "type": "object",
+            "properties": {
+                "limit": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "page": {
+                    "type": "integer"
+                }
+            }
+        },
+        "node.APIGetCaasWorkspaceListOutputs": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/caas.WorkSpace"
+                    }
+                },
+                "totalCount": {
+                    "type": "integer"
+                }
+            }
+        },
         "node.APIGetChartBarLegend": {
             "type": "object",
             "properties": {
@@ -1002,6 +3042,40 @@ var doc = `{
                 }
             }
         },
+        "node.APIGetHostApplyRequestListInputs": {
+            "type": "object",
+            "properties": {
+                "applier": {
+                    "type": "string"
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "order": {
+                    "type": "string"
+                },
+                "orderBy": {
+                    "type": "string"
+                },
+                "page": {
+                    "type": "integer"
+                }
+            }
+        },
+        "node.APIGetHostApplyRequestListOutputs": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/node.HostApplyRequest"
+                    }
+                },
+                "totalCount": {
+                    "type": "integer"
+                }
+            }
+        },
         "node.APIGetHostGroupListInputs": {
             "type": "object",
             "properties": {
@@ -1030,20 +3104,6 @@ var doc = `{
                 }
             }
         },
-        "node.APIGetHostGroupMoveInputs": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "parentId": {
-                    "type": "integer"
-                }
-            }
-        },
         "node.APIGetHostGroupTreeOutputs": {
             "type": "object",
             "properties": {
@@ -1058,20 +3118,35 @@ var doc = `{
         "node.APIGetHostListInputs": {
             "type": "object",
             "properties": {
-                "cpuUsage": {
-                    "type": "number"
-                },
-                "fsUsage": {
-                    "type": "number"
-                },
-                "group": {
+                "areaName": {
                     "type": "string"
+                },
+                "cpuNumber": {
+                    "type": "integer"
+                },
+                "cpuUsageLowerLimit": {
+                    "type": "number"
+                },
+                "cpuUsageUpperLimit": {
+                    "type": "number"
+                },
+                "fsUsageLowerLimit": {
+                    "type": "number"
+                },
+                "fsUsageUpperLimit": {
+                    "type": "number"
                 },
                 "ip": {
                     "type": "string"
                 },
                 "limit": {
                     "type": "integer"
+                },
+                "memoryUsageLowerLimit": {
+                    "type": "number"
+                },
+                "memoryUsageUpperLimit": {
+                    "type": "number"
                 },
                 "order": {
                     "type": "string"
@@ -1085,8 +3160,18 @@ var doc = `{
                 "physicalSystem": {
                     "type": "string"
                 },
+                "relatedTag": {
+                    "type": "string"
+                },
                 "status": {
                     "type": "string"
+                },
+                "tagIDs[]": {
+                    "description": "Group                 string  ` + "`" + `json:\"group\" form:\"group\"` + "`" + `\nBoundGroup            string  ` + "`" + `json:\"boundGroup\" form:\"boundGroup\"` + "`" + `",
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 }
             }
         },
@@ -1104,6 +3189,177 @@ var doc = `{
                 }
             }
         },
+        "node.APIGetPodListInputs": {
+            "type": "object",
+            "properties": {
+                "limit": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "namespace": {
+                    "type": "string"
+                },
+                "order": {
+                    "type": "string"
+                },
+                "orderBy": {
+                    "type": "string"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "serviceName": {
+                    "type": "string"
+                }
+            }
+        },
+        "node.APIGetTagCategoryListInputs": {
+            "type": "object",
+            "properties": {
+                "limit": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "order": {
+                    "type": "string"
+                },
+                "orderBy": {
+                    "type": "string"
+                },
+                "page": {
+                    "type": "integer"
+                }
+            }
+        },
+        "node.APIGetTagCategoryListOutputs": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/node.TagCategory"
+                    }
+                },
+                "totalCount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "node.APIGetTagCategoryTagsInputs": {
+            "type": "object",
+            "properties": {
+                "categoryID": {
+                    "type": "string"
+                },
+                "categoryName": {
+                    "type": "string"
+                }
+            }
+        },
+        "node.APIGetTagCategoryTagsOutputs": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/node.Tag"
+                    }
+                },
+                "totalCount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "node.APIGetTagListInputs": {
+            "type": "object",
+            "properties": {
+                "categoryID": {
+                    "type": "string"
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "order": {
+                    "type": "string"
+                },
+                "orderBy": {
+                    "type": "string"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "remark": {
+                    "type": "string"
+                }
+            }
+        },
+        "node.APIGetTagListOutputs": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/node.Tag"
+                    }
+                },
+                "totalCount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "node.APIPostHostApplyRequestCreateInputs": {
+            "type": "object",
+            "properties": {
+                "applier": {
+                    "type": "string"
+                },
+                "cpu": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "memory": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "releaseAt": {
+                    "type": "string"
+                },
+                "remark": {
+                    "type": "string"
+                }
+            }
+        },
+        "node.APIPostHostBatchUpdateInputs": {
+            "type": "object",
+            "properties": {
+                "devOwner": {
+                    "type": "string"
+                },
+                "ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "tagIDs": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
         "node.APIPostHostUpdateInputs": {
             "type": "object",
             "required": [
@@ -1112,13 +3368,6 @@ var doc = `{
             "properties": {
                 "devOwner": {
                     "type": "string"
-                },
-                "groupIds": {
-                    "description": "Groups         [][]string ` + "`" + `json:\"groups\" form:\"groups\"` + "`" + `",
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
                 },
                 "id": {
                     "type": "integer"
@@ -1129,10 +3378,57 @@ var doc = `{
                 "name": {
                     "type": "string"
                 },
-                "path": {
+                "physicalSystem": {
                     "type": "string"
                 },
-                "physicalSystem": {
+                "state": {
+                    "type": "string"
+                },
+                "tagIDs": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "node.APIPostTagCategoryCreateInputs": {
+            "type": "object",
+            "properties": {
+                "categoryID": {
+                    "type": "integer"
+                },
+                "cnName": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "remark": {
+                    "type": "string"
+                }
+            }
+        },
+        "node.APIPostTagCreateInputs": {
+            "type": "object",
+            "properties": {
+                "categoryID": {
+                    "type": "integer"
+                },
+                "cnName": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "remark": {
+                    "description": "ParentID   int64  ` + "`" + `json:\"parentID\" form:\"parentID\"` + "`" + `",
                     "type": "string"
                 }
             }
@@ -1142,13 +3438,13 @@ var doc = `{
             "required": [
                 "id",
                 "name",
-                "parentId"
+                "type"
             ],
             "properties": {
-                "desc": {
-                    "type": "string"
+                "caasServiceId": {
+                    "type": "integer"
                 },
-                "icon": {
+                "desc": {
                     "type": "string"
                 },
                 "id": {
@@ -1160,7 +3456,117 @@ var doc = `{
                 "parentId": {
                     "type": "integer"
                 },
-                "perms": {
+                "parentName": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "node.CaasService": {
+            "type": "object",
+            "properties": {
+                "activeDeadlineSeconds": {
+                    "type": "integer"
+                },
+                "affinityType": {
+                    "type": "string"
+                },
+                "appId": {
+                    "type": "integer"
+                },
+                "appName": {
+                    "type": "string"
+                },
+                "clusterIP": {
+                    "type": "string"
+                },
+                "clusterName": {
+                    "type": "string"
+                },
+                "completions": {
+                    "description": "Command               string    ` + "`" + `json:\"command\" gorm:\"column:command;type:string;size:128;comment:\"` + "`" + `\nArg                   string    ` + "`" + `json:\"arg\" gorm:\"column:arg;type:string;size:128;comment:\"` + "`" + `",
+                    "type": "integer"
+                },
+                "cpu": {
+                    "type": "integer"
+                },
+                "createTime": {
+                    "type": "string"
+                },
+                "duration": {
+                    "type": "string"
+                },
+                "externalTrafficPolicy": {
+                    "description": "HostAliases           string    ` + "`" + `json:\"hostAliases\" gorm:\"column:host_aliases;type:string;size:128;comment:\"` + "`" + `",
+                    "type": "string"
+                },
+                "finishTime": {
+                    "type": "string"
+                },
+                "gpu": {
+                    "type": "integer"
+                },
+                "headlessName": {
+                    "description": "NodeSelectorLabel     string    ` + "`" + `json:\"nodeSelectorLabel\" gorm:\"column:node_selector_label;type:string;size:128;comment:\"` + "`" + `\nZones                 string    ` + "`" + `json:\"zones\" gorm:\"column:zones;type:string;size:128;comment:\"` + "`" + `\nReadinessProbeInfo    string    ` + "`" + `json:\"readinessProbeInfo\" gorm:\"column:readiness_probe_info;type:string;size:128;comment:\"` + "`" + `\nLivenessProbeInfo     string    ` + "`" + `json:\"livenessProbeInfo\" gorm:\"column:liveness_probe_info;type:string;size:128;comment:\"` + "`" + `",
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "imageName": {
+                    "description": "Envs         *Envs  ` + "`" + `json:\"envs,omitempty\" gorm:\"foreignkey:app_id;association_foreignkey:id;association_autoupdate:false\"` + "`" + `",
+                    "type": "string"
+                },
+                "imageTag": {
+                    "type": "string"
+                },
+                "memory": {
+                    "type": "integer"
+                },
+                "namespace": {
+                    "type": "string"
+                },
+                "nowReplicas": {
+                    "type": "integer"
+                },
+                "parallelism": {
+                    "type": "integer"
+                },
+                "physicalSystemName": {
+                    "type": "string"
+                },
+                "ports": {
+                    "description": "Ports        []*Port ` + "`" + `json:\"ports,omitempty\" gorm:\"many2many:caas_service_port_rel;foreignkey:service_name;association_foreignkey:host;association_jointable_foreignkey:host;jointable_foreignkey:service_name;\"` + "`" + `",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/caas.Port"
+                    }
+                },
+                "pullPolicy": {
+                    "type": "string"
+                },
+                "replicas": {
+                    "type": "integer"
+                },
+                "serviceName": {
+                    "type": "string"
+                },
+                "srvLbType": {
+                    "description": "VolumeList            string    ` + "`" + `json:\"volumeList\" gorm:\"column:volume_list;type:string;size:128;comment:\"` + "`" + `\nLocalVolumeList       string    ` + "`" + `json:\"localVolumeList\" gorm:\"column:local_volume_list;type:string;size:128;comment:\"` + "`" + `\nConfigMapVolumeList   string    ` + "`" + `json:\"configMapVolumeList\" gorm:\"column:config_map_volume_list;type:string;size:128;comment:\"` + "`" + `",
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "updateTime": {
+                    "type": "string"
+                },
+                "workspaceName": {
                     "type": "string"
                 }
             }
@@ -1188,6 +3594,9 @@ var doc = `{
                 },
                 "cpuUsage": {
                     "type": "number"
+                },
+                "createTime": {
+                    "type": "string"
                 },
                 "databaseVersion": {
                     "type": "string"
@@ -1226,7 +3635,6 @@ var doc = `{
                     }
                 },
                 "id": {
-                    "description": "gorm.Model",
                     "type": "integer"
                 },
                 "instanceId": {
@@ -1234,6 +3642,9 @@ var doc = `{
                 },
                 "ip": {
                     "type": "string"
+                },
+                "isWarning": {
+                    "type": "boolean"
                 },
                 "logicSystem": {
                     "type": "string"
@@ -1295,7 +3706,22 @@ var doc = `{
                 "srvStatus": {
                     "type": "string"
                 },
+                "state": {
+                    "type": "string"
+                },
                 "status": {
+                    "type": "string"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/node.Tag"
+                    }
+                },
+                "type": {
+                    "type": "string"
+                },
+                "updateTime": {
                     "type": "string"
                 },
                 "virtFcNum": {
@@ -1306,14 +3732,63 @@ var doc = `{
                 }
             }
         },
+        "node.HostApplyRequest": {
+            "type": "object",
+            "properties": {
+                "applier": {
+                    "type": "string"
+                },
+                "count": {
+                    "type": "integer"
+                },
+                "cpu": {
+                    "type": "integer"
+                },
+                "createAt": {
+                    "type": "object",
+                    "$ref": "#/definitions/gtime.GTime"
+                },
+                "creator": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "memory": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "releaseAt": {
+                    "type": "object",
+                    "$ref": "#/definitions/gtime.GTime"
+                },
+                "remark": {
+                    "type": "string"
+                },
+                "state": {
+                    "type": "string"
+                }
+            }
+        },
         "node.HostGroup": {
             "type": "object",
             "properties": {
+                "caasServiceId": {
+                    "type": "integer"
+                },
                 "children": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/node.HostGroup"
                     }
+                },
+                "childrenHostCount": {
+                    "type": "integer"
+                },
+                "childrenPodCount": {
+                    "type": "integer"
                 },
                 "createUser": {
                     "type": "string"
@@ -1321,14 +3796,8 @@ var doc = `{
                 "desc": {
                     "type": "string"
                 },
-                "icon": {
-                    "type": "string"
-                },
                 "id": {
                     "type": "integer"
-                },
-                "isLeaf": {
-                    "type": "boolean"
                 },
                 "isWarning": {
                     "type": "boolean"
@@ -1336,18 +3805,132 @@ var doc = `{
                 "name": {
                     "type": "string"
                 },
-                "parent": {
-                    "type": "string"
-                },
                 "parentId": {
                     "type": "integer"
                 },
+                "parentName": {
+                    "type": "string"
+                },
                 "path": {
+                    "type": "string"
+                },
+                "pathArray": {
+                    "type": "string"
+                },
+                "relatedHostCount": {
+                    "type": "integer"
+                },
+                "relatedPodCount": {
+                    "type": "integer"
+                },
+                "subGroupCount": {
+                    "type": "integer"
+                },
+                "type": {
                     "type": "string"
                 }
             }
         },
-        "portal.APIPostMenuUpdateInputs": {
+        "node.Tag": {
+            "type": "object",
+            "properties": {
+                "categoryID": {
+                    "type": "integer"
+                },
+                "categoryName": {
+                    "type": "string"
+                },
+                "cnName": {
+                    "type": "string"
+                },
+                "createAt": {
+                    "type": "object",
+                    "$ref": "#/definitions/gtime.GTime"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "remark": {
+                    "type": "string"
+                }
+            }
+        },
+        "node.TagCategory": {
+            "type": "object",
+            "properties": {
+                "cnName": {
+                    "type": "string"
+                },
+                "createAt": {
+                    "type": "object",
+                    "$ref": "#/definitions/gtime.GTime"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "remark": {
+                    "type": "string"
+                }
+            }
+        },
+        "sys.APIGetMenuNavListOutputs": {
+            "type": "object",
+            "properties": {
+                "menus": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/sys.Menu"
+                    }
+                },
+                "permissions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/uic.Perm"
+                    }
+                }
+            }
+        },
+        "sys.APIGetParamListInputs": {
+            "type": "object",
+            "properties": {
+                "key": {
+                    "type": "string"
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "order": {
+                    "type": "string"
+                },
+                "orderBy": {
+                    "type": "string"
+                },
+                "page": {
+                    "type": "integer"
+                }
+            }
+        },
+        "sys.APIGetParamListOutputs": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/sys.Param"
+                    }
+                },
+                "totalCount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "sys.APIPostMenuUpdateInputs": {
             "type": "object",
             "required": [
                 "menuId"
@@ -1373,7 +3956,24 @@ var doc = `{
                 }
             }
         },
-        "portal.Menu": {
+        "sys.APIPostParamCreateInputs": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "key": {
+                    "type": "string"
+                },
+                "remark": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "sys.Menu": {
             "type": "object",
             "properties": {
                 "icon": {
@@ -1383,7 +3983,7 @@ var doc = `{
                     "description": "Open     string ` + "`" + `json:\"open\" gorm:\"column:open;type:string;size:128;comment:\"` + "`" + `",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/portal.Menu"
+                        "$ref": "#/definitions/sys.Menu"
                     }
                 },
                 "menuId": {
@@ -1391,6 +3991,7 @@ var doc = `{
                     "type": "integer"
                 },
                 "name": {
+                    "description": "Type     int64  ` + "`" + `json:\"type\" gorm:\"column:type;comment:\"` + "`" + `",
                     "type": "string"
                 },
                 "orderNum": {
@@ -1399,17 +4000,200 @@ var doc = `{
                 "parentId": {
                     "type": "integer"
                 },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "sys.Param": {
+            "type": "object",
+            "properties": {
+                "createAt": {
+                    "type": "object",
+                    "$ref": "#/definitions/gtime.GTime"
+                },
+                "deleted": {
+                    "type": "boolean"
+                },
+                "key": {
+                    "type": "string"
+                },
+                "menuId": {
+                    "type": "integer"
+                },
+                "remark": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "uic.APIGetPermCreateInputs": {
+            "type": "object",
+            "properties": {
+                "cnName": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "remark": {
+                    "type": "string"
+                }
+            }
+        },
+        "uic.APIGetPermCreateOutputs": {
+            "type": "object",
+            "properties": {
+                "perm": {
+                    "type": "object",
+                    "$ref": "#/definitions/uic.Perm"
+                }
+            }
+        },
+        "uic.APIGetPermInfoOutputs": {
+            "type": "object",
+            "properties": {
+                "perm": {
+                    "type": "object",
+                    "$ref": "#/definitions/uic.Perm"
+                }
+            }
+        },
+        "uic.APIGetPermListInputs": {
+            "type": "object",
+            "properties": {
+                "cnName": {
+                    "type": "string"
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "order": {
+                    "type": "string"
+                },
+                "orderBy": {
+                    "type": "string"
+                },
+                "page": {
+                    "type": "integer"
+                }
+            }
+        },
+        "uic.APIGetPermListOutputs": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/uic.Perm"
+                    }
+                },
+                "totalCount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "uic.APIGetRoleCreateInputs": {
+            "type": "object",
+            "properties": {
+                "cnName": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "permList": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "remark": {
+                    "type": "string"
+                }
+            }
+        },
+        "uic.APIGetRoleCreateOutputs": {
+            "type": "object",
+            "properties": {
+                "role": {
+                    "type": "object",
+                    "$ref": "#/definitions/uic.Role"
+                }
+            }
+        },
+        "uic.APIGetRoleInfoOutputs": {
+            "type": "object",
+            "properties": {
                 "perms": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/uic.Perm"
                     }
                 },
-                "type": {
+                "role": {
+                    "type": "object",
+                    "$ref": "#/definitions/uic.Role"
+                }
+            }
+        },
+        "uic.APIGetRoleListInputs": {
+            "type": "object",
+            "properties": {
+                "limit": {
                     "type": "integer"
                 },
-                "url": {
+                "name": {
                     "type": "string"
+                },
+                "order": {
+                    "type": "string"
+                },
+                "orderBy": {
+                    "type": "string"
+                },
+                "page": {
+                    "type": "integer"
+                }
+            }
+        },
+        "uic.APIGetRoleListOutputs": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/uic.Role"
+                    }
+                },
+                "totalCount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "uic.APIGetUserInfoOutputs": {
+            "type": "object",
+            "properties": {
+                "roles": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/uic.Role"
+                    }
+                },
+                "user": {
+                    "type": "object",
+                    "$ref": "#/definitions/uic.User"
                 }
             }
         },
@@ -1443,20 +4227,58 @@ var doc = `{
                 }
             }
         },
+        "uic.APIPutUserUpdateInputs": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "roleList": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
         "uic.Perm": {
             "type": "object",
             "properties": {
                 "cnName": {
                     "type": "string"
                 },
-                "desc": {
-                    "type": "string"
+                "createAt": {
+                    "type": "object",
+                    "$ref": "#/definitions/gtime.GTime"
                 },
                 "id": {
-                    "description": "gorm.Model",
                     "type": "integer"
                 },
                 "name": {
+                    "type": "string"
+                },
+                "remark": {
+                    "type": "string"
+                }
+            }
+        },
+        "uic.Role": {
+            "type": "object",
+            "properties": {
+                "cnName": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "object",
+                    "$ref": "#/definitions/gtime.GTime"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "remark": {
                     "type": "string"
                 }
             }
@@ -1481,7 +4303,6 @@ var doc = `{
                     "type": "integer"
                 },
                 "instId": {
-                    "description": "Image       []byte    ` + "`" + `json:\"image\" gorm:\"column:image;type:bytes;null;comment:头像\"` + "`" + `",
                     "type": "string"
                 },
                 "isSuperuser": {
@@ -1491,7 +4312,6 @@ var doc = `{
                     "type": "string"
                 },
                 "mobile": {
-                    "description": "Birthday    time.Time ` + "`" + `json:\"birthday\" gorm:\"column:birthday;type:time;null;comment:出生日期\"` + "`" + `",
                     "type": "string"
                 },
                 "password": {

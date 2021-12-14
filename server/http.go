@@ -4,6 +4,9 @@ package server
 
 import (
 	"github.com/alexreagan/rabbit/server/controller/alert"
+	"github.com/alexreagan/rabbit/server/controller/app"
+	"github.com/alexreagan/rabbit/server/controller/caas"
+	"github.com/alexreagan/rabbit/server/controller/chart"
 	"github.com/alexreagan/rabbit/server/controller/node"
 	"github.com/alexreagan/rabbit/server/controller/sys"
 	"github.com/alexreagan/rabbit/server/controller/uic"
@@ -41,8 +44,11 @@ func Start() {
 	// set routers
 	uic.Routes(r)
 	sys.Routes(r)
+	app.Routes(r)
 	node.Routes(r)
 	alert.Routes(r)
+	chart.Routes(r)
+	caas.Routes(r)
 
 	// start server graceful
 	endless.ListenAndServe(viper.GetString("serv.addr"), r)

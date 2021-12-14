@@ -1,11 +1,11 @@
-package node
+package app
 
 import (
 	"errors"
 	"github.com/alexreagan/rabbit/g"
 	h "github.com/alexreagan/rabbit/server/helper"
+	"github.com/alexreagan/rabbit/server/model/app"
 	"github.com/alexreagan/rabbit/server/model/gtime"
-	"github.com/alexreagan/rabbit/server/model/node"
 	"github.com/alexreagan/rabbit/server/utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -22,8 +22,8 @@ type APIGetTagListInputs struct {
 }
 
 type APIGetTagListOutputs struct {
-	List       []*node.Tag `json:"list"`
-	TotalCount int64       `json:"totalCount"`
+	List       []*app.Tag `json:"list"`
+	TotalCount int64      `json:"totalCount"`
 }
 
 func (input APIGetTagListInputs) checkInputsContain() error {
@@ -54,9 +54,9 @@ func TagList(c *gin.Context) {
 		return
 	}
 
-	var tags []*node.Tag
+	var tags []*app.Tag
 	var totalCount int64
-	db := g.Con().Portal.Debug().Model(node.Tag{})
+	db := g.Con().Portal.Debug().Model(app.Tag{})
 	db = db.Select("`tag`.*, `tag_category`.name as category_name, `ptag`.`name` as parent_name")
 	db = db.Joins("left join `tag_category` on `tag`.`category_id` = `tag_category`.`id`")
 	db = db.Joins("left join `tag` as `ptag` on `ptag`.`id` = `tag`.`parent_id`")
@@ -89,7 +89,7 @@ func TagList(c *gin.Context) {
 // @Description
 // @Produce json
 // @Param id query string true "tag id"
-// @Success 200 {object} node.TagCate
+// @Success 200 {object} node.TagCategory
 // @Failure 400 json error
 // @Router /api/v1/tag/info [get]
 func TagInfo(c *gin.Context) {
@@ -99,8 +99,8 @@ func TagInfo(c *gin.Context) {
 		return
 	}
 
-	var tag *node.Tag
-	db := g.Con().Portal.Debug().Model(node.Tag{})
+	var tag *app.Tag
+	db := g.Con().Portal.Debug().Model(app.Tag{})
 	db.Where("id = ?", id).Find(&tag)
 
 	h.JSONR(c, http.StatusOK, tag)
@@ -119,7 +119,7 @@ type APIPostTagCreateInputs struct {
 // @Summary 创建新tag
 // @Description
 // @Produce json
-// @Param APIPostTagCreateInputs formData APIPostTagCreateInputs true "创建新tag"
+// @Param APIPostTagCreateInputs body APIPostTagCreateInputs true "创建新tag"
 // @Success 200 {object} APIPostTagCreateInputs
 // @Failure 400 {object} APIPostTagCreateInputs
 // @Router /api/v1/tag/create [post]
@@ -130,7 +130,7 @@ func TagCreate(c *gin.Context) {
 		return
 	}
 
-	tag := node.Tag{
+	tag := app.Tag{
 		Name:       inputs.Name,
 		CnName:     inputs.CnName,
 		CategoryID: inputs.CategoryID,
@@ -138,7 +138,7 @@ func TagCreate(c *gin.Context) {
 		CreateAt:   gtime.Now(),
 	}
 	tx := g.Con().Portal
-	if dt := tx.Model(node.Tag{}).Create(&tag); dt.Error != nil {
+	if dt := tx.Model(app.Tag{}).Create(&tag); dt.Error != nil {
 		h.JSONR(c, h.ExpecStatus, dt.Error)
 	}
 
@@ -149,7 +149,7 @@ func TagCreate(c *gin.Context) {
 // @Summary 更新tag
 // @Description
 // @Produce json
-// @Param APIPostTagCreateInputs formData APIPostTagCreateInputs true "更新tag"
+// @Param APIPostTagCreateInputs body APIPostTagCreateInputs true "更新tag"
 // @Success 200 {object} APIPostTagCreateInputs
 // @Failure 400 {object} APIPostTagCreateInputs
 // @Router /api/v1/tag/update [put]
@@ -160,7 +160,7 @@ func TagUpdate(c *gin.Context) {
 		return
 	}
 
-	tag := node.Tag{
+	tag := app.Tag{
 		ID:         inputs.ID,
 		Name:       inputs.Name,
 		CnName:     inputs.CnName,
@@ -170,7 +170,7 @@ func TagUpdate(c *gin.Context) {
 		CreateAt: gtime.Now(),
 	}
 	tx := g.Con().Portal
-	if dt := tx.Model(node.Tag{}).Where("id = ?", inputs.ID).Updates(&tag); dt.Error != nil {
+	if dt := tx.Model(app.Tag{}).Where("id = ?", inputs.ID).Updates(&tag); dt.Error != nil {
 		h.JSONR(c, h.ExpecStatus, dt.Error)
 	}
 
@@ -187,8 +187,8 @@ type APIGetTagCategoryListInputs struct {
 }
 
 type APIGetTagCategoryListOutputs struct {
-	List       []*node.TagCategory `json:"list"`
-	TotalCount int64               `json:"totalCount"`
+	List       []*app.TagCategory `json:"list"`
+	TotalCount int64              `json:"totalCount"`
 }
 
 // @Summary tag category列表
@@ -211,9 +211,9 @@ func TagCategoryList(c *gin.Context) {
 		return
 	}
 
-	var categorys []*node.TagCategory
+	var categorys []*app.TagCategory
 	var totalCount int64
-	db := g.Con().Portal.Debug().Model(node.TagCategory{})
+	db := g.Con().Portal.Debug().Model(app.TagCategory{})
 	if inputs.Name != "" {
 		db = db.Where("`name` regexp ?", inputs.Name)
 	}
@@ -247,8 +247,8 @@ func TagCategoryInfo(c *gin.Context) {
 		return
 	}
 
-	var tc *node.TagCategory
-	db := g.Con().Portal.Debug().Model(node.TagCategory{})
+	var tc *app.TagCategory
+	db := g.Con().Portal.Debug().Model(app.TagCategory{})
 	db.Where("id = ?", id).Find(&tc)
 
 	h.JSONR(c, http.StatusOK, tc)
@@ -266,7 +266,7 @@ type APIPostTagCategoryCreateInputs struct {
 // @Summary 创建tag category
 // @Description
 // @Produce json
-// @Param APIPostTagCategoryCreateInputs formData APIPostTagCategoryCreateInputs true "创建tag category"
+// @Param APIPostTagCategoryCreateInputs body APIPostTagCategoryCreateInputs true "创建tag category"
 // @Success 200 {object} node.TagCategory
 // @Failure 400 {object} node.TagCategory
 // @Router /api/v1/tag_category/create [post]
@@ -277,7 +277,7 @@ func TagCategoryCreate(c *gin.Context) {
 		return
 	}
 
-	tagCategory := node.TagCategory{
+	tagCategory := app.TagCategory{
 		ID:       inputs.ID,
 		Name:     inputs.Name,
 		CnName:   inputs.CnName,
@@ -285,7 +285,7 @@ func TagCategoryCreate(c *gin.Context) {
 		CreateAt: gtime.Now(),
 	}
 	tx := g.Con().Portal
-	if dt := tx.Model(node.TagCategory{}).Create(&tagCategory); dt.Error != nil {
+	if dt := tx.Model(app.TagCategory{}).Create(&tagCategory); dt.Error != nil {
 		h.JSONR(c, h.ExpecStatus, dt.Error)
 	}
 
@@ -296,7 +296,7 @@ func TagCategoryCreate(c *gin.Context) {
 // @Summary 更新tag category
 // @Description
 // @Produce json
-// @Param APIPostTagCategoryCreateInputs formData APIPostTagCategoryCreateInputs true "更新tag category"
+// @Param APIPostTagCategoryCreateInputs body APIPostTagCategoryCreateInputs true "更新tag category"
 // @Success 200 {object} node.TagCategory
 // @Failure 400 {object} node.TagCategory
 // @Router /api/v1/tag_category/update [put]
@@ -307,7 +307,7 @@ func TagCategoryUpdate(c *gin.Context) {
 		return
 	}
 
-	tagCategory := node.TagCategory{
+	tagCategory := app.TagCategory{
 		ID:       inputs.ID,
 		Name:     inputs.Name,
 		CnName:   inputs.CnName,
@@ -315,7 +315,7 @@ func TagCategoryUpdate(c *gin.Context) {
 		CreateAt: gtime.Now(),
 	}
 	tx := g.Con().Portal
-	if dt := tx.Model(node.TagCategory{}).Where("id = ?", inputs.ID).Updates(&tagCategory); dt.Error != nil {
+	if dt := tx.Model(app.TagCategory{}).Where("id = ?", inputs.ID).Updates(&tagCategory); dt.Error != nil {
 		h.JSONR(c, h.ExpecStatus, dt.Error)
 	}
 
@@ -324,8 +324,8 @@ func TagCategoryUpdate(c *gin.Context) {
 }
 
 type APIGetTagCategoryTagsOutputs struct {
-	List       []*node.Tag `json:"list"`
-	TotalCount int64       `json:"totalCount"`
+	List       []*app.Tag `json:"list"`
+	TotalCount int64      `json:"totalCount"`
 }
 
 type APIGetTagCategoryTagsInputs struct {
@@ -348,9 +348,9 @@ func TagCategoryTags(c *gin.Context) {
 		return
 	}
 
-	var tags []*node.Tag
+	var tags []*app.Tag
 	var totalCount int64
-	db := g.Con().Portal.Model(node.Tag{})
+	db := g.Con().Portal.Model(app.Tag{})
 	db = db.Select("`tag`.*, `tag_category`.name as category_name")
 	db = db.Joins("left join `tag_category` on `tag`.`category_id` = `tag_category`.`id`")
 	if inputs.CategoryID != "" {

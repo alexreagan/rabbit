@@ -199,8 +199,8 @@ type APIPutUserUpdateInputs struct {
 // @Description
 // @Produce json
 // @Param APIPutUserUpdateInputs query APIPutUserUpdateInputs true "根据查询条件分页查询用户列表"
-// @Success 200 {object} APIPutUserUpdateOutputs
-// @Failure 400 {object} APIPutUserListOutputs
+// @Success 200 {object} uic.User
+// @Failure 400 {object} uic.User
 // @Router /api/v1/user/update [put]
 func UserUpdate(c *gin.Context) {
 	var inputs APIPutUserUpdateInputs

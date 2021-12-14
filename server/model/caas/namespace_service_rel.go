@@ -3,8 +3,8 @@ package caas
 import "github.com/alexreagan/rabbit/g"
 
 type NamespaceServiceRel struct {
-	NamespaceID int64 `json:"namespaceId" gorm:"column:namespace_id;index;comment:"`
-	ServiceID   int64 `json:"serviceId" gorm:"column:service_id;index;comment:"`
+	NameSpace int64 `json:"namespace" gorm:"column:namespace;index;comment:"`
+	Service   int64 `json:"service" gorm:"column:service;index;comment:"`
 }
 
 func (this NamespaceServiceRel) TableName() string {
@@ -14,8 +14,8 @@ func (this NamespaceServiceRel) TableName() string {
 func (this NamespaceServiceRel) Existing() bool {
 	var nsr NamespaceServiceRel
 	db := g.Con().Portal
-	db.Model(this).Where("namespace_id = ? and service_id = ?", this.NamespaceID, this.ServiceID).Scan(&nsr)
-	if nsr.NamespaceID != 0 {
+	db.Model(this).Where("namespace = ? and service = ?", this.NameSpace, this.Service).Scan(&nsr)
+	if nsr.NameSpace != 0 {
 		return true
 	} else {
 		return false

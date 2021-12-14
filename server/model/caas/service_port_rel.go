@@ -1,8 +1,8 @@
 package caas
 
 type ServicePortRel struct {
-	ServiceID int64 `json:"serviceId" gorm:"column:service_id;index;comment:"`
-	PortID    int64 `json:"portId" gorm:"column:port_id;index;comment:"`
+	Service int64 `json:"service" gorm:"column:service;index;comment:"`
+	Port    int64 `json:"port" gorm:"column:port;index;comment:"`
 }
 
 func (this ServicePortRel) TableName() string {

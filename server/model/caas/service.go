@@ -1,16 +1,16 @@
 package caas
 
 import (
-	"time"
+	"github.com/alexreagan/rabbit/server/model/gtime"
 )
 
 type Port struct {
-	ID            int64     `json:"id" gorm:"primary_key;column:id"`
-	ContainerPort string    `json:"containerPort" gorm:"column:container_port;type:string;size:128;comment:"`
-	Host          string    `json:"host" gorm:"column:host;type:string;size:128;comment:"`
-	NodePort      string    `json:"nodePort" gorm:"column:node_port;type:string;size:128;comment:"`
-	Protocol      string    `json:"protocol" gorm:"column:protocol;type:string;size:128;comment:"`
-	UpdateTime    time.Time `json:"updateTime" gorm:"column:update_time;default:null;comment:"`
+	ID            int64       `json:"id" gorm:"primary_key;column:id"`
+	ContainerPort string      `json:"containerPort" gorm:"column:container_port;type:string;size:128;comment:"`
+	Host          string      `json:"host" gorm:"column:host;type:string;size:128;comment:"`
+	NodePort      string      `json:"nodePort" gorm:"column:node_port;type:string;size:128;comment:"`
+	Protocol      string      `json:"protocol" gorm:"column:protocol;type:string;size:128;comment:"`
+	UpdateTime    gtime.GTime `json:"updateTime" gorm:"column:update_time;default:null;comment:"`
 }
 
 func (this Port) TableName() string {
@@ -46,17 +46,18 @@ type Service struct {
 	SrvLbType string `json:"srvLbType" gorm:"column:srv_lb_type;type:string;size:128;comment:"`
 	//Command               string    `json:"command" gorm:"column:command;type:string;size:128;comment:"`
 	//Arg                   string    `json:"arg" gorm:"column:arg;type:string;size:128;comment:"`
-	Completions           int64     `json:"completions" gorm:"column:completions;comment:"`
-	Parallelism           int64     `json:"parallelism" gorm:"column:parallelism;comment:"`
-	ActiveDeadlineSeconds int64     `json:"activeDeadlineSeconds" gorm:"column:active_deadline_seconds;comment:"`
-	ClusterIP             string    `json:"clusterIP" gorm:"column:cluster_ip;type:string;size:128;comment:"`
-	CreateTime            time.Time `json:"createTime" gorm:"column:create_time"`
-	UpdateTime            time.Time `json:"updateTime" gorm:"column:update_time;default:null;comment:"`
-	FinishTime            time.Time `json:"finishTime" gorm:"column:finish_time"`
-	Duration              string    `json:"duration" gorm:"column:duration;type:string;size:128;comment:"`
-	Status                string    `json:"status" gorm:"column:status;type:string;size:128;comment:"`
+	Completions           int64       `json:"completions" gorm:"column:completions;comment:"`
+	Parallelism           int64       `json:"parallelism" gorm:"column:parallelism;comment:"`
+	ActiveDeadlineSeconds int64       `json:"activeDeadlineSeconds" gorm:"column:active_deadline_seconds;comment:"`
+	ClusterIP             string      `json:"clusterIP" gorm:"column:cluster_ip;type:string;size:128;comment:"`
+	CreateTime            gtime.GTime `json:"createTime" gorm:"column:create_time"`
+	UpdateTime            gtime.GTime `json:"updateTime" gorm:"column:update_time;default:null;comment:"`
+	FinishTime            gtime.GTime `json:"finishTime" gorm:"column:finish_time"`
+	Duration              string      `json:"duration" gorm:"column:duration;type:string;size:128;comment:"`
+	Status                string      `json:"status" gorm:"column:status;type:string;size:128;comment:"`
 	//HostAliases           string    `json:"hostAliases" gorm:"column:host_aliases;type:string;size:128;comment:"`
 	ExternalTrafficPolicy string `json:"externalTrafficPolicy" gorm:"column:external_traffic_policy;type:string;size:128;comment:"`
+	Owner                 string `json:"owner" gorm:"column:owner;type:string;size:128;comment:负责人"`
 }
 
 func (this Service) TableName() string {

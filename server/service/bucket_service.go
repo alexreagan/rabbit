@@ -1,15 +1,16 @@
 package service
 
 import (
+	"github.com/alexreagan/rabbit/server/model/app"
 	"github.com/alexreagan/rabbit/server/model/node"
 )
 
 type bucketService struct {
 }
 
-func (s *bucketService) Sort(hosts []*node.Host, tags []*node.Tag) (map[int64]*node.Tag, []*node.Host) {
+func (s *bucketService) Sort(hosts []*node.Host, tags []*app.Tag) (map[int64]*app.Tag, []*node.Host) {
 	// host tag map
-	hostTagMap := make(map[int64]*node.Tag)
+	hostTagMap := make(map[int64]*app.Tag)
 	for _, host := range hosts {
 		for _, tag := range host.RelatedTags() {
 			if _, ok := hostTagMap[tag.ID]; !ok {
@@ -19,7 +20,7 @@ func (s *bucketService) Sort(hosts []*node.Host, tags []*node.Tag) (map[int64]*n
 	}
 
 	// tag map
-	tagMap := make(map[int64]*node.Tag)
+	tagMap := make(map[int64]*app.Tag)
 	for _, tag := range tags {
 		if _, ok := tagMap[tag.ID]; !ok {
 			tagMap[tag.ID] = tag
@@ -27,7 +28,7 @@ func (s *bucketService) Sort(hosts []*node.Host, tags []*node.Tag) (map[int64]*n
 	}
 
 	// host tag与tag桶的交集
-	intersectTags := make([]*node.Tag, 0)
+	intersectTags := make([]*app.Tag, 0)
 	for _, hostTag := range hostTagMap {
 		for _, tag := range tagMap {
 			if hostTag.ID == tag.ID {
@@ -37,7 +38,7 @@ func (s *bucketService) Sort(hosts []*node.Host, tags []*node.Tag) (map[int64]*n
 	}
 
 	// tag 交集
-	intersectTagMap := make(map[int64]*node.Tag)
+	intersectTagMap := make(map[int64]*app.Tag)
 	unTaggedHost := make([]*node.Host, 0)
 	for _, tag := range intersectTags {
 		intersectTagMap[tag.ID] = tag

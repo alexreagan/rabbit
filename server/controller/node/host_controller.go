@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/alexreagan/rabbit/g"
 	h "github.com/alexreagan/rabbit/server/helper"
+	"github.com/alexreagan/rabbit/server/model"
+	"github.com/alexreagan/rabbit/server/model/app"
 	"github.com/alexreagan/rabbit/server/model/node"
 	"github.com/alexreagan/rabbit/server/service"
 	"github.com/alexreagan/rabbit/server/utils"
@@ -141,7 +143,7 @@ func HostList(c *gin.Context) {
 		}
 		db = db.Where("`host_tag_rel`.`tag` in (?)", inputs.TagIDs)
 		db = db.Group("`host_tag_rel`.`host`")
-		db = db.Having("group_concat(`host_tag_rel`.`tag`) = ?", strings.Join(tmp, ","))
+		db = db.Having("group_concat(`host_tag_rel`.`tag` order by `host_tag_rel`.`tag`) = ?", strings.Join(tmp, ","))
 	} else {
 		db = db.Group("`host`.`ip`")
 	}
@@ -171,6 +173,45 @@ func HostList(c *gin.Context) {
 	resp := &APIGetHostListOutputs{
 		List:       hosts,
 		TotalCount: totalCount,
+	}
+	h.JSONR(c, http.StatusOK, resp)
+	return
+}
+
+type APIGetHostSelectInputs struct {
+	Query string `json:"query" form:"query"`
+}
+
+type APIGetHostSelectOutputs struct {
+	List []*node.Host `json:"list"`
+}
+
+// @Summary 机器查找
+// @Description
+// @Produce json
+// @Param APIGetHostSelectInputs body APIGetHostSelectInputs true "机器查找"
+// @Success 200 {object} APIGetHostListOutputs
+// @Failure 400 {object} APIGetHostListOutputs
+// @Router /api/v1/host/select [get]
+func HostSelect(c *gin.Context) {
+	var inputs APIGetHostSelectInputs
+
+	if err := c.Bind(&inputs); err != nil {
+		h.JSONR(c, h.BadStatus, err)
+		return
+	}
+	var hosts []*node.Host
+	db := g.Con().Portal.Debug().Model(node.Host{})
+	db = db.Distinct("`host`.*")
+	if inputs.Query != "" {
+		db = db.Where("`host`.`ip` regexp ?", inputs.Query)
+		db = db.Or("`host`.`physical_system` = ?", inputs.Query)
+	}
+	db = db.Limit(10)
+	db.Find(&hosts)
+
+	resp := &APIGetHostSelectOutputs{
+		List: hosts,
 	}
 	h.JSONR(c, http.StatusOK, resp)
 	return
@@ -238,8 +279,8 @@ func HostCreate(c *gin.Context) {
 		h.JSONR(c, h.ExpecStatus, dt.Error)
 	}
 
-	var tags []node.Tag
-	if dt := tx.Model(node.Tag{}).Where("id in (?)", inputs.TagIDs).Find(&tags); dt.Error != nil {
+	var tags []app.Tag
+	if dt := tx.Model(app.Tag{}).Where("id in (?)", inputs.TagIDs).Find(&tags); dt.Error != nil {
 		h.JSONR(c, h.ExpecStatus, dt.Error)
 		return
 	}
@@ -279,6 +320,7 @@ func HostUpdate(c *gin.Context) {
 	host := node.Host{}
 	if dt := tx.Model(node.Host{}).Where("ip = ?", inputs.IP).Find(&host); dt.Error != nil {
 		h.JSONR(c, h.ExpecStatus, dt.Error)
+		return
 	}
 
 	if dt := tx.Model(node.Host{}).Where("ip = ?", inputs.IP).Updates(node.Host{
@@ -286,6 +328,7 @@ func HostUpdate(c *gin.Context) {
 		State:    inputs.State,
 	}); dt.Error != nil {
 		h.JSONR(c, h.ExpecStatus, dt.Error)
+		return
 	}
 
 	dt := tx.Debug().Model(node.HostTagRel{})
@@ -320,7 +363,7 @@ type APIPostHostBatchUpdateInputs struct {
 // @Summary 更新机器标签和负责人
 // @Description
 // @Produce json
-// @Param APIPostHostBatchUpdateInputs formData APIPostHostBatchUpdateInputs false "更新机器标签和负责人信息"
+// @Param APIPostHostBatchUpdateInputs body APIPostHostBatchUpdateInputs false "更新机器标签和负责人信息"
 // @Success 200 {object} APIPostHostBatchUpdateInputs
 // @Failure 400 {object} APIPostHostBatchUpdateInputs
 // @Router /api/v1/host/batch/update [put]
@@ -330,8 +373,6 @@ func HostBatchUpdate(c *gin.Context) {
 		h.JSONR(c, h.BadStatus, err)
 		return
 	}
-	log.Println("=========")
-	log.Printf("%+v", inputs)
 
 	tx := g.Con().Portal.Begin()
 	for _, id := range inputs.IDs {
@@ -405,16 +446,16 @@ func HostDetail(c *gin.Context) {
 // @Summary 物理子系统类别
 // @Description
 // @Produce json
-// @Success 200 {object} APIGetVariableOutputs
-// @Failure 400 {object} APIGetVariableOutputs
+// @Success 200 {object} model.APIGetVariableOutputs
+// @Failure 400 {object} model.APIGetVariableOutputs
 // @Router /api/v1/host/physical_system_choices [get]
 func HostPhysicalSystemChoices(c *gin.Context) {
-	var data []*h.APIGetVariableItem
+	var data []*model.APIGetVariableItem
 	db := g.Con().Portal.Model(node.Host{}).Debug()
 	db = db.Select("distinct `physical_system` as `label`, `physical_system` as `value`")
 	db = db.Order("`physical_system`")
 	db = db.Find(&data)
-	resp := h.APIGetVariableOutputs{
+	resp := model.APIGetVariableOutputs{
 		List:       data,
 		TotalCount: int64(len(data)),
 	}
@@ -425,16 +466,16 @@ func HostPhysicalSystemChoices(c *gin.Context) {
 // @Summary 区域类别
 // @Description
 // @Produce json
-// @Success 200 {object} APIGetVariableOutputs
-// @Failure 400 {object} APIGetVariableOutputs
+// @Success 200 {object} model.APIGetVariableOutputs
+// @Failure 400 {object} model.APIGetVariableOutputs
 // @Router /api/v1/host/area_choices [get]
 func HostAreaChoices(c *gin.Context) {
-	var data []*h.APIGetVariableItem
+	var data []*model.APIGetVariableItem
 	db := g.Con().Portal.Model(node.Host{}).Debug()
 	db = db.Select("distinct `area_name` as `label`, `area_name` as `value`")
 	db = db.Where("area_name != ''")
 	db = db.Find(&data)
-	resp := h.APIGetVariableOutputs{
+	resp := model.APIGetVariableOutputs{
 		List:       data,
 		TotalCount: int64(len(data)),
 	}
