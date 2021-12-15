@@ -93,8 +93,8 @@ type APIPostCreateHostGroup struct {
 // @Description
 // @Produce json
 // @Param APIGetHostGroupListInputs query APIGetHostGroupListInputs true "更新host group信息"
-// @Success 200 {object} APIGetHostGroupTreeOutputs
-// @Failure 400 {object} APIGetHostGroupTreeOutputs
+// @Success 200 {object} APIGetHostGroupListOutputs
+// @Failure 400 {object} APIGetHostGroupListOutputs
 // @Router /api/v1/host_group/create [post]
 func HostGroupCreate(c *gin.Context) {
 	var inputs APIPostCreateHostGroup
@@ -142,8 +142,8 @@ type APIBindHostToHostGroupInput struct {
 // @Description
 // @Produce json
 // @Param id query int64 true "根据ID获取host group树状信息"
-// @Success 200 {object} APIGetHostGroupTreeOutputs
-// @Failure 400 {object} APIGetHostGroupTreeOutputs
+// @Success 200 {object} node.HostGroupRel
+// @Failure 417 "internal error"
 // @Router /api/v1/host_group/bind_host [post]
 func BindHostToHostGroup(c *gin.Context) {
 	var inputs APIBindHostToHostGroupInput
@@ -181,8 +181,8 @@ type APIGetHostGroupGetInputs struct {
 // @Description
 // @Produce json
 // @Param id query int true "根据机器群组名称获取机器群组详细信息"
-// @Success 200 {object} APIGetHostGroupTreeOutputs
-// @Failure 400 {object} APIGetHostGroupTreeOutputs
+// @Success 200 {object} node.HostGroup
+// @Failure 400 {object} node.HostGroup
 // @Router /api/v1/host_group/get [get]
 func HostGroupGet(c *gin.Context) {
 	var inputs APIGetHostGroupGetInputs
@@ -210,8 +210,8 @@ type APIPutHostGroupInputs struct {
 // @Description
 // @Produce json
 // @Param APIPutHostGroupInputs query APIPutHostGroupInputs true "更新host group信息"
-// @Success 200 {object} APIGetHostGroupTreeOutputs
-// @Failure 400 {object} APIGetHostGroupTreeOutputs
+// @Success 200 {object} node.HostGroup
+// @Failure 400 {object} node.HostGroup
 // @Router /api/v1/host_group/update [put]
 func HostGroupPut(c *gin.Context) {
 	var inputs APIPutHostGroupInputs
@@ -268,8 +268,8 @@ func HostGroupPut(c *gin.Context) {
 // @Description
 // @Produce json
 // @Param id path int64 true "删除host group信息"
-// @Success 200 {object} APIGetHostGroupTreeOutputs
-// @Failure 400 {object} APIGetHostGroupTreeOutputs
+// @Success 200 {object} node.HostGroup
+// @Failure 417 "internal error"
 // @Router /api/v1/host_group/delete [post]
 func HostGroupDelete(c *gin.Context) {
 	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
@@ -296,8 +296,8 @@ func HostGroupDelete(c *gin.Context) {
 // @Description
 // @Produce json
 // @Param path query string true "group路径"
-// @Success 200 {object} APIGetHostGroupTreeOutputs
-// @Failure 400 {object} APIGetHostGroupTreeOutputs
+// @Success 200 {object} node.HostGroup
+// @Failure 417 "internal error"
 // @Router /api/v1/host_group/related_hosts [get]
 func HostGroupRelatedHosts(c *gin.Context) {
 	groupPath := c.Query("path")

@@ -89,8 +89,8 @@ func Tree(c *gin.Context) {
 // @Summary 重建群组树
 // @Description
 // @Produce json
-// @Success 200 {object} []HostGroup
-// @Failure 400 {object} []HostGroup
+// @Success 200 {object} []node.HostGroup
+// @Failure 400 {object} []node.HostGroup
 // @Router /api/v1/tree/rebuild [get]
 func TreeRebuild(c *gin.Context) {
 	resp := service.TagService.ReBuildGraph()

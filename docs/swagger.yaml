@@ -63,6 +63,413 @@ definitions:
         $ref: '#/definitions/gtime.GTime'
         type: object
     type: object
+  app.APIGetHostGroupTreeOutputs:
+    properties:
+      hostGroups:
+        items:
+          $ref: '#/definitions/node.HostGroup'
+        type: array
+    type: object
+  app.APIGetTagCategoryListInputs:
+    properties:
+      limit:
+        type: integer
+      name:
+        type: string
+      order:
+        type: string
+      orderBy:
+        type: string
+      page:
+        type: integer
+    type: object
+  app.APIGetTagCategoryListOutputs:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/app.TagCategory'
+        type: array
+      totalCount:
+        type: integer
+    type: object
+  app.APIGetTagCategoryTagsInputs:
+    properties:
+      categoryID:
+        type: string
+      categoryName:
+        type: string
+    type: object
+  app.APIGetTagCategoryTagsOutputs:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/app.Tag'
+        type: array
+      totalCount:
+        type: integer
+    type: object
+  app.APIGetTagListInputs:
+    properties:
+      categoryID:
+        type: string
+      limit:
+        type: integer
+      name:
+        type: string
+      order:
+        type: string
+      orderBy:
+        type: string
+      page:
+        type: integer
+      remark:
+        type: string
+    type: object
+  app.APIGetTagListOutputs:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/app.Tag'
+        type: array
+      totalCount:
+        type: integer
+    type: object
+  app.APIGetTemplateListInputs:
+    properties:
+      limit:
+        type: integer
+      name:
+        type: string
+      order:
+        type: string
+      orderBy:
+        type: string
+      page:
+        type: integer
+      remark:
+        type: string
+    type: object
+  app.APIGetTemplateListOutputs:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/app.Template'
+        type: array
+      totalCount:
+        type: integer
+    type: object
+  app.APIPostTagCategoryCreateInputs:
+    properties:
+      categoryID:
+        type: integer
+      cnName:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      remark:
+        type: string
+    type: object
+  app.APIPostTagCreateInputs:
+    properties:
+      categoryID:
+        type: integer
+      cnName:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      remark:
+        description: ParentID   int64  `json:"parentID" form:"parentID"`
+        type: string
+    type: object
+  app.APIPostTemplateUpdateInputs:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      remark:
+        type: string
+      state:
+        type: string
+    type: object
+  app.Tag:
+    properties:
+      categoryID:
+        type: integer
+      categoryName:
+        type: string
+      cnName:
+        type: string
+      createAt:
+        $ref: '#/definitions/gtime.GTime'
+        type: object
+      id:
+        type: integer
+      name:
+        type: string
+      remark:
+        type: string
+    type: object
+  app.TagCategory:
+    properties:
+      cnName:
+        type: string
+      createAt:
+        $ref: '#/definitions/gtime.GTime'
+        type: object
+      id:
+        type: integer
+      name:
+        type: string
+      remark:
+        type: string
+    type: object
+  app.Template:
+    properties:
+      createAt:
+        $ref: '#/definitions/gtime.GTime'
+        type: object
+      creator:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      remark:
+        type: string
+      state:
+        type: string
+      updateAt:
+        $ref: '#/definitions/gtime.GTime'
+        type: object
+    type: object
+  caas.APIGetCaasAppListInputs:
+    properties:
+      appName:
+        type: string
+      limit:
+        type: integer
+      page:
+        type: integer
+    type: object
+  caas.APIGetCaasAppListOutputs:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/caas.App'
+        type: array
+      totalCount:
+        type: integer
+    type: object
+  caas.APIGetCaasNamespaceListInputs:
+    properties:
+      clusterName:
+        type: string
+      limit:
+        type: integer
+      namespace:
+        type: string
+      page:
+        type: integer
+      physicalSystemName:
+        type: string
+      workspaceName:
+        type: string
+    type: object
+  caas.APIGetCaasNamespaceListOutputs:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/caas.NameSpace'
+        type: array
+      totalCount:
+        type: integer
+    type: object
+  caas.APIGetCaasServiceListInputs:
+    properties:
+      limit:
+        type: integer
+      page:
+        type: integer
+      serviceName:
+        type: string
+    type: object
+  caas.APIGetCaasServiceListOutputs:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/caas.CaasService'
+        type: array
+      totalCount:
+        type: integer
+    type: object
+  caas.APIGetCaasWorkspaceListInputs:
+    properties:
+      limit:
+        type: integer
+      name:
+        type: string
+      page:
+        type: integer
+    type: object
+  caas.APIGetCaasWorkspaceListOutputs:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/caas.WorkSpace'
+        type: array
+      totalCount:
+        type: integer
+    type: object
+  caas.APIGetPodListInputs:
+    properties:
+      limit:
+        type: integer
+      name:
+        type: string
+      namespace:
+        type: string
+      order:
+        type: string
+      orderBy:
+        type: string
+      page:
+        type: integer
+      serviceName:
+        type: string
+    type: object
+  caas.APIGetPodListOutputs:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/caas.Pod'
+        type: array
+      totalCount:
+        type: integer
+    type: object
+  caas.APIPutServiceUpdateInputs:
+    properties:
+      id:
+        type: integer
+      owner:
+        type: string
+      tagIDs:
+        items:
+          type: integer
+        type: array
+    type: object
+  caas.App:
+    properties:
+      appName:
+        type: string
+      createTime:
+        $ref: '#/definitions/gtime.GTime'
+        type: object
+      description:
+        type: string
+      id:
+        type: integer
+      namespaceID:
+        type: integer
+      updateTime:
+        $ref: '#/definitions/gtime.GTime'
+        type: object
+    type: object
+  caas.CaasService:
+    properties:
+      activeDeadlineSeconds:
+        type: integer
+      affinityType:
+        type: string
+      appId:
+        type: integer
+      appName:
+        type: string
+      clusterIP:
+        type: string
+      clusterName:
+        type: string
+      completions:
+        description: |-
+          Command               string    `json:"command" gorm:"column:command;type:string;size:128;comment:"`
+          Arg                   string    `json:"arg" gorm:"column:arg;type:string;size:128;comment:"`
+        type: integer
+      cpu:
+        type: integer
+      createTime:
+        $ref: '#/definitions/gtime.GTime'
+        type: object
+      duration:
+        type: string
+      externalTrafficPolicy:
+        description: HostAliases           string    `json:"hostAliases" gorm:"column:host_aliases;type:string;size:128;comment:"`
+        type: string
+      finishTime:
+        $ref: '#/definitions/gtime.GTime'
+        type: object
+      gpu:
+        type: integer
+      headlessName:
+        description: |-
+          NodeSelectorLabel     string    `json:"nodeSelectorLabel" gorm:"column:node_selector_label;type:string;size:128;comment:"`
+          Zones                 string    `json:"zones" gorm:"column:zones;type:string;size:128;comment:"`
+          ReadinessProbeInfo    string    `json:"readinessProbeInfo" gorm:"column:readiness_probe_info;type:string;size:128;comment:"`
+          LivenessProbeInfo     string    `json:"livenessProbeInfo" gorm:"column:liveness_probe_info;type:string;size:128;comment:"`
+        type: string
+      id:
+        type: integer
+      imageName:
+        description: Envs         *Envs  `json:"envs,omitempty" gorm:"foreignkey:app_id;association_foreignkey:id;association_autoupdate:false"`
+        type: string
+      imageTag:
+        type: string
+      memory:
+        type: integer
+      namespace:
+        type: string
+      nowReplicas:
+        type: integer
+      owner:
+        type: string
+      parallelism:
+        type: integer
+      physicalSystemName:
+        type: string
+      ports:
+        description: Ports        []*Port `json:"ports,omitempty" gorm:"many2many:caas_service_port_rel;foreignkey:service_name;association_foreignkey:host;association_jointable_foreignkey:host;jointable_foreignkey:service_name;"`
+        items:
+          $ref: '#/definitions/caas.Port'
+        type: array
+      pullPolicy:
+        type: string
+      replicas:
+        type: integer
+      serviceName:
+        type: string
+      srvLbType:
+        description: |-
+          VolumeList            string    `json:"volumeList" gorm:"column:volume_list;type:string;size:128;comment:"`
+          LocalVolumeList       string    `json:"localVolumeList" gorm:"column:local_volume_list;type:string;size:128;comment:"`
+          ConfigMapVolumeList   string    `json:"configMapVolumeList" gorm:"column:config_map_volume_list;type:string;size:128;comment:"`
+        type: string
+      status:
+        type: string
+      tags:
+        items:
+          $ref: '#/definitions/app.Tag'
+        type: array
+      type:
+        type: string
+      updateTime:
+        $ref: '#/definitions/gtime.GTime'
+        type: object
+      workspaceName:
+        type: string
+    type: object
   caas.NameSpace:
     properties:
       clusterId:
@@ -72,7 +479,8 @@ definitions:
       cpu:
         type: integer
       createTime:
-        type: string
+        $ref: '#/definitions/gtime.GTime'
+        type: object
       gpu:
         type: integer
       id:
@@ -92,7 +500,8 @@ definitions:
       sharedVolume:
         type: integer
       updateTime:
-        type: string
+        $ref: '#/definitions/gtime.GTime'
+        type: object
       workspaceId:
         type: integer
       workspaceName:
@@ -103,7 +512,8 @@ definitions:
   caas.Pod:
     properties:
       createTime:
-        type: string
+        $ref: '#/definitions/gtime.GTime'
+        type: object
       hostIp:
         type: string
       hostName:
@@ -125,7 +535,8 @@ definitions:
       type:
         type: string
       updateTime:
-        type: string
+        $ref: '#/definitions/gtime.GTime'
+        type: object
     type: object
   caas.Port:
     properties:
@@ -140,7 +551,8 @@ definitions:
       protocol:
         type: string
       updateTime:
-        type: string
+        $ref: '#/definitions/gtime.GTime'
+        type: object
     type: object
   caas.Service:
     properties:
@@ -162,14 +574,16 @@ definitions:
       cpu:
         type: integer
       createTime:
-        type: string
+        $ref: '#/definitions/gtime.GTime'
+        type: object
       duration:
         type: string
       externalTrafficPolicy:
         description: HostAliases           string    `json:"hostAliases" gorm:"column:host_aliases;type:string;size:128;comment:"`
         type: string
       finishTime:
-        type: string
+        $ref: '#/definitions/gtime.GTime'
+        type: object
       gpu:
         type: integer
       headlessName:
@@ -190,6 +604,8 @@ definitions:
         type: integer
       nowReplicas:
         type: integer
+      owner:
+        type: string
       parallelism:
         type: integer
       ports:
@@ -214,7 +630,8 @@ definitions:
       type:
         type: string
       updateTime:
-        type: string
+        $ref: '#/definitions/gtime.GTime'
+        type: object
     type: object
   caas.WorkSpace:
     properties:
@@ -233,9 +650,89 @@ definitions:
       orgProposer:
         type: string
       updateTime:
-        type: string
+        $ref: '#/definitions/gtime.GTime'
+        type: object
       zones:
         type: string
+    type: object
+  chart.APIGetChartBarLegend:
+    properties:
+      data:
+        items:
+          type: string
+        type: array
+    type: object
+  chart.APIGetChartBarOutputs:
+    properties:
+      legend:
+        $ref: '#/definitions/chart.APIGetChartBarLegend'
+        type: object
+      series:
+        items:
+          $ref: '#/definitions/chart.APIGetChartBarSeries'
+        type: array
+      xAxis:
+        items:
+          $ref: '#/definitions/chart.APIGetChartBarXAxis'
+        type: array
+    type: object
+  chart.APIGetChartBarSeries:
+    properties:
+      data:
+        items:
+          type: integer
+        type: array
+      name:
+        type: string
+      type:
+        type: string
+    type: object
+  chart.APIGetChartBarXAxis:
+    properties:
+      data:
+        items:
+          type: string
+        type: array
+      type:
+        type: string
+    type: object
+  chart.APIGetChartStat:
+    properties:
+      name:
+        type: string
+      totalCpuCount:
+        type: integer
+      totalHostCount:
+        type: integer
+      unUsedCpuCount:
+        type: integer
+      unUsedHostCount:
+        type: integer
+      usedCpuCount:
+        type: integer
+      usedHostCount:
+        type: integer
+    type: object
+  chart.APIGetChartStatOutputs:
+    properties:
+      name:
+        type: string
+      subStat:
+        items:
+          $ref: '#/definitions/chart.APIGetChartStat'
+        type: array
+      totalCpuCount:
+        type: integer
+      totalHostCount:
+        type: integer
+      unUsedCpuCount:
+        type: integer
+      unUsedHostCount:
+        type: integer
+      usedCpuCount:
+        type: integer
+      usedHostCount:
+        type: integer
     type: object
   gtime.GTime:
     type: object
@@ -255,144 +752,49 @@ definitions:
       totalCount:
         type: integer
     type: object
-  node.APIGetCaasNamespaceListInputs:
+  node.APIGetHostApplyRequestListData:
     properties:
-      clusterName:
+      applier:
         type: string
-      limit:
-        type: integer
-      namespace:
-        type: string
-      page:
-        type: integer
-      physicalSystemName:
-        type: string
-      workspaceName:
-        type: string
-    type: object
-  node.APIGetCaasNamespaceListOutputs:
-    properties:
-      list:
-        items:
-          $ref: '#/definitions/caas.NameSpace'
-        type: array
-      totalCount:
-        type: integer
-    type: object
-  node.APIGetCaasServiceListInputs:
-    properties:
-      limit:
-        type: integer
-      page:
-        type: integer
-      serviceName:
-        type: string
-    type: object
-  node.APIGetCaasServiceListOutputs:
-    properties:
-      list:
-        items:
-          $ref: '#/definitions/node.CaasService'
-        type: array
-      totalCount:
-        type: integer
-    type: object
-  node.APIGetCaasWorkspaceListInputs:
-    properties:
-      limit:
-        type: integer
-      name:
-        type: string
-      page:
-        type: integer
-    type: object
-  node.APIGetCaasWorkspaceListOutputs:
-    properties:
-      list:
-        items:
-          $ref: '#/definitions/caas.WorkSpace'
-        type: array
-      totalCount:
-        type: integer
-    type: object
-  node.APIGetChartBarLegend:
-    properties:
-      data:
-        items:
-          type: string
-        type: array
-    type: object
-  node.APIGetChartBarOutputs:
-    properties:
-      legend:
-        $ref: '#/definitions/node.APIGetChartBarLegend'
+      assignAt:
+        $ref: '#/definitions/gtime.GTime'
         type: object
-      series:
+      assigner:
+        type: string
+      count:
+        type: integer
+      cpu:
+        type: integer
+      createAt:
+        $ref: '#/definitions/gtime.GTime'
+        type: object
+      creator:
+        type: string
+      hostIDs:
+        type: string
+      hosts:
         items:
-          $ref: '#/definitions/node.APIGetChartBarSeries'
+          $ref: '#/definitions/node.Host'
         type: array
-      xAxis:
-        items:
-          $ref: '#/definitions/node.APIGetChartBarXAxis'
-        type: array
-    type: object
-  node.APIGetChartBarSeries:
-    properties:
-      data:
-        items:
-          type: integer
-        type: array
+      id:
+        type: integer
+      memory:
+        type: integer
       name:
         type: string
-      type:
+      releaseAt:
+        $ref: '#/definitions/gtime.GTime'
+        type: object
+      remark:
         type: string
-    type: object
-  node.APIGetChartBarXAxis:
-    properties:
-      data:
+      state:
+        type: string
+      tagIDs:
+        type: string
+      tags:
         items:
-          type: string
+          $ref: '#/definitions/app.Tag'
         type: array
-      type:
-        type: string
-    type: object
-  node.APIGetChartStat:
-    properties:
-      name:
-        type: string
-      totalCpuCount:
-        type: integer
-      totalHostCount:
-        type: integer
-      unUsedCpuCount:
-        type: integer
-      unUsedHostCount:
-        type: integer
-      usedCpuCount:
-        type: integer
-      usedHostCount:
-        type: integer
-    type: object
-  node.APIGetChartStatOutputs:
-    properties:
-      name:
-        type: string
-      subStat:
-        items:
-          $ref: '#/definitions/node.APIGetChartStat'
-        type: array
-      totalCpuCount:
-        type: integer
-      totalHostCount:
-        type: integer
-      unUsedCpuCount:
-        type: integer
-      unUsedHostCount:
-        type: integer
-      usedCpuCount:
-        type: integer
-      usedHostCount:
-        type: integer
     type: object
   node.APIGetHostApplyRequestListInputs:
     properties:
@@ -411,7 +813,7 @@ definitions:
     properties:
       list:
         items:
-          $ref: '#/definitions/node.HostApplyRequest'
+          $ref: '#/definitions/node.APIGetHostApplyRequestListData'
         type: array
       totalCount:
         type: integer
@@ -433,13 +835,6 @@ definitions:
         type: array
       totalCount:
         type: integer
-    type: object
-  node.APIGetHostGroupTreeOutputs:
-    properties:
-      hostGroups:
-        items:
-          $ref: '#/definitions/node.HostGroup'
-        type: array
     type: object
   node.APIGetHostListInputs:
     properties:
@@ -492,86 +887,25 @@ definitions:
       totalCount:
         type: integer
     type: object
-  node.APIGetPodListInputs:
+  node.APIGetHostSelectInputs:
     properties:
-      limit:
-        type: integer
-      name:
-        type: string
-      namespace:
-        type: string
-      order:
-        type: string
-      orderBy:
-        type: string
-      page:
-        type: integer
-      serviceName:
+      query:
         type: string
     type: object
-  node.APIGetTagCategoryListInputs:
+  node.APIPostHostApplyRequestAssignInputs:
     properties:
-      limit:
-        type: integer
-      name:
-        type: string
-      order:
-        type: string
-      orderBy:
-        type: string
-      page:
-        type: integer
-    type: object
-  node.APIGetTagCategoryListOutputs:
-    properties:
-      list:
+      hostIDs:
         items:
-          $ref: '#/definitions/node.TagCategory'
+          type: integer
         type: array
-      totalCount:
+      id:
         type: integer
-    type: object
-  node.APIGetTagCategoryTagsInputs:
-    properties:
-      categoryID:
+      state:
         type: string
-      categoryName:
-        type: string
-    type: object
-  node.APIGetTagCategoryTagsOutputs:
-    properties:
-      list:
+      tagIDs:
         items:
-          $ref: '#/definitions/node.Tag'
+          type: integer
         type: array
-      totalCount:
-        type: integer
-    type: object
-  node.APIGetTagListInputs:
-    properties:
-      categoryID:
-        type: string
-      limit:
-        type: integer
-      name:
-        type: string
-      order:
-        type: string
-      orderBy:
-        type: string
-      page:
-        type: integer
-      remark:
-        type: string
-    type: object
-  node.APIGetTagListOutputs:
-    properties:
-      list:
-        items:
-          $ref: '#/definitions/node.Tag'
-        type: array
-      totalCount:
-        type: integer
     type: object
   node.APIPostHostApplyRequestCreateInputs:
     properties:
@@ -624,33 +958,6 @@ definitions:
     required:
     - ip
     type: object
-  node.APIPostTagCategoryCreateInputs:
-    properties:
-      categoryID:
-        type: integer
-      cnName:
-        type: string
-      id:
-        type: integer
-      name:
-        type: string
-      remark:
-        type: string
-    type: object
-  node.APIPostTagCreateInputs:
-    properties:
-      categoryID:
-        type: integer
-      cnName:
-        type: string
-      id:
-        type: integer
-      name:
-        type: string
-      remark:
-        description: ParentID   int64  `json:"parentID" form:"parentID"`
-        type: string
-    type: object
   node.APIPutHostGroupInputs:
     properties:
       caasServiceId:
@@ -671,88 +978,6 @@ definitions:
     - id
     - name
     - type
-    type: object
-  node.CaasService:
-    properties:
-      activeDeadlineSeconds:
-        type: integer
-      affinityType:
-        type: string
-      appId:
-        type: integer
-      appName:
-        type: string
-      clusterIP:
-        type: string
-      clusterName:
-        type: string
-      completions:
-        description: |-
-          Command               string    `json:"command" gorm:"column:command;type:string;size:128;comment:"`
-          Arg                   string    `json:"arg" gorm:"column:arg;type:string;size:128;comment:"`
-        type: integer
-      cpu:
-        type: integer
-      createTime:
-        type: string
-      duration:
-        type: string
-      externalTrafficPolicy:
-        description: HostAliases           string    `json:"hostAliases" gorm:"column:host_aliases;type:string;size:128;comment:"`
-        type: string
-      finishTime:
-        type: string
-      gpu:
-        type: integer
-      headlessName:
-        description: |-
-          NodeSelectorLabel     string    `json:"nodeSelectorLabel" gorm:"column:node_selector_label;type:string;size:128;comment:"`
-          Zones                 string    `json:"zones" gorm:"column:zones;type:string;size:128;comment:"`
-          ReadinessProbeInfo    string    `json:"readinessProbeInfo" gorm:"column:readiness_probe_info;type:string;size:128;comment:"`
-          LivenessProbeInfo     string    `json:"livenessProbeInfo" gorm:"column:liveness_probe_info;type:string;size:128;comment:"`
-        type: string
-      id:
-        type: integer
-      imageName:
-        description: Envs         *Envs  `json:"envs,omitempty" gorm:"foreignkey:app_id;association_foreignkey:id;association_autoupdate:false"`
-        type: string
-      imageTag:
-        type: string
-      memory:
-        type: integer
-      namespace:
-        type: string
-      nowReplicas:
-        type: integer
-      parallelism:
-        type: integer
-      physicalSystemName:
-        type: string
-      ports:
-        description: Ports        []*Port `json:"ports,omitempty" gorm:"many2many:caas_service_port_rel;foreignkey:service_name;association_foreignkey:host;association_jointable_foreignkey:host;jointable_foreignkey:service_name;"`
-        items:
-          $ref: '#/definitions/caas.Port'
-        type: array
-      pullPolicy:
-        type: string
-      replicas:
-        type: integer
-      serviceName:
-        type: string
-      srvLbType:
-        description: |-
-          VolumeList            string    `json:"volumeList" gorm:"column:volume_list;type:string;size:128;comment:"`
-          LocalVolumeList       string    `json:"localVolumeList" gorm:"column:local_volume_list;type:string;size:128;comment:"`
-          ConfigMapVolumeList   string    `json:"configMapVolumeList" gorm:"column:config_map_volume_list;type:string;size:128;comment:"`
-        type: string
-      status:
-        type: string
-      type:
-        type: string
-      updateTime:
-        type: string
-      workspaceName:
-        type: string
     type: object
   node.Host:
     properties:
@@ -850,7 +1075,7 @@ definitions:
         type: string
       tags:
         items:
-          $ref: '#/definitions/node.Tag'
+          $ref: '#/definitions/app.Tag'
         type: array
       type:
         type: string
@@ -859,33 +1084,6 @@ definitions:
       virtFcNum:
         type: string
       virtNetNum:
-        type: string
-    type: object
-  node.HostApplyRequest:
-    properties:
-      applier:
-        type: string
-      count:
-        type: integer
-      cpu:
-        type: integer
-      createAt:
-        $ref: '#/definitions/gtime.GTime'
-        type: object
-      creator:
-        type: string
-      id:
-        type: integer
-      memory:
-        type: integer
-      name:
-        type: string
-      releaseAt:
-        $ref: '#/definitions/gtime.GTime'
-        type: object
-      remark:
-        type: string
-      state:
         type: string
     type: object
   node.HostGroup:
@@ -927,37 +1125,12 @@ definitions:
       type:
         type: string
     type: object
-  node.Tag:
+  node.HostGroupRel:
     properties:
-      categoryID:
+      groupID:
         type: integer
-      categoryName:
-        type: string
-      cnName:
-        type: string
-      createAt:
-        $ref: '#/definitions/gtime.GTime'
-        type: object
-      id:
+      hostID:
         type: integer
-      name:
-        type: string
-      remark:
-        type: string
-    type: object
-  node.TagCategory:
-    properties:
-      cnName:
-        type: string
-      createAt:
-        $ref: '#/definitions/gtime.GTime'
-        type: object
-      id:
-        type: integer
-      name:
-        type: string
-      remark:
-        type: string
     type: object
   sys.APIGetMenuNavListOutputs:
     properties:
@@ -1311,6 +1484,50 @@ paths:
           schema:
             $ref: '#/definitions/model.APIGetVariableOutputs'
       summary: 物理子系统类别
+  /api/v1/caas/app/info:
+    get:
+      parameters:
+      - description: 获取app详细信息
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/caas.App'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/caas.App'
+      summary: 获取app详细信息
+  /api/v1/caas/app/list:
+    get:
+      parameters:
+      - in: query
+        name: appName
+        type: string
+      - in: query
+        name: limit
+        type: integer
+      - in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/caas.APIGetCaasAppListOutputs'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/caas.APIGetCaasAppListOutputs'
+      summary: 获取caas应用信息
   /api/v1/caas/namespace/list:
     get:
       parameters:
@@ -1338,13 +1555,13 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/node.APIGetCaasNamespaceListOutputs'
+            $ref: '#/definitions/caas.APIGetCaasNamespaceListOutputs'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/node.APIGetCaasNamespaceListOutputs'
+            $ref: '#/definitions/caas.APIGetCaasNamespaceListOutputs'
       summary: 获取caas项目空间信息
-  /api/v1/caas/pod/:id:
+  /api/v1/caas/pod/info:
     get:
       parameters:
       - description: 根据机器ID获取机器详细信息
@@ -1394,11 +1611,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/node.APIGetHostListOutputs'
+            $ref: '#/definitions/caas.APIGetPodListOutputs'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/node.APIGetHostListOutputs'
+            $ref: '#/definitions/caas.APIGetPodListOutputs'
       summary: pod列表接口
   /api/v1/caas/service/info:
     get:
@@ -1438,11 +1655,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/node.APIGetCaasServiceListOutputs'
+            $ref: '#/definitions/caas.APIGetCaasServiceListOutputs'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/node.APIGetCaasServiceListOutputs'
+            $ref: '#/definitions/caas.APIGetCaasServiceListOutputs'
       summary: 更新host group信息
   /api/v1/caas/service/refresh_pods:
     get:
@@ -1462,12 +1679,26 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/node.APIGetCaasServiceListOutputs'
+            $ref: '#/definitions/caas.APIGetCaasServiceListOutputs'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/node.APIGetCaasServiceListOutputs'
+            $ref: '#/definitions/caas.APIGetCaasServiceListOutputs'
       summary: 更新service下的pods信息
+  /api/v1/caas/service/update:
+    put:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/caas.APIPutServiceUpdateInputs'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/caas.APIPutServiceUpdateInputs'
+      summary: 更新service信息
   /api/v1/caas/workspace/list:
     get:
       parameters:
@@ -1486,11 +1717,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/node.APIGetCaasWorkspaceListOutputs'
+            $ref: '#/definitions/caas.APIGetCaasWorkspaceListOutputs'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/node.APIGetCaasWorkspaceListOutputs'
+            $ref: '#/definitions/caas.APIGetCaasWorkspaceListOutputs'
       summary: 获取caas组织空间信息
   /api/v1/chart/bar:
     get:
@@ -1500,12 +1731,12 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/node.APIGetChartBarOutputs'
+            $ref: '#/definitions/chart.APIGetChartBarOutputs'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/node.APIGetChartBarOutputs'
-      summary: 按照host_group统计host_group下的CPU个数
+            $ref: '#/definitions/chart.APIGetChartBarOutputs'
+      summary: 按照tag统计tag下的CPU个数
   /api/v1/chart/container/stat:
     get:
       produces:
@@ -1514,11 +1745,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/node.APIGetChartStatOutputs'
+            $ref: '#/definitions/chart.APIGetChartStatOutputs'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/node.APIGetChartStatOutputs'
+            $ref: '#/definitions/chart.APIGetChartStatOutputs'
       summary: 统计平台收纳的容器使用量/cpu数/已分配机器数/已分配cpu数
   /api/v1/chart/pie:
     get:
@@ -1528,12 +1759,12 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/node.APIGetChartBarOutputs'
+            $ref: '#/definitions/chart.APIGetChartBarOutputs'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/node.APIGetChartBarOutputs'
-      summary: 按照host_group统计host_group下的CPU个数
+            $ref: '#/definitions/chart.APIGetChartBarOutputs'
+      summary: 按照tag统计tag下的CPU个数
   /api/v1/chart/vm/stat:
     get:
       produces:
@@ -1542,11 +1773,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/node.APIGetChartStatOutputs'
+            $ref: '#/definitions/chart.APIGetChartStatOutputs'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/node.APIGetChartStatOutputs'
+            $ref: '#/definitions/chart.APIGetChartStatOutputs'
       summary: 统计平台收纳的所有机器数/cpu数/已分配机器数/已分配cpu数
   /api/v1/host/area_choices:
     get:
@@ -1760,6 +1991,24 @@ paths:
           schema:
             $ref: '#/definitions/model.APIGetVariableOutputs'
       summary: 物理子系统类别
+  /api/v1/host/select:
+    get:
+      parameters:
+      - in: query
+        name: query
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/node.APIGetHostListOutputs'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/node.APIGetHostListOutputs'
+      summary: 机器查找
   /api/v1/host/update:
     put:
       parameters:
@@ -1792,6 +2041,27 @@ paths:
           schema:
             $ref: '#/definitions/node.APIPostHostUpdateInputs'
       summary: 更新机器信息
+  /api/v1/host_apply_request/assign:
+    put:
+      parameters:
+      - description: 创建机器申请单处理
+        in: body
+        name: APIPostHostApplyRequestAssignInputs
+        required: true
+        schema:
+          $ref: '#/definitions/node.APIPostHostApplyRequestAssignInputs'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: json
+        "400":
+          description: Bad Request
+          schema:
+            type: json
+      summary: 创建机器申请单处理
   /api/v1/host_apply_request/create:
     post:
       parameters:
@@ -1891,11 +2161,9 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/node.APIGetHostGroupTreeOutputs'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/node.APIGetHostGroupTreeOutputs'
+            $ref: '#/definitions/node.HostGroupRel'
+        "417":
+          description: internal error
       summary: 获取host group信息
   /api/v1/host_group/create:
     post:
@@ -1915,11 +2183,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/node.APIGetHostGroupTreeOutputs'
+            $ref: '#/definitions/node.APIGetHostGroupListOutputs'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/node.APIGetHostGroupTreeOutputs'
+            $ref: '#/definitions/node.APIGetHostGroupListOutputs'
       summary: 创建host group信息
   /api/v1/host_group/delete:
     post:
@@ -1935,11 +2203,9 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/node.APIGetHostGroupTreeOutputs'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/node.APIGetHostGroupTreeOutputs'
+            $ref: '#/definitions/node.HostGroup'
+        "417":
+          description: internal error
       summary: 删除host group信息
   /api/v1/host_group/get:
     get:
@@ -1955,11 +2221,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/node.APIGetHostGroupTreeOutputs'
+            $ref: '#/definitions/node.HostGroup'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/node.APIGetHostGroupTreeOutputs'
+            $ref: '#/definitions/node.HostGroup'
       summary: 根据机器群组名称获取机器群组详细信息
   /api/v1/host_group/list:
     get:
@@ -1999,11 +2265,9 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/node.APIGetHostGroupTreeOutputs'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/node.APIGetHostGroupTreeOutputs'
+            $ref: '#/definitions/node.HostGroup'
+        "417":
+          description: internal error
       summary: 根据group路径获取group下所有的host
   /api/v1/host_group/update:
     put:
@@ -2038,11 +2302,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/node.APIGetHostGroupTreeOutputs'
+            $ref: '#/definitions/node.HostGroup'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/node.APIGetHostGroupTreeOutputs'
+            $ref: '#/definitions/node.HostGroup'
       summary: 更新host group信息
   /api/v1/menu/info/:id:
     get:
@@ -2449,18 +2713,18 @@ paths:
         name: APIPostTagCreateInputs
         required: true
         schema:
-          $ref: '#/definitions/node.APIPostTagCreateInputs'
+          $ref: '#/definitions/app.APIPostTagCreateInputs'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/node.APIPostTagCreateInputs'
+            $ref: '#/definitions/app.APIPostTagCreateInputs'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/node.APIPostTagCreateInputs'
+            $ref: '#/definitions/app.APIPostTagCreateInputs'
       summary: 创建新tag
   /api/v1/tag/info:
     get:
@@ -2476,7 +2740,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/node.TagCategory'
+            $ref: '#/definitions/app.Tag'
         "400":
           description: Bad Request
           schema:
@@ -2512,11 +2776,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/node.APIGetTagListOutputs'
+            $ref: '#/definitions/app.APIGetTagListOutputs'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/node.APIGetTagListOutputs'
+            $ref: '#/definitions/app.APIGetTagListOutputs'
       summary: tag列表
   /api/v1/tag/update:
     put:
@@ -2526,18 +2790,18 @@ paths:
         name: APIPostTagCreateInputs
         required: true
         schema:
-          $ref: '#/definitions/node.APIPostTagCreateInputs'
+          $ref: '#/definitions/app.APIPostTagCreateInputs'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/node.APIPostTagCreateInputs'
+            $ref: '#/definitions/app.APIPostTagCreateInputs'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/node.APIPostTagCreateInputs'
+            $ref: '#/definitions/app.APIPostTagCreateInputs'
       summary: 更新tag
   /api/v1/tag_category/create:
     post:
@@ -2547,18 +2811,18 @@ paths:
         name: APIPostTagCategoryCreateInputs
         required: true
         schema:
-          $ref: '#/definitions/node.APIPostTagCategoryCreateInputs'
+          $ref: '#/definitions/app.APIPostTagCategoryCreateInputs'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/node.TagCategory'
+            $ref: '#/definitions/app.TagCategory'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/node.TagCategory'
+            $ref: '#/definitions/app.TagCategory'
       summary: 创建tag category
   /api/v1/tag_category/info:
     get:
@@ -2574,7 +2838,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/node.TagCategory'
+            $ref: '#/definitions/app.TagCategory'
         "400":
           description: Bad Request
           schema:
@@ -2604,11 +2868,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/node.APIGetTagCategoryListOutputs'
+            $ref: '#/definitions/app.APIGetTagCategoryListOutputs'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/node.APIGetTagCategoryListOutputs'
+            $ref: '#/definitions/app.APIGetTagCategoryListOutputs'
       summary: tag category列表
   /api/v1/tag_category/tags:
     get:
@@ -2625,7 +2889,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/node.APIGetTagCategoryTagsOutputs'
+            $ref: '#/definitions/app.APIGetTagCategoryTagsOutputs'
         "400":
           description: Bad Request
           schema:
@@ -2639,19 +2903,112 @@ paths:
         name: APIPostTagCategoryCreateInputs
         required: true
         schema:
-          $ref: '#/definitions/node.APIPostTagCategoryCreateInputs'
+          $ref: '#/definitions/app.APIPostTagCategoryCreateInputs'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/node.TagCategory'
+            $ref: '#/definitions/app.TagCategory'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/node.TagCategory'
+            $ref: '#/definitions/app.TagCategory'
       summary: 更新tag category
+  /api/v1/template/create:
+    post:
+      parameters:
+      - description: 创建新模板
+        in: body
+        name: APIPostTemplateUpdateInputs
+        required: true
+        schema:
+          $ref: '#/definitions/app.APIPostTemplateUpdateInputs'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.APIPostTemplateUpdateInputs'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.APIPostTemplateUpdateInputs'
+      summary: 创建新模板
+  /api/v1/template/info:
+    get:
+      parameters:
+      - description: 根据机器ID获取模板详细信息
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Template'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.Template'
+      summary: 根据机器ID获取模板详细信息
+  /api/v1/template/list:
+    get:
+      parameters:
+      - in: query
+        name: limit
+        type: integer
+      - in: query
+        name: name
+        type: string
+      - in: query
+        name: order
+        type: string
+      - in: query
+        name: orderBy
+        type: string
+      - in: query
+        name: page
+        type: integer
+      - in: query
+        name: remark
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.APIGetTemplateListOutputs'
+        "400":
+          description: error
+      summary: 展现模板列表接口
+  /api/v1/template/update:
+    put:
+      parameters:
+      - description: 更新模板信息
+        in: body
+        name: APIPostTemplateUpdateInputs
+        required: true
+        schema:
+          $ref: '#/definitions/app.APIPostTemplateUpdateInputs'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Template'
+        "400":
+          description: bad parameters
+        "417":
+          description: internal error
+      summary: 更新模板信息
   /api/v1/tree:
     get:
       parameters:
@@ -2666,11 +3023,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/node.APIGetHostGroupTreeOutputs'
+            $ref: '#/definitions/app.APIGetHostGroupTreeOutputs'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/node.APIGetHostGroupTreeOutputs'
+            $ref: '#/definitions/app.APIGetHostGroupTreeOutputs'
       summary: 获取host group信息
   /api/v1/tree/rebuild:
     get:
@@ -2787,10 +3144,10 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/node.APIGetHostGroupTreeOutputs'
+            $ref: '#/definitions/app.APIGetHostGroupTreeOutputs'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/node.APIGetHostGroupTreeOutputs'
+            $ref: '#/definitions/app.APIGetHostGroupTreeOutputs'
       summary: 根据tags获取tags下所有的机器
 swagger: "2.0"

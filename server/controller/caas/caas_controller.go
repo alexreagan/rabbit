@@ -204,8 +204,8 @@ type APIGetPodListOutputs struct {
 // @Description
 // @Produce json
 // @Param APIGetPodListInputs query APIGetPodListInputs true "根据查询条件分页查询机器列表"
-// @Success 200 {object} APIGetHostListOutputs
-// @Failure 400 {object} APIGetHostListOutputs
+// @Success 200 {object} APIGetPodListOutputs
+// @Failure 400 {object} APIGetPodListOutputs
 // @Router /api/v1/caas/pod/list [get]
 func PodList(c *gin.Context) {
 	var inputs APIGetPodListInputs
@@ -430,7 +430,7 @@ type App struct {
 // @Summary 获取caas应用信息
 // @Description
 // @Produce json
-// @Param APIGetCaasAppListInputs body APIGetCaasAppListInputs true "获取caas应用信息"
+// @Param APIGetCaasAppListInputs query APIGetCaasAppListInputs true "获取caas应用信息"
 // @Success 200 {object} APIGetCaasAppListOutputs
 // @Failure 400 {object} APIGetCaasAppListOutputs
 // @Router /api/v1/caas/app/list [get]

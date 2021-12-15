@@ -106,6 +106,76 @@ var doc = `{
                 }
             }
         },
+        "/api/v1/caas/app/info": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "获取app详细信息",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "获取app详细信息",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/caas.App"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/caas.App"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/caas/app/list": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "获取caas应用信息",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "appName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/caas.APIGetCaasAppListOutputs"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/caas.APIGetCaasAppListOutputs"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/caas/namespace/list": {
             "get": {
                 "produces": [
@@ -148,19 +218,19 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/node.APIGetCaasNamespaceListOutputs"
+                            "$ref": "#/definitions/caas.APIGetCaasNamespaceListOutputs"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/node.APIGetCaasNamespaceListOutputs"
+                            "$ref": "#/definitions/caas.APIGetCaasNamespaceListOutputs"
                         }
                     }
                 }
             }
         },
-        "/api/v1/caas/pod/:id": {
+        "/api/v1/caas/pod/info": {
             "get": {
                 "produces": [
                     "application/json"
@@ -238,13 +308,13 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/node.APIGetHostListOutputs"
+                            "$ref": "#/definitions/caas.APIGetPodListOutputs"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/node.APIGetHostListOutputs"
+                            "$ref": "#/definitions/caas.APIGetPodListOutputs"
                         }
                     }
                 }
@@ -308,13 +378,13 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/node.APIGetCaasServiceListOutputs"
+                            "$ref": "#/definitions/caas.APIGetCaasServiceListOutputs"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/node.APIGetCaasServiceListOutputs"
+                            "$ref": "#/definitions/caas.APIGetCaasServiceListOutputs"
                         }
                     }
                 }
@@ -347,13 +417,35 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/node.APIGetCaasServiceListOutputs"
+                            "$ref": "#/definitions/caas.APIGetCaasServiceListOutputs"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/node.APIGetCaasServiceListOutputs"
+                            "$ref": "#/definitions/caas.APIGetCaasServiceListOutputs"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/caas/service/update": {
+            "put": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "更新service信息",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/caas.APIPutServiceUpdateInputs"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/caas.APIPutServiceUpdateInputs"
                         }
                     }
                 }
@@ -386,13 +478,13 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/node.APIGetCaasWorkspaceListOutputs"
+                            "$ref": "#/definitions/caas.APIGetCaasWorkspaceListOutputs"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/node.APIGetCaasWorkspaceListOutputs"
+                            "$ref": "#/definitions/caas.APIGetCaasWorkspaceListOutputs"
                         }
                     }
                 }
@@ -403,18 +495,18 @@ var doc = `{
                 "produces": [
                     "application/json"
                 ],
-                "summary": "按照host_group统计host_group下的CPU个数",
+                "summary": "按照tag统计tag下的CPU个数",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/node.APIGetChartBarOutputs"
+                            "$ref": "#/definitions/chart.APIGetChartBarOutputs"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/node.APIGetChartBarOutputs"
+                            "$ref": "#/definitions/chart.APIGetChartBarOutputs"
                         }
                     }
                 }
@@ -430,13 +522,13 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/node.APIGetChartStatOutputs"
+                            "$ref": "#/definitions/chart.APIGetChartStatOutputs"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/node.APIGetChartStatOutputs"
+                            "$ref": "#/definitions/chart.APIGetChartStatOutputs"
                         }
                     }
                 }
@@ -447,18 +539,18 @@ var doc = `{
                 "produces": [
                     "application/json"
                 ],
-                "summary": "按照host_group统计host_group下的CPU个数",
+                "summary": "按照tag统计tag下的CPU个数",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/node.APIGetChartBarOutputs"
+                            "$ref": "#/definitions/chart.APIGetChartBarOutputs"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/node.APIGetChartBarOutputs"
+                            "$ref": "#/definitions/chart.APIGetChartBarOutputs"
                         }
                     }
                 }
@@ -474,13 +566,13 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/node.APIGetChartStatOutputs"
+                            "$ref": "#/definitions/chart.APIGetChartStatOutputs"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/node.APIGetChartStatOutputs"
+                            "$ref": "#/definitions/chart.APIGetChartStatOutputs"
                         }
                     }
                 }
@@ -817,6 +909,35 @@ var doc = `{
                 }
             }
         },
+        "/api/v1/host/select": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "机器查找",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "query",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/node.APIGetHostListOutputs"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/node.APIGetHostListOutputs"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/host/update": {
             "put": {
                 "produces": [
@@ -861,6 +982,39 @@ var doc = `{
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/node.APIPostHostUpdateInputs"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/host_apply_request/assign": {
+            "put": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "创建机器申请单处理",
+                "parameters": [
+                    {
+                        "description": "创建机器申请单处理",
+                        "name": "APIPostHostApplyRequestAssignInputs",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/node.APIPostHostApplyRequestAssignInputs"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "json"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "json"
                         }
                     }
                 }
@@ -1020,14 +1174,11 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/node.APIGetHostGroupTreeOutputs"
+                            "$ref": "#/definitions/node.HostGroupRel"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/node.APIGetHostGroupTreeOutputs"
-                        }
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -1059,13 +1210,13 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/node.APIGetHostGroupTreeOutputs"
+                            "$ref": "#/definitions/node.APIGetHostGroupListOutputs"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/node.APIGetHostGroupTreeOutputs"
+                            "$ref": "#/definitions/node.APIGetHostGroupListOutputs"
                         }
                     }
                 }
@@ -1090,14 +1241,11 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/node.APIGetHostGroupTreeOutputs"
+                            "$ref": "#/definitions/node.HostGroup"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/node.APIGetHostGroupTreeOutputs"
-                        }
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -1121,13 +1269,13 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/node.APIGetHostGroupTreeOutputs"
+                            "$ref": "#/definitions/node.HostGroup"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/node.APIGetHostGroupTreeOutputs"
+                            "$ref": "#/definitions/node.HostGroup"
                         }
                     }
                 }
@@ -1191,14 +1339,11 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/node.APIGetHostGroupTreeOutputs"
+                            "$ref": "#/definitions/node.HostGroup"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/node.APIGetHostGroupTreeOutputs"
-                        }
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -1253,13 +1398,13 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/node.APIGetHostGroupTreeOutputs"
+                            "$ref": "#/definitions/node.HostGroup"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/node.APIGetHostGroupTreeOutputs"
+                            "$ref": "#/definitions/node.HostGroup"
                         }
                     }
                 }
@@ -1911,7 +2056,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/node.APIPostTagCreateInputs"
+                            "$ref": "#/definitions/app.APIPostTagCreateInputs"
                         }
                     }
                 ],
@@ -1919,13 +2064,13 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/node.APIPostTagCreateInputs"
+                            "$ref": "#/definitions/app.APIPostTagCreateInputs"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/node.APIPostTagCreateInputs"
+                            "$ref": "#/definitions/app.APIPostTagCreateInputs"
                         }
                     }
                 }
@@ -1950,7 +2095,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/node.TagCategory"
+                            "$ref": "#/definitions/app.Tag"
                         }
                     },
                     "400": {
@@ -2009,13 +2154,13 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/node.APIGetTagListOutputs"
+                            "$ref": "#/definitions/app.APIGetTagListOutputs"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/node.APIGetTagListOutputs"
+                            "$ref": "#/definitions/app.APIGetTagListOutputs"
                         }
                     }
                 }
@@ -2034,7 +2179,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/node.APIPostTagCreateInputs"
+                            "$ref": "#/definitions/app.APIPostTagCreateInputs"
                         }
                     }
                 ],
@@ -2042,13 +2187,13 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/node.APIPostTagCreateInputs"
+                            "$ref": "#/definitions/app.APIPostTagCreateInputs"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/node.APIPostTagCreateInputs"
+                            "$ref": "#/definitions/app.APIPostTagCreateInputs"
                         }
                     }
                 }
@@ -2067,7 +2212,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/node.APIPostTagCategoryCreateInputs"
+                            "$ref": "#/definitions/app.APIPostTagCategoryCreateInputs"
                         }
                     }
                 ],
@@ -2075,13 +2220,13 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/node.TagCategory"
+                            "$ref": "#/definitions/app.TagCategory"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/node.TagCategory"
+                            "$ref": "#/definitions/app.TagCategory"
                         }
                     }
                 }
@@ -2106,7 +2251,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/node.TagCategory"
+                            "$ref": "#/definitions/app.TagCategory"
                         }
                     },
                     "400": {
@@ -2155,13 +2300,13 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/node.APIGetTagCategoryListOutputs"
+                            "$ref": "#/definitions/app.APIGetTagCategoryListOutputs"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/node.APIGetTagCategoryListOutputs"
+                            "$ref": "#/definitions/app.APIGetTagCategoryListOutputs"
                         }
                     }
                 }
@@ -2189,7 +2334,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/node.APIGetTagCategoryTagsOutputs"
+                            "$ref": "#/definitions/app.APIGetTagCategoryTagsOutputs"
                         }
                     },
                     "400": {
@@ -2214,7 +2359,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/node.APIPostTagCategoryCreateInputs"
+                            "$ref": "#/definitions/app.APIPostTagCategoryCreateInputs"
                         }
                     }
                 ],
@@ -2222,14 +2367,162 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/node.TagCategory"
+                            "$ref": "#/definitions/app.TagCategory"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/node.TagCategory"
+                            "$ref": "#/definitions/app.TagCategory"
                         }
+                    }
+                }
+            }
+        },
+        "/api/v1/template/create": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "创建新模板",
+                "parameters": [
+                    {
+                        "description": "创建新模板",
+                        "name": "APIPostTemplateUpdateInputs",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/app.APIPostTemplateUpdateInputs"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.APIPostTemplateUpdateInputs"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/app.APIPostTemplateUpdateInputs"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/template/info": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "根据机器ID获取模板详细信息",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "根据机器ID获取模板详细信息",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.Template"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/app.Template"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/template/list": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "展现模板列表接口",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "orderBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "remark",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.APIGetTemplateListOutputs"
+                        }
+                    },
+                    "400": {
+                        "description": "error"
+                    }
+                }
+            }
+        },
+        "/api/v1/template/update": {
+            "put": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "更新模板信息",
+                "parameters": [
+                    {
+                        "description": "更新模板信息",
+                        "name": "APIPostTemplateUpdateInputs",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/app.APIPostTemplateUpdateInputs"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.Template"
+                        }
+                    },
+                    "400": {
+                        "description": "bad parameters"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -2253,13 +2546,13 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/node.APIGetHostGroupTreeOutputs"
+                            "$ref": "#/definitions/app.APIGetHostGroupTreeOutputs"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/node.APIGetHostGroupTreeOutputs"
+                            "$ref": "#/definitions/app.APIGetHostGroupTreeOutputs"
                         }
                     }
                 }
@@ -2443,13 +2736,13 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/node.APIGetHostGroupTreeOutputs"
+                            "$ref": "#/definitions/app.APIGetHostGroupTreeOutputs"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/node.APIGetHostGroupTreeOutputs"
+                            "$ref": "#/definitions/app.APIGetHostGroupTreeOutputs"
                         }
                     }
                 }
@@ -2553,6 +2846,609 @@ var doc = `{
                 }
             }
         },
+        "app.APIGetHostGroupTreeOutputs": {
+            "type": "object",
+            "properties": {
+                "hostGroups": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/node.HostGroup"
+                    }
+                }
+            }
+        },
+        "app.APIGetTagCategoryListInputs": {
+            "type": "object",
+            "properties": {
+                "limit": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "order": {
+                    "type": "string"
+                },
+                "orderBy": {
+                    "type": "string"
+                },
+                "page": {
+                    "type": "integer"
+                }
+            }
+        },
+        "app.APIGetTagCategoryListOutputs": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/app.TagCategory"
+                    }
+                },
+                "totalCount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "app.APIGetTagCategoryTagsInputs": {
+            "type": "object",
+            "properties": {
+                "categoryID": {
+                    "type": "string"
+                },
+                "categoryName": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.APIGetTagCategoryTagsOutputs": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/app.Tag"
+                    }
+                },
+                "totalCount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "app.APIGetTagListInputs": {
+            "type": "object",
+            "properties": {
+                "categoryID": {
+                    "type": "string"
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "order": {
+                    "type": "string"
+                },
+                "orderBy": {
+                    "type": "string"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "remark": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.APIGetTagListOutputs": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/app.Tag"
+                    }
+                },
+                "totalCount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "app.APIGetTemplateListInputs": {
+            "type": "object",
+            "properties": {
+                "limit": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "order": {
+                    "type": "string"
+                },
+                "orderBy": {
+                    "type": "string"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "remark": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.APIGetTemplateListOutputs": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/app.Template"
+                    }
+                },
+                "totalCount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "app.APIPostTagCategoryCreateInputs": {
+            "type": "object",
+            "properties": {
+                "categoryID": {
+                    "type": "integer"
+                },
+                "cnName": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "remark": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.APIPostTagCreateInputs": {
+            "type": "object",
+            "properties": {
+                "categoryID": {
+                    "type": "integer"
+                },
+                "cnName": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "remark": {
+                    "description": "ParentID   int64  ` + "`" + `json:\"parentID\" form:\"parentID\"` + "`" + `",
+                    "type": "string"
+                }
+            }
+        },
+        "app.APIPostTemplateUpdateInputs": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "remark": {
+                    "type": "string"
+                },
+                "state": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.Tag": {
+            "type": "object",
+            "properties": {
+                "categoryID": {
+                    "type": "integer"
+                },
+                "categoryName": {
+                    "type": "string"
+                },
+                "cnName": {
+                    "type": "string"
+                },
+                "createAt": {
+                    "type": "object",
+                    "$ref": "#/definitions/gtime.GTime"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "remark": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.TagCategory": {
+            "type": "object",
+            "properties": {
+                "cnName": {
+                    "type": "string"
+                },
+                "createAt": {
+                    "type": "object",
+                    "$ref": "#/definitions/gtime.GTime"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "remark": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.Template": {
+            "type": "object",
+            "properties": {
+                "createAt": {
+                    "type": "object",
+                    "$ref": "#/definitions/gtime.GTime"
+                },
+                "creator": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "remark": {
+                    "type": "string"
+                },
+                "state": {
+                    "type": "string"
+                },
+                "updateAt": {
+                    "type": "object",
+                    "$ref": "#/definitions/gtime.GTime"
+                }
+            }
+        },
+        "caas.APIGetCaasAppListInputs": {
+            "type": "object",
+            "properties": {
+                "appName": {
+                    "type": "string"
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                }
+            }
+        },
+        "caas.APIGetCaasAppListOutputs": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/caas.App"
+                    }
+                },
+                "totalCount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "caas.APIGetCaasNamespaceListInputs": {
+            "type": "object",
+            "properties": {
+                "clusterName": {
+                    "type": "string"
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "namespace": {
+                    "type": "string"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "physicalSystemName": {
+                    "type": "string"
+                },
+                "workspaceName": {
+                    "type": "string"
+                }
+            }
+        },
+        "caas.APIGetCaasNamespaceListOutputs": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/caas.NameSpace"
+                    }
+                },
+                "totalCount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "caas.APIGetCaasServiceListInputs": {
+            "type": "object",
+            "properties": {
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "serviceName": {
+                    "type": "string"
+                }
+            }
+        },
+        "caas.APIGetCaasServiceListOutputs": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/caas.CaasService"
+                    }
+                },
+                "totalCount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "caas.APIGetCaasWorkspaceListInputs": {
+            "type": "object",
+            "properties": {
+                "limit": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "page": {
+                    "type": "integer"
+                }
+            }
+        },
+        "caas.APIGetCaasWorkspaceListOutputs": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/caas.WorkSpace"
+                    }
+                },
+                "totalCount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "caas.APIGetPodListInputs": {
+            "type": "object",
+            "properties": {
+                "limit": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "namespace": {
+                    "type": "string"
+                },
+                "order": {
+                    "type": "string"
+                },
+                "orderBy": {
+                    "type": "string"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "serviceName": {
+                    "type": "string"
+                }
+            }
+        },
+        "caas.APIGetPodListOutputs": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/caas.Pod"
+                    }
+                },
+                "totalCount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "caas.APIPutServiceUpdateInputs": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "owner": {
+                    "type": "string"
+                },
+                "tagIDs": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "caas.App": {
+            "type": "object",
+            "properties": {
+                "appName": {
+                    "type": "string"
+                },
+                "createTime": {
+                    "type": "object",
+                    "$ref": "#/definitions/gtime.GTime"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "namespaceID": {
+                    "type": "integer"
+                },
+                "updateTime": {
+                    "type": "object",
+                    "$ref": "#/definitions/gtime.GTime"
+                }
+            }
+        },
+        "caas.CaasService": {
+            "type": "object",
+            "properties": {
+                "activeDeadlineSeconds": {
+                    "type": "integer"
+                },
+                "affinityType": {
+                    "type": "string"
+                },
+                "appId": {
+                    "type": "integer"
+                },
+                "appName": {
+                    "type": "string"
+                },
+                "clusterIP": {
+                    "type": "string"
+                },
+                "clusterName": {
+                    "type": "string"
+                },
+                "completions": {
+                    "description": "Command               string    ` + "`" + `json:\"command\" gorm:\"column:command;type:string;size:128;comment:\"` + "`" + `\nArg                   string    ` + "`" + `json:\"arg\" gorm:\"column:arg;type:string;size:128;comment:\"` + "`" + `",
+                    "type": "integer"
+                },
+                "cpu": {
+                    "type": "integer"
+                },
+                "createTime": {
+                    "type": "object",
+                    "$ref": "#/definitions/gtime.GTime"
+                },
+                "duration": {
+                    "type": "string"
+                },
+                "externalTrafficPolicy": {
+                    "description": "HostAliases           string    ` + "`" + `json:\"hostAliases\" gorm:\"column:host_aliases;type:string;size:128;comment:\"` + "`" + `",
+                    "type": "string"
+                },
+                "finishTime": {
+                    "type": "object",
+                    "$ref": "#/definitions/gtime.GTime"
+                },
+                "gpu": {
+                    "type": "integer"
+                },
+                "headlessName": {
+                    "description": "NodeSelectorLabel     string    ` + "`" + `json:\"nodeSelectorLabel\" gorm:\"column:node_selector_label;type:string;size:128;comment:\"` + "`" + `\nZones                 string    ` + "`" + `json:\"zones\" gorm:\"column:zones;type:string;size:128;comment:\"` + "`" + `\nReadinessProbeInfo    string    ` + "`" + `json:\"readinessProbeInfo\" gorm:\"column:readiness_probe_info;type:string;size:128;comment:\"` + "`" + `\nLivenessProbeInfo     string    ` + "`" + `json:\"livenessProbeInfo\" gorm:\"column:liveness_probe_info;type:string;size:128;comment:\"` + "`" + `",
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "imageName": {
+                    "description": "Envs         *Envs  ` + "`" + `json:\"envs,omitempty\" gorm:\"foreignkey:app_id;association_foreignkey:id;association_autoupdate:false\"` + "`" + `",
+                    "type": "string"
+                },
+                "imageTag": {
+                    "type": "string"
+                },
+                "memory": {
+                    "type": "integer"
+                },
+                "namespace": {
+                    "type": "string"
+                },
+                "nowReplicas": {
+                    "type": "integer"
+                },
+                "owner": {
+                    "type": "string"
+                },
+                "parallelism": {
+                    "type": "integer"
+                },
+                "physicalSystemName": {
+                    "type": "string"
+                },
+                "ports": {
+                    "description": "Ports        []*Port ` + "`" + `json:\"ports,omitempty\" gorm:\"many2many:caas_service_port_rel;foreignkey:service_name;association_foreignkey:host;association_jointable_foreignkey:host;jointable_foreignkey:service_name;\"` + "`" + `",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/caas.Port"
+                    }
+                },
+                "pullPolicy": {
+                    "type": "string"
+                },
+                "replicas": {
+                    "type": "integer"
+                },
+                "serviceName": {
+                    "type": "string"
+                },
+                "srvLbType": {
+                    "description": "VolumeList            string    ` + "`" + `json:\"volumeList\" gorm:\"column:volume_list;type:string;size:128;comment:\"` + "`" + `\nLocalVolumeList       string    ` + "`" + `json:\"localVolumeList\" gorm:\"column:local_volume_list;type:string;size:128;comment:\"` + "`" + `\nConfigMapVolumeList   string    ` + "`" + `json:\"configMapVolumeList\" gorm:\"column:config_map_volume_list;type:string;size:128;comment:\"` + "`" + `",
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/app.Tag"
+                    }
+                },
+                "type": {
+                    "type": "string"
+                },
+                "updateTime": {
+                    "type": "object",
+                    "$ref": "#/definitions/gtime.GTime"
+                },
+                "workspaceName": {
+                    "type": "string"
+                }
+            }
+        },
         "caas.NameSpace": {
             "type": "object",
             "properties": {
@@ -2566,7 +3462,8 @@ var doc = `{
                     "type": "integer"
                 },
                 "createTime": {
-                    "type": "string"
+                    "type": "object",
+                    "$ref": "#/definitions/gtime.GTime"
                 },
                 "gpu": {
                     "type": "integer"
@@ -2596,7 +3493,8 @@ var doc = `{
                     "type": "integer"
                 },
                 "updateTime": {
-                    "type": "string"
+                    "type": "object",
+                    "$ref": "#/definitions/gtime.GTime"
                 },
                 "workspaceId": {
                     "type": "integer"
@@ -2613,7 +3511,8 @@ var doc = `{
             "type": "object",
             "properties": {
                 "createTime": {
-                    "type": "string"
+                    "type": "object",
+                    "$ref": "#/definitions/gtime.GTime"
                 },
                 "hostIp": {
                     "type": "string"
@@ -2646,7 +3545,8 @@ var doc = `{
                     "type": "string"
                 },
                 "updateTime": {
-                    "type": "string"
+                    "type": "object",
+                    "$ref": "#/definitions/gtime.GTime"
                 }
             }
         },
@@ -2669,7 +3569,8 @@ var doc = `{
                     "type": "string"
                 },
                 "updateTime": {
-                    "type": "string"
+                    "type": "object",
+                    "$ref": "#/definitions/gtime.GTime"
                 }
             }
         },
@@ -2699,7 +3600,8 @@ var doc = `{
                     "type": "integer"
                 },
                 "createTime": {
-                    "type": "string"
+                    "type": "object",
+                    "$ref": "#/definitions/gtime.GTime"
                 },
                 "duration": {
                     "type": "string"
@@ -2709,7 +3611,8 @@ var doc = `{
                     "type": "string"
                 },
                 "finishTime": {
-                    "type": "string"
+                    "type": "object",
+                    "$ref": "#/definitions/gtime.GTime"
                 },
                 "gpu": {
                     "type": "integer"
@@ -2733,6 +3636,9 @@ var doc = `{
                 },
                 "nowReplicas": {
                     "type": "integer"
+                },
+                "owner": {
+                    "type": "string"
                 },
                 "parallelism": {
                     "type": "integer"
@@ -2764,7 +3670,8 @@ var doc = `{
                     "type": "string"
                 },
                 "updateTime": {
-                    "type": "string"
+                    "type": "object",
+                    "$ref": "#/definitions/gtime.GTime"
                 }
             }
         },
@@ -2793,10 +3700,132 @@ var doc = `{
                     "type": "string"
                 },
                 "updateTime": {
-                    "type": "string"
+                    "type": "object",
+                    "$ref": "#/definitions/gtime.GTime"
                 },
                 "zones": {
                     "type": "string"
+                }
+            }
+        },
+        "chart.APIGetChartBarLegend": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "chart.APIGetChartBarOutputs": {
+            "type": "object",
+            "properties": {
+                "legend": {
+                    "type": "object",
+                    "$ref": "#/definitions/chart.APIGetChartBarLegend"
+                },
+                "series": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/chart.APIGetChartBarSeries"
+                    }
+                },
+                "xAxis": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/chart.APIGetChartBarXAxis"
+                    }
+                }
+            }
+        },
+        "chart.APIGetChartBarSeries": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "chart.APIGetChartBarXAxis": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "chart.APIGetChartStat": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "totalCpuCount": {
+                    "type": "integer"
+                },
+                "totalHostCount": {
+                    "type": "integer"
+                },
+                "unUsedCpuCount": {
+                    "type": "integer"
+                },
+                "unUsedHostCount": {
+                    "type": "integer"
+                },
+                "usedCpuCount": {
+                    "type": "integer"
+                },
+                "usedHostCount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "chart.APIGetChartStatOutputs": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "subStat": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/chart.APIGetChartStat"
+                    }
+                },
+                "totalCpuCount": {
+                    "type": "integer"
+                },
+                "totalHostCount": {
+                    "type": "integer"
+                },
+                "unUsedCpuCount": {
+                    "type": "integer"
+                },
+                "unUsedHostCount": {
+                    "type": "integer"
+                },
+                "usedCpuCount": {
+                    "type": "integer"
+                },
+                "usedHostCount": {
+                    "type": "integer"
                 }
             }
         },
@@ -2828,217 +3857,68 @@ var doc = `{
                 }
             }
         },
-        "node.APIGetCaasNamespaceListInputs": {
+        "node.APIGetHostApplyRequestListData": {
             "type": "object",
             "properties": {
-                "clusterName": {
+                "applier": {
                     "type": "string"
                 },
-                "limit": {
-                    "type": "integer"
-                },
-                "namespace": {
-                    "type": "string"
-                },
-                "page": {
-                    "type": "integer"
-                },
-                "physicalSystemName": {
-                    "type": "string"
-                },
-                "workspaceName": {
-                    "type": "string"
-                }
-            }
-        },
-        "node.APIGetCaasNamespaceListOutputs": {
-            "type": "object",
-            "properties": {
-                "list": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/caas.NameSpace"
-                    }
-                },
-                "totalCount": {
-                    "type": "integer"
-                }
-            }
-        },
-        "node.APIGetCaasServiceListInputs": {
-            "type": "object",
-            "properties": {
-                "limit": {
-                    "type": "integer"
-                },
-                "page": {
-                    "type": "integer"
-                },
-                "serviceName": {
-                    "type": "string"
-                }
-            }
-        },
-        "node.APIGetCaasServiceListOutputs": {
-            "type": "object",
-            "properties": {
-                "list": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/node.CaasService"
-                    }
-                },
-                "totalCount": {
-                    "type": "integer"
-                }
-            }
-        },
-        "node.APIGetCaasWorkspaceListInputs": {
-            "type": "object",
-            "properties": {
-                "limit": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "page": {
-                    "type": "integer"
-                }
-            }
-        },
-        "node.APIGetCaasWorkspaceListOutputs": {
-            "type": "object",
-            "properties": {
-                "list": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/caas.WorkSpace"
-                    }
-                },
-                "totalCount": {
-                    "type": "integer"
-                }
-            }
-        },
-        "node.APIGetChartBarLegend": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                }
-            }
-        },
-        "node.APIGetChartBarOutputs": {
-            "type": "object",
-            "properties": {
-                "legend": {
+                "assignAt": {
                     "type": "object",
-                    "$ref": "#/definitions/node.APIGetChartBarLegend"
+                    "$ref": "#/definitions/gtime.GTime"
                 },
-                "series": {
+                "assigner": {
+                    "type": "string"
+                },
+                "count": {
+                    "type": "integer"
+                },
+                "cpu": {
+                    "type": "integer"
+                },
+                "createAt": {
+                    "type": "object",
+                    "$ref": "#/definitions/gtime.GTime"
+                },
+                "creator": {
+                    "type": "string"
+                },
+                "hostIDs": {
+                    "type": "string"
+                },
+                "hosts": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/node.APIGetChartBarSeries"
+                        "$ref": "#/definitions/node.Host"
                     }
                 },
-                "xAxis": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/node.APIGetChartBarXAxis"
-                    }
-                }
-            }
-        },
-        "node.APIGetChartBarSeries": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
+                "id": {
+                    "type": "integer"
+                },
+                "memory": {
+                    "type": "integer"
                 },
                 "name": {
                     "type": "string"
                 },
-                "type": {
+                "releaseAt": {
+                    "type": "object",
+                    "$ref": "#/definitions/gtime.GTime"
+                },
+                "remark": {
                     "type": "string"
-                }
-            }
-        },
-        "node.APIGetChartBarXAxis": {
-            "type": "object",
-            "properties": {
-                "data": {
+                },
+                "state": {
+                    "type": "string"
+                },
+                "tagIDs": {
+                    "type": "string"
+                },
+                "tags": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "$ref": "#/definitions/app.Tag"
                     }
-                },
-                "type": {
-                    "type": "string"
-                }
-            }
-        },
-        "node.APIGetChartStat": {
-            "type": "object",
-            "properties": {
-                "name": {
-                    "type": "string"
-                },
-                "totalCpuCount": {
-                    "type": "integer"
-                },
-                "totalHostCount": {
-                    "type": "integer"
-                },
-                "unUsedCpuCount": {
-                    "type": "integer"
-                },
-                "unUsedHostCount": {
-                    "type": "integer"
-                },
-                "usedCpuCount": {
-                    "type": "integer"
-                },
-                "usedHostCount": {
-                    "type": "integer"
-                }
-            }
-        },
-        "node.APIGetChartStatOutputs": {
-            "type": "object",
-            "properties": {
-                "name": {
-                    "type": "string"
-                },
-                "subStat": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/node.APIGetChartStat"
-                    }
-                },
-                "totalCpuCount": {
-                    "type": "integer"
-                },
-                "totalHostCount": {
-                    "type": "integer"
-                },
-                "unUsedCpuCount": {
-                    "type": "integer"
-                },
-                "unUsedHostCount": {
-                    "type": "integer"
-                },
-                "usedCpuCount": {
-                    "type": "integer"
-                },
-                "usedHostCount": {
-                    "type": "integer"
                 }
             }
         },
@@ -3068,7 +3948,7 @@ var doc = `{
                 "list": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/node.HostApplyRequest"
+                        "$ref": "#/definitions/node.APIGetHostApplyRequestListData"
                     }
                 },
                 "totalCount": {
@@ -3101,17 +3981,6 @@ var doc = `{
                 },
                 "totalCount": {
                     "type": "integer"
-                }
-            }
-        },
-        "node.APIGetHostGroupTreeOutputs": {
-            "type": "object",
-            "properties": {
-                "hostGroups": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/node.HostGroup"
-                    }
                 }
             }
         },
@@ -3189,128 +4058,34 @@ var doc = `{
                 }
             }
         },
-        "node.APIGetPodListInputs": {
+        "node.APIGetHostSelectInputs": {
             "type": "object",
             "properties": {
-                "limit": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "namespace": {
-                    "type": "string"
-                },
-                "order": {
-                    "type": "string"
-                },
-                "orderBy": {
-                    "type": "string"
-                },
-                "page": {
-                    "type": "integer"
-                },
-                "serviceName": {
+                "query": {
                     "type": "string"
                 }
             }
         },
-        "node.APIGetTagCategoryListInputs": {
+        "node.APIPostHostApplyRequestAssignInputs": {
             "type": "object",
             "properties": {
-                "limit": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "order": {
-                    "type": "string"
-                },
-                "orderBy": {
-                    "type": "string"
-                },
-                "page": {
-                    "type": "integer"
-                }
-            }
-        },
-        "node.APIGetTagCategoryListOutputs": {
-            "type": "object",
-            "properties": {
-                "list": {
+                "hostIDs": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/node.TagCategory"
+                        "type": "integer"
                     }
                 },
-                "totalCount": {
+                "id": {
                     "type": "integer"
-                }
-            }
-        },
-        "node.APIGetTagCategoryTagsInputs": {
-            "type": "object",
-            "properties": {
-                "categoryID": {
+                },
+                "state": {
                     "type": "string"
                 },
-                "categoryName": {
-                    "type": "string"
-                }
-            }
-        },
-        "node.APIGetTagCategoryTagsOutputs": {
-            "type": "object",
-            "properties": {
-                "list": {
+                "tagIDs": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/node.Tag"
+                        "type": "integer"
                     }
-                },
-                "totalCount": {
-                    "type": "integer"
-                }
-            }
-        },
-        "node.APIGetTagListInputs": {
-            "type": "object",
-            "properties": {
-                "categoryID": {
-                    "type": "string"
-                },
-                "limit": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "order": {
-                    "type": "string"
-                },
-                "orderBy": {
-                    "type": "string"
-                },
-                "page": {
-                    "type": "integer"
-                },
-                "remark": {
-                    "type": "string"
-                }
-            }
-        },
-        "node.APIGetTagListOutputs": {
-            "type": "object",
-            "properties": {
-                "list": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/node.Tag"
-                    }
-                },
-                "totalCount": {
-                    "type": "integer"
                 }
             }
         },
@@ -3392,47 +4167,6 @@ var doc = `{
                 }
             }
         },
-        "node.APIPostTagCategoryCreateInputs": {
-            "type": "object",
-            "properties": {
-                "categoryID": {
-                    "type": "integer"
-                },
-                "cnName": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "remark": {
-                    "type": "string"
-                }
-            }
-        },
-        "node.APIPostTagCreateInputs": {
-            "type": "object",
-            "properties": {
-                "categoryID": {
-                    "type": "integer"
-                },
-                "cnName": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "remark": {
-                    "description": "ParentID   int64  ` + "`" + `json:\"parentID\" form:\"parentID\"` + "`" + `",
-                    "type": "string"
-                }
-            }
-        },
         "node.APIPutHostGroupInputs": {
             "type": "object",
             "required": [
@@ -3460,113 +4194,6 @@ var doc = `{
                     "type": "string"
                 },
                 "type": {
-                    "type": "string"
-                }
-            }
-        },
-        "node.CaasService": {
-            "type": "object",
-            "properties": {
-                "activeDeadlineSeconds": {
-                    "type": "integer"
-                },
-                "affinityType": {
-                    "type": "string"
-                },
-                "appId": {
-                    "type": "integer"
-                },
-                "appName": {
-                    "type": "string"
-                },
-                "clusterIP": {
-                    "type": "string"
-                },
-                "clusterName": {
-                    "type": "string"
-                },
-                "completions": {
-                    "description": "Command               string    ` + "`" + `json:\"command\" gorm:\"column:command;type:string;size:128;comment:\"` + "`" + `\nArg                   string    ` + "`" + `json:\"arg\" gorm:\"column:arg;type:string;size:128;comment:\"` + "`" + `",
-                    "type": "integer"
-                },
-                "cpu": {
-                    "type": "integer"
-                },
-                "createTime": {
-                    "type": "string"
-                },
-                "duration": {
-                    "type": "string"
-                },
-                "externalTrafficPolicy": {
-                    "description": "HostAliases           string    ` + "`" + `json:\"hostAliases\" gorm:\"column:host_aliases;type:string;size:128;comment:\"` + "`" + `",
-                    "type": "string"
-                },
-                "finishTime": {
-                    "type": "string"
-                },
-                "gpu": {
-                    "type": "integer"
-                },
-                "headlessName": {
-                    "description": "NodeSelectorLabel     string    ` + "`" + `json:\"nodeSelectorLabel\" gorm:\"column:node_selector_label;type:string;size:128;comment:\"` + "`" + `\nZones                 string    ` + "`" + `json:\"zones\" gorm:\"column:zones;type:string;size:128;comment:\"` + "`" + `\nReadinessProbeInfo    string    ` + "`" + `json:\"readinessProbeInfo\" gorm:\"column:readiness_probe_info;type:string;size:128;comment:\"` + "`" + `\nLivenessProbeInfo     string    ` + "`" + `json:\"livenessProbeInfo\" gorm:\"column:liveness_probe_info;type:string;size:128;comment:\"` + "`" + `",
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "imageName": {
-                    "description": "Envs         *Envs  ` + "`" + `json:\"envs,omitempty\" gorm:\"foreignkey:app_id;association_foreignkey:id;association_autoupdate:false\"` + "`" + `",
-                    "type": "string"
-                },
-                "imageTag": {
-                    "type": "string"
-                },
-                "memory": {
-                    "type": "integer"
-                },
-                "namespace": {
-                    "type": "string"
-                },
-                "nowReplicas": {
-                    "type": "integer"
-                },
-                "parallelism": {
-                    "type": "integer"
-                },
-                "physicalSystemName": {
-                    "type": "string"
-                },
-                "ports": {
-                    "description": "Ports        []*Port ` + "`" + `json:\"ports,omitempty\" gorm:\"many2many:caas_service_port_rel;foreignkey:service_name;association_foreignkey:host;association_jointable_foreignkey:host;jointable_foreignkey:service_name;\"` + "`" + `",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/caas.Port"
-                    }
-                },
-                "pullPolicy": {
-                    "type": "string"
-                },
-                "replicas": {
-                    "type": "integer"
-                },
-                "serviceName": {
-                    "type": "string"
-                },
-                "srvLbType": {
-                    "description": "VolumeList            string    ` + "`" + `json:\"volumeList\" gorm:\"column:volume_list;type:string;size:128;comment:\"` + "`" + `\nLocalVolumeList       string    ` + "`" + `json:\"localVolumeList\" gorm:\"column:local_volume_list;type:string;size:128;comment:\"` + "`" + `\nConfigMapVolumeList   string    ` + "`" + `json:\"configMapVolumeList\" gorm:\"column:config_map_volume_list;type:string;size:128;comment:\"` + "`" + `",
-                    "type": "string"
-                },
-                "status": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "string"
-                },
-                "updateTime": {
-                    "type": "string"
-                },
-                "workspaceName": {
                     "type": "string"
                 }
             }
@@ -3715,7 +4342,7 @@ var doc = `{
                 "tags": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/node.Tag"
+                        "$ref": "#/definitions/app.Tag"
                     }
                 },
                 "type": {
@@ -3728,46 +4355,6 @@ var doc = `{
                     "type": "string"
                 },
                 "virtNetNum": {
-                    "type": "string"
-                }
-            }
-        },
-        "node.HostApplyRequest": {
-            "type": "object",
-            "properties": {
-                "applier": {
-                    "type": "string"
-                },
-                "count": {
-                    "type": "integer"
-                },
-                "cpu": {
-                    "type": "integer"
-                },
-                "createAt": {
-                    "type": "object",
-                    "$ref": "#/definitions/gtime.GTime"
-                },
-                "creator": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "memory": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "releaseAt": {
-                    "type": "object",
-                    "$ref": "#/definitions/gtime.GTime"
-                },
-                "remark": {
-                    "type": "string"
-                },
-                "state": {
                     "type": "string"
                 }
             }
@@ -3831,51 +4418,14 @@ var doc = `{
                 }
             }
         },
-        "node.Tag": {
+        "node.HostGroupRel": {
             "type": "object",
             "properties": {
-                "categoryID": {
+                "groupID": {
                     "type": "integer"
                 },
-                "categoryName": {
-                    "type": "string"
-                },
-                "cnName": {
-                    "type": "string"
-                },
-                "createAt": {
-                    "type": "object",
-                    "$ref": "#/definitions/gtime.GTime"
-                },
-                "id": {
+                "hostID": {
                     "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "remark": {
-                    "type": "string"
-                }
-            }
-        },
-        "node.TagCategory": {
-            "type": "object",
-            "properties": {
-                "cnName": {
-                    "type": "string"
-                },
-                "createAt": {
-                    "type": "object",
-                    "$ref": "#/definitions/gtime.GTime"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "remark": {
-                    "type": "string"
                 }
             }
         },

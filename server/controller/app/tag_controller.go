@@ -89,7 +89,7 @@ func TagList(c *gin.Context) {
 // @Description
 // @Produce json
 // @Param id query string true "tag id"
-// @Success 200 {object} node.TagCategory
+// @Success 200 {object} app.Tag
 // @Failure 400 json error
 // @Router /api/v1/tag/info [get]
 func TagInfo(c *gin.Context) {
@@ -237,7 +237,7 @@ func TagCategoryList(c *gin.Context) {
 // @Description
 // @Produce json
 // @Param id query string true "tag category id"
-// @Success 200 {object} node.TagCategory
+// @Success 200 {object} app.TagCategory
 // @Failure 400 json error
 // @Router /api/v1/tag_category/info [get]
 func TagCategoryInfo(c *gin.Context) {
@@ -267,8 +267,8 @@ type APIPostTagCategoryCreateInputs struct {
 // @Description
 // @Produce json
 // @Param APIPostTagCategoryCreateInputs body APIPostTagCategoryCreateInputs true "创建tag category"
-// @Success 200 {object} node.TagCategory
-// @Failure 400 {object} node.TagCategory
+// @Success 200 {object} app.TagCategory
+// @Failure 400 {object} app.TagCategory
 // @Router /api/v1/tag_category/create [post]
 func TagCategoryCreate(c *gin.Context) {
 	var inputs APIPostTagCategoryCreateInputs
@@ -297,8 +297,8 @@ func TagCategoryCreate(c *gin.Context) {
 // @Description
 // @Produce json
 // @Param APIPostTagCategoryCreateInputs body APIPostTagCategoryCreateInputs true "更新tag category"
-// @Success 200 {object} node.TagCategory
-// @Failure 400 {object} node.TagCategory
+// @Success 200 {object} app.TagCategory
+// @Failure 400 {object} app.TagCategory
 // @Router /api/v1/tag_category/update [put]
 func TagCategoryUpdate(c *gin.Context) {
 	var inputs APIPostTagCategoryCreateInputs

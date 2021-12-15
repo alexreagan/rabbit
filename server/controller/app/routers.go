@@ -14,6 +14,9 @@ func Routes(r *gin.Engine) {
 	tGroup.GET("/rebuild", TreeRebuild)
 	//tGroup.POST("/dragging", TreeDragging)
 
+	v2TreeGroup := r.Group("/api/v2/tree")
+	v2TreeGroup.GET("", V2Tree)
+
 	tagGroup := r.Group("/api/v1/tag")
 	tagGroup.GET("/list", TagList)
 	tagGroup.GET("/info", TagInfo)
@@ -27,6 +30,9 @@ func Routes(r *gin.Engine) {
 	tcGroup.PUT("/update", TagCategoryUpdate)
 	tcGroup.PUT("/tags", TagCategoryTags)
 
-	v2TreeGroup := r.Group("/api/v2/tree")
-	v2TreeGroup.GET("", V2Tree)
+	templateGroup := r.Group("/api/v1/template")
+	templateGroup.GET("/list", TemplateList)
+	templateGroup.GET("/info", TemplateInfo)
+	templateGroup.POST("/create", TemplateCreate)
+	templateGroup.PUT("/update", TemplateUpdate)
 }

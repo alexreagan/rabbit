@@ -57,16 +57,18 @@ func main() {
 		g.Con().Portal.AutoMigrate(&sys.Menu{})
 		g.Con().Portal.AutoMigrate(&sys.MenuPermission{})
 
-		// host tag rel
+		// node
 		g.Con().Portal.AutoMigrate(&node.Host{})
-		g.Con().Portal.AutoMigrate(&node.HostGroup{})
-		g.Con().Portal.AutoMigrate(&node.HostGroupRel{})
-		g.Con().Portal.AutoMigrate(&app.Tag{})
-		g.Con().Portal.AutoMigrate(&app.TagCategory{})
+		//g.Con().Portal.AutoMigrate(&node.HostGroup{})
+		//g.Con().Portal.AutoMigrate(&node.HostGroupRel{})
 		g.Con().Portal.AutoMigrate(&node.HostTagRel{})
-
 		// host apply request
 		g.Con().Portal.AutoMigrate(&node.HostApplyRequest{})
+
+		// app
+		g.Con().Portal.AutoMigrate(&app.Template{})
+		g.Con().Portal.AutoMigrate(&app.Tag{})
+		g.Con().Portal.AutoMigrate(&app.TagCategory{})
 
 		// caas
 		g.Con().Portal.AutoMigrate(&caas.WorkSpace{})

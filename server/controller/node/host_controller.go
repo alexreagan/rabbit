@@ -189,7 +189,7 @@ type APIGetHostSelectOutputs struct {
 // @Summary 机器查找
 // @Description
 // @Produce json
-// @Param APIGetHostSelectInputs body APIGetHostSelectInputs true "机器查找"
+// @Param APIGetHostSelectInputs query APIGetHostSelectInputs true "机器查找"
 // @Success 200 {object} APIGetHostListOutputs
 // @Failure 400 {object} APIGetHostListOutputs
 // @Router /api/v1/host/select [get]
