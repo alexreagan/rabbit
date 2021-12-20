@@ -17,7 +17,4 @@ func Routes(r *gin.Engine) {
 	paramGroup.GET("/info", ParamInfo)
 	paramGroup.POST("/create", ParamCreate)
 	paramGroup.PUT("/update", ParamUpdate)
-
-	envGroup := r.Group("/api/v1/env")
-	envGroup.GET("/list", EnvList)
 }

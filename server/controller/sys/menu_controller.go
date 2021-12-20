@@ -21,7 +21,8 @@ type APIGetMenuNavListOutputs struct {
 // @Description
 // @Produce json
 // @Success 200 {object} APIGetMenuNavListOutputs
-// @Failure 400 json error
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/menu/nav [get]
 func MenuNav(c *gin.Context) {
 	var inputs APIGetMenuNavListInputs
@@ -65,7 +66,7 @@ type APIPostMenuUpdateInputs struct {
 	Type     int64  `json:"type" form:"type"`
 	Name     string `json:"name" form:"name"`
 	Url      string `json:"url" form:"url"`
-	ParentId int64  `json:"parentId" form:"parentId"`
+	ParentID int64  `json:"parentID" form:"parentID"`
 	Icon     string `json:"icon" form:"icon"`
 }
 
@@ -75,10 +76,11 @@ type APIPostMenuUpdateInputs struct {
 // @Param menuId formData string true "根据ID更新菜单信息"
 // @Param name formData string false "更新Name"
 // @Param Url formData string false "更新Url"
-// @Param ParentId formData string false "更新ParentId"
+// @Param ParentID formData string false "更新ParentId"
 // @Param Icon formData string false "更新Icon"
 // @Success 200 {object} APIPostMenuUpdateInputs
-// @Failure 400 {object} APIPostMenuUpdateInputs
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/menu/update [post]
 func MenuUpdate(c *gin.Context) {
 	var inputs APIPostMenuUpdateInputs
@@ -97,7 +99,8 @@ func MenuUpdate(c *gin.Context) {
 // @Produce json
 // @Param id path int true "根据ID获取菜单信息"
 // @Success 200 {object} sys.Menu
-// @Failure 400 {object} sys.Menu
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/menu/info/:id [get]
 func MenuInfo(c *gin.Context) {
 	id := c.Param("id")

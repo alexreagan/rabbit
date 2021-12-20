@@ -44,7 +44,8 @@ type CaasService struct {
 // @Produce json
 // @Param APIGetCaasServiceListInputs query APIGetCaasServiceListInputs true "更新host group信息"
 // @Success 200 {object} APIGetCaasServiceListOutputs
-// @Failure 400 {object} APIGetCaasServiceListOutputs
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/caas/service/list [get]
 func ServiceList(c *gin.Context) {
 	var inputs APIGetCaasServiceListInputs
@@ -88,7 +89,8 @@ type APIGetCaasServiceRefreshPodsInputs struct {
 // @Produce json
 // @Param APIGetCaasServiceListInputs query APIGetCaasServiceListInputs true "更新service下的pods信息"
 // @Success 200 {object} APIGetCaasServiceListOutputs
-// @Failure 400 {object} APIGetCaasServiceListOutputs
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/caas/service/refresh_pods [get]
 func ServiceRefreshPods(c *gin.Context) {
 	var inputs APIGetCaasServiceRefreshPodsInputs
@@ -144,7 +146,8 @@ type APIGetCaasNamespaceListOutputs struct {
 // @Produce json
 // @Param APIGetCaasNamespaceListInputs query APIGetCaasNamespaceListInputs true "获取caas项目空间信息"
 // @Success 200 {object} APIGetCaasNamespaceListOutputs
-// @Failure 400 {object} APIGetCaasNamespaceListOutputs
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/caas/namespace/list [get]
 func NamespaceList(c *gin.Context) {
 	var inputs APIGetCaasNamespaceListInputs
@@ -205,7 +208,8 @@ type APIGetPodListOutputs struct {
 // @Produce json
 // @Param APIGetPodListInputs query APIGetPodListInputs true "根据查询条件分页查询机器列表"
 // @Success 200 {object} APIGetPodListOutputs
-// @Failure 400 {object} APIGetPodListOutputs
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/caas/pod/list [get]
 func PodList(c *gin.Context) {
 	var inputs APIGetPodListInputs
@@ -264,7 +268,8 @@ type APIGetCaasWorkspaceListOutputs struct {
 // @Produce json
 // @Param APIGetCaasWorkspaceListInputs query APIGetCaasWorkspaceListInputs true "获取caas组织空间信息"
 // @Success 200 {object} APIGetCaasWorkspaceListOutputs
-// @Failure 400 {object} APIGetCaasWorkspaceListOutputs
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/caas/workspace/list [get]
 func WorkspaceList(c *gin.Context) {
 	var inputs APIGetCaasWorkspaceListInputs
@@ -305,7 +310,8 @@ type APIGetPodGetInputs struct {
 // @Produce json
 // @Param id path int true "根据机器ID获取机器详细信息"
 // @Success 200 {object} caas.Pod
-// @Failure 400 {object} caas.Pod
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/caas/pod/info [get]
 func PodInfo(c *gin.Context) {
 	id := c.Query("id")
@@ -323,7 +329,8 @@ func PodInfo(c *gin.Context) {
 // @Produce json
 // @Param id query int64 true "获取service详细信息"
 // @Success 200 {object} caas.Service
-// @Failure 400 {object} caas.Service
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/caas/service/info [get]
 func ServiceInfo(c *gin.Context) {
 	id := c.Query("id")
@@ -364,7 +371,8 @@ type APIPutServiceUpdateInputs struct {
 // @Description
 // @Produce json
 // @Success 200 {object} APIPutServiceUpdateInputs
-// @Failure 400 {object} APIPutServiceUpdateInputs
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/caas/service/update [put]
 func ServiceUpdate(c *gin.Context) {
 	var inputs APIPutServiceUpdateInputs
@@ -432,7 +440,8 @@ type App struct {
 // @Produce json
 // @Param APIGetCaasAppListInputs query APIGetCaasAppListInputs true "获取caas应用信息"
 // @Success 200 {object} APIGetCaasAppListOutputs
-// @Failure 400 {object} APIGetCaasAppListOutputs
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/caas/app/list [get]
 func AppList(c *gin.Context) {
 	var inputs APIGetCaasAppListInputs
@@ -471,7 +480,8 @@ func AppList(c *gin.Context) {
 // @Produce json
 // @Param id query int64 true "获取app详细信息"
 // @Success 200 {object} caas.App
-// @Failure 400 {object} caas.App
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/caas/app/info [get]
 func AppInfo(c *gin.Context) {
 	id := c.Query("id")

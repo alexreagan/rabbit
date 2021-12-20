@@ -2,12 +2,37 @@ package worker
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
 	"github.com/alexreagan/rabbit/server/service"
 	log "github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 	"sync"
 	"time"
 )
+
+var treeRebuilderConfig *TreeReBuilderConfig
+
+type TreeReBuilderRebuildConfig struct {
+	Enable   bool `json:"enable"`
+	Duration int  `json:"duration"`
+}
+
+type TreeReBuilderConfig struct {
+	Rebuild TreeReBuilderRebuildConfig `json:"rebuild"`
+}
+
+func initTreeReBuilderConfigFromDB() (*TreeReBuilderConfig, error) {
+	value, err := service.ParamService.Get("tree")
+	if err != nil {
+		return nil, err
+	}
+	if value == "" {
+		return nil, errors.New("tree is empty")
+	}
+	var config TreeReBuilderConfig
+	err = json.Unmarshal([]byte(value), &config)
+	return &config, err
+}
 
 type TreeReBuilder struct {
 	wg     sync.WaitGroup
@@ -26,7 +51,16 @@ func (s *TreeReBuilder) Close() {
 }
 
 func (s *TreeReBuilder) Start() {
-	if viper.GetBool("tree.rebuild.enable") == true {
+	//if viper.GetBool("tree.rebuild.enable") == false {
+	//	return
+	//}
+	var err error
+	treeRebuilderConfig, err = initTreeReBuilderConfigFromDB()
+	if err != nil {
+		log.Error(err)
+		return
+	}
+	if treeRebuilderConfig.Rebuild.Enable == false {
 		return
 	}
 
@@ -47,7 +81,8 @@ func (s *TreeReBuilder) StartReBuilder() {
 	log.Println("[TreeReBuilder] StartReBuilder...")
 
 	// 时间定时器启动
-	dur := viper.GetDuration("tree.rebuild.duration") * time.Second
+	//dur := viper.GetDuration("tree.rebuild.duration") * time.Second
+	dur := time.Duration(treeRebuilderConfig.Rebuild.Duration) * time.Second
 	ticker := time.NewTicker(dur)
 	for {
 		select {

@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/alexreagan/rabbit/g"
+	"github.com/alexreagan/rabbit/server/model/app"
 	log "github.com/sirupsen/logrus"
 	"testing"
 )
@@ -16,7 +17,28 @@ func init() {
 
 func TestBuildGraph(t *testing.T) {
 	graph := TagService.BuildGraph()
-	for _, node := range graph.Next {
-		log.Printf("%#v", node)
+	var resp []*TagGraphNode
+	for _, n := range graph.Next {
+		log.Printf("%#v", n)
+		resp = append(resp, &TagGraphNode{
+			Tag: app.Tag{
+				ID:           n.ID,
+				Name:         n.Name,
+				CnName:       n.CnName,
+				CategoryID:   n.CategoryID,
+				Remark:       n.Remark,
+				CategoryName: n.CategoryName,
+			},
+			Path:               n.Path,
+			RelatedHosts:       n.RelatedHosts,
+			RelatedHostsCount:  n.RelatedHostsCount,
+			UnTaggedHosts:      n.UnTaggedHosts,
+			UnTaggedHostsCount: n.UnTaggedHostsCount,
+			RelatedPods:        n.RelatedPods,
+			RelatedPodsCount:   n.RelatedPodsCount,
+			UnTaggedPods:       n.UnTaggedPods,
+			UnTaggedPodsCount:  n.UnTaggedPodsCount,
+		})
 	}
+	log.Printf("%+v", resp)
 }

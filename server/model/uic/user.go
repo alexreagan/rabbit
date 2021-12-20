@@ -14,9 +14,9 @@ type User struct {
 	Mobile      string `json:"mobile" gorm:"column:mobile;type:string;size:81;index;null;comment:手机"`
 	Telephone   string `json:"telephone" gorm:"column:telphone;type:string;size:80;null;comment:电话"`
 	Email       string `json:"email" gorm:"column:email;type:string;size:1024;null;comment:邮箱"`
-	InstId      string `json:"instId" gorm:"column:inst_id;type:string;size:9;null;comment:所属机构编码"`
-	FirstInstId string `json:"firstInstId" gorm:"column:first_inst_id;type:string;size:9;null;comment:所属一级机构编码"`
-	JgygUserId  string `json:"jgygUserId" gorm:"column:jgyg_user_id;type:string;size:8;unique;index;no null;comment:机构员工编号"`
+	InstID      string `json:"instID" gorm:"column:inst_id;type:string;size:9;null;comment:所属机构编码"`
+	FirstInstID string `json:"firstInstID" gorm:"column:first_inst_id;type:string;size:9;null;comment:所属一级机构编码"`
+	JgygUserID  string `json:"jgygUserID" gorm:"column:jgyg_user_id;type:string;size:8;unique;index;no null;comment:机构员工编号"`
 	AdUserName  string `json:"adUserName" gorm:"column:ad_username;type:string;size:80;unique;index;not null;comment:AD(云桌面)用户名"`
 	IsSuperuser bool   `json:"isSuperuser" gorm:"column:is_superuser;type:tinyint;size:1;default:0;comment:是否为超级用户"`
 	//Birthday    time.Time `json:"birthday" gorm:"column:birthday;type:time;null;comment:出生日期"`

@@ -8,8 +8,7 @@ import (
 	"strconv"
 )
 
-type paramService struct {
-}
+type paramService struct{}
 
 func (s *paramService) get(key string) (string, error) {
 	var value string

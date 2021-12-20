@@ -3,7 +3,6 @@ package node
 import (
 	"github.com/alexreagan/rabbit/g"
 	"github.com/alexreagan/rabbit/server/model/app"
-	"github.com/spf13/viper"
 	"sort"
 	"time"
 )
@@ -28,7 +27,7 @@ type Host struct {
 	DeployDate           time.Time    `json:"deployDate" gorm:"column:deploy_date"`
 	DevAreaCode          string       `json:"devAreaCode" gorm:"column:dev_area_code;type:string;size:128;comment:"`
 	FunDesc              string       `json:"funDesc" gorm:"column:fun_desc;type:string;size:512;comment:"`
-	InstanceId           string       `json:"instanceId" gorm:"column:instance_id;type:string;size:128;comment:"`
+	InstanceID           string       `json:"instanceId" gorm:"column:instance_id;type:string;size:128;comment:"`
 	ManagerA             string       `json:"managerA" gorm:"column:manager_a;type:string;size:128;comment:"`
 	ManagerB             string       `json:"managerB" gorm:"column:manager_b;type:string;size:128;comment:"`
 	MemorySize           int          `json:"memorySize" gorm:"column:memory_size"`
@@ -81,26 +80,13 @@ func (this Host) Existing() (int64, bool) {
 func (this Host) RelatedGroups() []*HostGroup {
 	var hostGroupRels []*HostGroupRel
 	g.Con().Portal.Table(HostGroupRel{}.TableName()).Where("`host_id` = ?", this.ID).Find(&hostGroupRels)
-	var groupIds []int64
+	var groupIDs []int64
 	for _, t := range hostGroupRels {
-		groupIds = append(groupIds, t.GroupID)
+		groupIDs = append(groupIDs, t.GroupID)
 	}
 	var hostGroups []*HostGroup
-	g.Con().Portal.Table(HostGroup{}.TableName()).Where("id in (?)", groupIds).Find(&hostGroups)
+	g.Con().Portal.Table(HostGroup{}.TableName()).Where("id in (?)", groupIDs).Find(&hostGroups)
 	return hostGroups
-}
-
-func (this Host) MeetWarningCondition() bool {
-	if this.CpuUsage >= viper.GetFloat64("alarm.threshold.cpu") {
-		return true
-	}
-	if this.MemoryUsage >= viper.GetFloat64("alarm.threshold.memory") {
-		return true
-	}
-	if this.FsUsage >= viper.GetFloat64("alarm.threshold.fs") {
-		return true
-	}
-	return false
 }
 
 func (this Host) RelatedTags() []*app.Tag {
@@ -112,12 +98,6 @@ func (this Host) RelatedTags() []*app.Tag {
 	db = db.Where("`host_tag_rel`.host = ?", this.ID)
 	db.Find(&tags)
 	return tags
-}
-
-func (this *Host) AdditionalAttrs() *Host {
-	this.Type = "host"
-	this.IsWarning = this.MeetWarningCondition()
-	return this
 }
 
 type Hosts []*Host

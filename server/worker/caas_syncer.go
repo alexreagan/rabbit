@@ -4,19 +4,79 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/alexreagan/rabbit/g"
 	"github.com/alexreagan/rabbit/server/model/caas"
 	"github.com/alexreagan/rabbit/server/model/gtime"
 	"github.com/alexreagan/rabbit/server/service"
 	log "github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 	"sync"
 	"time"
 )
+
+var caasSyncConfig *CaasSyncerConfig
+
+type CaasSyncerLoginConfig struct {
+	URL      string `json:"url"`
+	User     string `json:"user"`
+	Password string `json:"password"`
+}
+
+type CaasSyncerSyncConfig struct {
+	Duration int `json:"duration"`
+}
+
+type CaasSyncerCleanConfig struct {
+	Duration int `json:"duration"`
+}
+
+type CaasSyncerWorkSpaceConfig struct {
+	URL string `json:"url"`
+}
+
+type CaasSyncerNameSpaceConfig struct {
+	URL string `json:"url"`
+}
+
+type CaasSyncerAppConfig struct {
+	URL string `json:"url"`
+}
+
+type CaasSyncerServiceConfig struct {
+	URL string `json:"url"`
+}
+
+type CaasSyncerPodConfig struct {
+	URL string `json:"url"`
+}
+
+type CaasSyncerConfig struct {
+	Enable    bool                      `json:"enable"`
+	Duration  int                       `json:"duration"`
+	Login     CaasSyncerLoginConfig     `json:"login"`
+	WorkSpace CaasSyncerWorkSpaceConfig `json:"workspace"`
+	NameSpace CaasSyncerNameSpaceConfig `json:"namespace"`
+	App       CaasSyncerAppConfig       `json:"app"`
+	Service   CaasSyncerServiceConfig   `json:"service"`
+	Pod       CaasSyncerPodConfig       `json:"pod"`
+}
+
+func loadCaasSyncerConfigFromDB() (*CaasSyncerConfig, error) {
+	value, err := service.ParamService.Get("caas.syncer")
+	if err != nil {
+		return nil, err
+	}
+	if value == "" {
+		return nil, errors.New("caas.syncer is empty")
+	}
+	var config CaasSyncerConfig
+	err = json.Unmarshal([]byte(value), &config)
+	return &config, nil
+}
 
 type CaasSyncer struct {
 	wg     sync.WaitGroup
@@ -35,10 +95,6 @@ func (s *CaasSyncer) Close() {
 }
 
 func (s *CaasSyncer) Start() {
-	if viper.GetBool("caas_syncer.enable") == false {
-		return
-	}
-
 	s.wg.Add(1)
 	go func() {
 		defer func() {
@@ -50,56 +106,31 @@ func (s *CaasSyncer) Start() {
 		s.StartSyncer()
 		defer s.wg.Done()
 	}()
-
-	s.wg.Add(1)
-	go func() {
-		defer func() {
-			err := recover()
-			if err != nil {
-				log.Error(err)
-			}
-		}()
-		s.StartClean()
-		defer s.wg.Done()
-	}()
-}
-
-func (s *CaasSyncer) Clean() {
-	log.Debugf("[CaasSyncer] Clean...")
-	latestTime := service.CaasService.GetNameSpaceLatestTime()
-	oneDayBeforeLatestTime := latestTime.AddDate(0, 0, -1)
-	service.CaasService.DeleteNameSpaceBeforeTime(oneDayBeforeLatestTime)
-	service.CaasService.DeleteServiceBeforeTime(oneDayBeforeLatestTime)
-	service.CaasService.DeletePodBeforeTime(oneDayBeforeLatestTime)
-	service.CaasService.DeletePortBeforeTime(oneDayBeforeLatestTime)
-}
-
-func (s *CaasSyncer) StartClean() {
-	log.Debugf("[CaasSyncer] StartClean...")
-	// 启动
-	s.Clean()
-
-	// 清理定时器启动
-	cleanDur := viper.GetDuration("caas_syncer.clean.duration") * time.Second
-	cleanTicker := time.NewTicker(cleanDur)
-	for {
-		select {
-		case <-s.ctx.Done():
-			log.Println("ctx done")
-			return
-		case <-cleanTicker.C:
-			s.Clean()
-		}
-	}
 }
 
 func (s *CaasSyncer) StartSyncer() {
-	log.Println("[CaasSyncer] StartReBuilder...")
-	// 启动
+	log.Debugf("[CaasSyncer] StartSyncer...")
+
+	//if viper.GetBool("caas.syncer.enable") == false {
+	//	return
+	//}
+
+	// load config
+	var err error
+	caasSyncConfig, err = loadCaasSyncerConfigFromDB()
+	if err != nil {
+		log.Error(err)
+		return
+	}
+	if caasSyncConfig.Enable == false {
+		return
+	}
+	// start sync
 	s.Sync()
 
 	// 时间定时器启动
-	dur := viper.GetDuration("caas_syncer.sync.duration") * time.Second
+	//dur := viper.GetDuration("caas.syncer.duration") * time.Second
+	dur := time.Duration(caasSyncConfig.Duration) * time.Second
 	ticker := time.NewTicker(dur)
 	for {
 		select {
@@ -107,6 +138,17 @@ func (s *CaasSyncer) StartSyncer() {
 			log.Println("ctx done")
 			return
 		case <-ticker.C:
+			// load config
+			caasSyncConfig, err = loadCaasSyncerConfigFromDB()
+			if err != nil {
+				log.Error(err)
+				return
+			}
+			if caasSyncConfig.Enable == false {
+				return
+			}
+
+			// start sync
 			s.Sync()
 		}
 	}
@@ -181,7 +223,7 @@ func (s *CaasSyncer) Sync() {
 }
 
 type CaasLoginResultDataCluster struct {
-	Id   int64  `json:"id"`
+	ID   int64  `json:"id"`
 	Name string `json:"name"`
 }
 
@@ -189,7 +231,7 @@ type CaasLoginResultData struct {
 	Cluster  []CaasLoginResultDataCluster `json:"cluster"`
 	LdapUer  int64                        `json:"ldapUser"`
 	Token    string                       `json:"token"`
-	UserId   int64                        `json:"userId"`
+	UserID   int64                        `json:"userId"`
 	UserType int64                        `json:"userType"`
 	Username string                       `json:"username"`
 }
@@ -204,10 +246,13 @@ type CaasLoginResult struct {
 func Login() (*CaasLoginResult, error) {
 	log.Debugf("[CaasSyncer] Login...")
 	lr := &CaasLoginResult{}
-	loginUrl := viper.GetString("caas_syncer.login.url")
+	//loginUrl := viper.GetString("caas.syncer.login.url")
+	loginUrl := caasSyncConfig.Login.URL
 	payload := make(map[string]string)
-	payload["userName"] = viper.GetString("caas_syncer.login.user")
-	payload["password"] = viper.GetString("caas_syncer.login.password")
+	//payload["userName"] = viper.GetString("caas.syncer.login.user")
+	//payload["password"] = viper.GetString("caas.syncer.login.password")
+	payload["userName"] = caasSyncConfig.Login.User
+	payload["password"] = caasSyncConfig.Login.Password
 	buf, err := json.Marshal(payload)
 	req, _ := http.NewRequest(http.MethodPost, loginUrl, bytes.NewReader(buf))
 	req.Header.Add("Content-Type", "application/json;charset=UTF-8")
@@ -233,9 +278,9 @@ type CaasWorkSpaceResult struct {
 }
 
 type App struct {
-	ID          int64     `json:"Id"`
+	ID          int64     `json:"ID"`
 	AppName     string    `json:"AppName"`
-	NameSpaceId int64     `json:"NamespaceID"`
+	NameSpaceID int64     `json:"NamespaceID"`
 	Description string    `json:"Description"`
 	CreateTime  time.Time `json:"CreateTime"`
 }
@@ -262,7 +307,7 @@ func UpdateApp(app *App) {
 	napp := caas.App{
 		ID:          app.ID,
 		AppName:     app.AppName,
-		NameSpaceId: app.NameSpaceId,
+		NameSpaceID: app.NameSpaceID,
 		Description: app.Description,
 		CreateTime:  gtime.NewGTime(app.CreateTime),
 		UpdateTime:  gtime.Now(),
@@ -281,7 +326,7 @@ func UpdateApp(app *App) {
 // GetApp 获取单页应用列表
 func GetApp(ns *caas.NameSpace) (*CaasAppResult, error) {
 	namespaceID := ns.ID
-	clusterID := ns.ClusterId
+	clusterID := ns.ClusterID
 	lr, err := Login()
 	if err != nil || lr.Data.Token == "" {
 		log.Errorln(err)
@@ -291,11 +336,11 @@ func GetApp(ns *caas.NameSpace) (*CaasAppResult, error) {
 
 	log.Debugf("[CaasSyncer] GetApp...")
 	app := &CaasAppResult{}
-	appUrl := viper.GetString("caas_syncer.app.url")
+	//appUrl := viper.GetString("caas.syncer.app.url")
+	appUrl := caasSyncConfig.App.URL
 	appUrl = fmt.Sprintf(appUrl, namespaceID)
 	req, _ := http.NewRequest(http.MethodGet, appUrl, nil)
 	query := req.URL.Query()
-	//query.Add("current", strconv.Itoa(page))
 	req.URL.RawQuery = query.Encode()
 	req.Header.Add("Content-Type", "application/json;charset=UTF-8")
 	req.Header.Add("Connection", "Keep-Alive")
@@ -328,7 +373,8 @@ func GetWorkSpace() (*CaasWorkSpaceResult, error) {
 
 	log.Debugf("[CaasSyncer] GetWorkSpace...")
 	ws := &CaasWorkSpaceResult{}
-	workspaceUrl := viper.GetString("caas_syncer.workspace.url")
+	//workspaceUrl := viper.GetString("caas.syncer.workspace.url")
+	workspaceUrl := caasSyncConfig.WorkSpace.URL
 	req, _ := http.NewRequest(http.MethodGet, workspaceUrl, nil)
 	req.Header.Add("Content-Type", "application/json;charset=UTF-8")
 	req.Header.Add("Connection", "Keep-Alive")
@@ -365,7 +411,8 @@ func GetNameSpace(workspaceId int64) (*CaasNameSpaceResult, error) {
 
 	log.Debugf("[CaasSyncer] GetNameSpace...")
 	ns := &CaasNameSpaceResult{}
-	namespaceUrl := viper.GetString("caas_syncer.namespace.url")
+	//namespaceUrl := viper.GetString("caas.syncer.namespace.url")
+	namespaceUrl := caasSyncConfig.NameSpace.URL
 	req, _ := http.NewRequest(http.MethodGet, namespaceUrl, nil)
 	query := req.URL.Query()
 	query.Add("workspace_id", strconv.FormatInt(workspaceId, 10))
@@ -397,7 +444,7 @@ type CaasServiceResult struct {
 // GetService 获取项目空间下的服务列表
 func GetService(ns caas.NameSpace) (*CaasServiceResult, error) {
 	namespaceID := ns.ID
-	clusterId := ns.ClusterId
+	clusterID := ns.ClusterID
 	lr, err := Login()
 	if err != nil || lr.Data.Token == "" {
 		log.Errorln(err)
@@ -407,7 +454,8 @@ func GetService(ns caas.NameSpace) (*CaasServiceResult, error) {
 
 	log.Debugf("[CaasSyncer] GetService...")
 	sr := &CaasServiceResult{}
-	serviceUrl := viper.GetString("caas_syncer.service.url")
+	//serviceUrl := viper.GetString("caas.syncer.service.url")
+	serviceUrl := caasSyncConfig.Service.URL
 	serviceUrl = fmt.Sprintf(serviceUrl, namespaceID)
 	req, _ := http.NewRequest(http.MethodGet, serviceUrl, nil)
 	query := req.URL.Query()
@@ -416,7 +464,7 @@ func GetService(ns caas.NameSpace) (*CaasServiceResult, error) {
 	req.Header.Add("Content-Type", "application/json;charset=UTF-8")
 	req.Header.Add("Connection", "Keep-Alive")
 	req.Header.Add("Authorization", token)
-	req.Header.Add("clusterId", strconv.FormatInt(clusterId, 10))
+	req.Header.Add("clusterId", strconv.FormatInt(clusterID, 10))
 	log.Debugf("request url: %s, params: %+v, headers: %+v", req.URL, query, req.Header)
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -457,7 +505,7 @@ func UpdateService(ser *caas.Service) {
 
 	db := g.Con().Portal.Debug()
 	tser := caas.Service{}
-	db.Model(ser).Debug().Where(caas.Service{Type: ser.Type, ServiceName: ser.ServiceName, AppId: ser.AppId}).First(&tser)
+	db.Model(ser).Debug().Where(caas.Service{Type: ser.Type, ServiceName: ser.ServiceName, AppID: ser.AppID}).First(&tser)
 	if tser.ID == 0 {
 		db.Model(ser).Create(&ser)
 	} else {
@@ -518,7 +566,7 @@ func UpdatePods(ser *caas.Service, pods *CaasPodResult) {
 	db := g.Con().Portal.Debug()
 
 	// 更新数据库
-	var podIds []int64
+	var podIDs []int64
 	for _, p := range pods.Data {
 		p.UpdateTime = gtime.NewGTime(time.Now())
 
@@ -531,13 +579,13 @@ func UpdatePods(ser *caas.Service, pods *CaasPodResult) {
 			db.Model(pod).Updates(&p)
 		}
 
-		podIds = append(podIds, p.ID)
+		podIDs = append(podIDs, p.ID)
 	}
 
 	// service pod rel
 	var rels []caas.ServicePodRel
 	db.Model(caas.ServicePodRel{}).Where(&caas.ServicePodRel{Service: ser.ID}).Delete(&rels)
-	for _, p := range RemoveRepeated(podIds) {
+	for _, p := range RemoveRepeated(podIDs) {
 		db.Model(caas.ServicePodRel{}).Create(&caas.ServicePodRel{Service: ser.ID, Pod: p})
 	}
 }
@@ -553,7 +601,8 @@ func GetPod(namespace *caas.NameSpace, service *caas.Service) (*CaasPodResult, e
 
 	log.Debugf("[CaasSyncer] GetPod...")
 	inst := &CaasPodResult{}
-	podUrl := viper.GetString("caas_syncer.pod.url")
+	//podUrl := viper.GetString("caas.syncer.pod.url")
+	podUrl := caasSyncConfig.Pod.URL
 	podUrl = fmt.Sprintf(podUrl, namespace.ID)
 	req, _ := http.NewRequest(http.MethodGet, podUrl, nil)
 	query := req.URL.Query()
@@ -563,7 +612,7 @@ func GetPod(namespace *caas.NameSpace, service *caas.Service) (*CaasPodResult, e
 	req.Header.Set("Content-Type", "application/json;charset=UTF-8")
 	req.Header.Set("Connection", "Keep-Alive")
 	req.Header.Set("Authorization", token)
-	req.Header.Set("clusterId", strconv.FormatInt(namespace.ClusterId, 10))
+	req.Header.Set("clusterId", strconv.FormatInt(namespace.ClusterID, 10))
 	log.Debugf("request url: %s, params: %+v, headers: %+v", req.URL, query, req.Header)
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {

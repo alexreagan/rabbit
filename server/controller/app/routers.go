@@ -17,13 +17,18 @@ func Routes(r *gin.Engine) {
 	v2TreeGroup := r.Group("/api/v2/tree")
 	v2TreeGroup.GET("", V2Tree)
 
+	v3TreeGroup := r.Group("/api/v3/tree")
+	v3TreeGroup.GET("", V3Tree)
+
 	tagGroup := r.Group("/api/v1/tag")
 	tagGroup.GET("/list", TagList)
+	tagGroup.GET("/all", TagAll)
 	tagGroup.GET("/info", TagInfo)
 	tagGroup.POST("/create", TagCreate)
 	tagGroup.PUT("/update", TagUpdate)
 
 	tcGroup := r.Group("/api/v1/tag_category")
+	tcGroup.GET("/all", TagCategoryAll)
 	tcGroup.GET("/list", TagCategoryList)
 	tcGroup.GET("/info", TagCategoryInfo)
 	tcGroup.POST("/create", TagCategoryCreate)
@@ -35,4 +40,5 @@ func Routes(r *gin.Engine) {
 	templateGroup.GET("/info", TemplateInfo)
 	templateGroup.POST("/create", TemplateCreate)
 	templateGroup.PUT("/update", TemplateUpdate)
+	templateGroup.POST("/design", TemplateDesign)
 }

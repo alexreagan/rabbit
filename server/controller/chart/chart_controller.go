@@ -66,7 +66,8 @@ type TagCpuChart struct {
 // @Description
 // @Produce json
 // @Success 200 {object} APIGetChartBarOutputs
-// @Failure 400 {object} APIGetChartBarOutputs
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/chart/bar [get]
 func ChartBar(c *gin.Context) {
 	var tnCharts []TagNodeChart
@@ -144,7 +145,8 @@ func ChartBar(c *gin.Context) {
 // @Description
 // @Produce json
 // @Success 200 {object} APIGetChartBarOutputs
-// @Failure 400 {object} APIGetChartBarOutputs
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/chart/pie [get]
 func ChartPie(c *gin.Context) {
 	var tnCharts []TagNodeChart
@@ -195,7 +197,8 @@ type APIGetChartStatOutputs struct {
 // @Description
 // @Produce json
 // @Success 200 {object} APIGetChartStatOutputs
-// @Failure 400 {object} APIGetChartStatOutputs
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/chart/vm/stat [get]
 func ChartVMStat(c *gin.Context) {
 	// 按照物理子系统统计所有机器使用情况
@@ -282,7 +285,8 @@ type APIGetChartContainerStatOutputs struct {
 // @Description
 // @Produce json
 // @Success 200 {object} APIGetChartStatOutputs
-// @Failure 400 {object} APIGetChartStatOutputs
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/chart/container/stat [get]
 func ChartContainerStat(c *gin.Context) {
 	// 按照物理子系统统计所有机器使用情况

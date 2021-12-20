@@ -15,7 +15,7 @@ var (
 )
 
 //
-//func Config() *GlobalConfig {
+//func Content() *GlobalConfig {
 //	lock.RLock()
 //	defer lock.RUnlock()
 //	return config

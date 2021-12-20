@@ -1,16 +1,16 @@
-package alert
+package alarm
 
 import (
 	"github.com/alexreagan/rabbit/g"
 	h "github.com/alexreagan/rabbit/server/helper"
 	"github.com/alexreagan/rabbit/server/model"
-	"github.com/alexreagan/rabbit/server/model/alert"
+	"github.com/alexreagan/rabbit/server/model/alarm"
 	"github.com/alexreagan/rabbit/server/utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
-type APIGetAlertListInputs struct {
+type APIGetAlarmListInputs struct {
 	IP             string `json:"ip" form:"ip"`
 	PhysicalSystem string `json:"physicalSystem" form:"physicalSystem"`
 	Resolved       string `json:"resolved" form:"resolved"`
@@ -20,20 +20,21 @@ type APIGetAlertListInputs struct {
 	Order          string `json:"order" form:"order"`
 }
 
-type APIGetAlertListOutputs struct {
-	List       []*alert.Alert `json:"list"`
+type APIGetAlarmListOutputs struct {
+	List       []*alarm.Alarm `json:"list"`
 	TotalCount int64          `json:"totalCount"`
 }
 
 // @Summary 监控报警接口
 // @Description
 // @Produce json
-// @Param APIGetAlertListInputs query APIGetAlertListInputs true "根据查询条件分页查询报警列表"
-// @Success 200 {object} APIGetAlertListOutputs
-// @Failure 400 {object} APIGetAlertListOutputs
-// @Router /api/v1/alert/list [get]
+// @Param APIGetAlarmListInputs query APIGetAlarmListInputs true "根据查询条件分页查询报警列表"
+// @Success 200 {object} APIGetAlarmListOutputs
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
+// @Router /api/v1/alarm/list [get]
 func List(c *gin.Context) {
-	var inputs APIGetAlertListInputs
+	var inputs APIGetAlarmListInputs
 	if err := c.Bind(&inputs); err != nil {
 		h.JSONR(c, h.BadStatus, err)
 		return
@@ -45,21 +46,21 @@ func List(c *gin.Context) {
 		return
 	}
 
-	var alerts []*alert.Alert
+	var alarms []*alarm.Alarm
 	var totalCount int64
-	db := g.Con().Portal.Debug().Model(alert.Alert{})
-	db = db.Select("distinct `alert`.*")
+	db := g.Con().Portal.Debug().Model(alarm.Alarm{})
+	db = db.Select("distinct `alarm`.*")
 	if inputs.IP != "" {
-		db = db.Where("`alert`.`prod_ip` regexp ?", inputs.IP)
+		db = db.Where("`alarm`.`prod_ip` regexp ?", inputs.IP)
 	}
 	if inputs.PhysicalSystem != "" {
-		db = db.Where("`alert`.`sub_sys_en_name` = ?", inputs.PhysicalSystem)
+		db = db.Where("`alarm`.`sub_sys_en_name` = ?", inputs.PhysicalSystem)
 	}
 	if inputs.Resolved != "" {
 		if inputs.Resolved == "true" {
-			db = db.Where("`alert`.`resolved` = 1")
+			db = db.Where("`alarm`.`resolved` = 1")
 		} else {
-			db = db.Where("`alert`.`resolved` = 0")
+			db = db.Where("`alarm`.`resolved` = 0")
 		}
 	}
 	if inputs.OrderBy != "" {
@@ -67,10 +68,10 @@ func List(c *gin.Context) {
 	}
 	db.Count(&totalCount)
 	db = db.Offset(offset).Limit(limit)
-	db.Find(&alerts)
+	db.Find(&alarms)
 
-	resp := &APIGetAlertListOutputs{
-		List:       alerts,
+	resp := &APIGetAlarmListOutputs{
+		List:       alarms,
 		TotalCount: totalCount,
 	}
 	h.JSONR(c, http.StatusOK, resp)
@@ -81,11 +82,12 @@ func List(c *gin.Context) {
 // @Description
 // @Produce json
 // @Success 200 {object} model.APIGetVariableOutputs
-// @Failure 400 {object} model.APIGetVariableOutputs
-// @Router /api/v1/alert/physical_system_choices [get]
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
+// @Router /api/v1/alarm/physical_system_choices [get]
 func PhysicalSystemChoices(c *gin.Context) {
 	var data []*model.APIGetVariableItem
-	db := g.Con().Portal.Model(alert.Alert{}).Debug()
+	db := g.Con().Portal.Model(alarm.Alarm{}).Debug()
 	db = db.Select("distinct `sub_sys_name` as `label`, `sub_sys_en_name` as `value`")
 	db = db.Order("`sub_sys_en_name`")
 	db = db.Find(&data)

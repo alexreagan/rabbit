@@ -3,7 +3,7 @@
 package server
 
 import (
-	"github.com/alexreagan/rabbit/server/controller/alert"
+	"github.com/alexreagan/rabbit/server/controller/alarm"
 	"github.com/alexreagan/rabbit/server/controller/app"
 	"github.com/alexreagan/rabbit/server/controller/caas"
 	"github.com/alexreagan/rabbit/server/controller/chart"
@@ -46,7 +46,7 @@ func Start() {
 	sys.Routes(r)
 	app.Routes(r)
 	node.Routes(r)
-	alert.Routes(r)
+	alarm.Routes(r)
 	chart.Routes(r)
 	caas.Routes(r)
 

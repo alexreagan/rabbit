@@ -29,7 +29,8 @@ type APIGetParamListOutputs struct {
 // @Produce json
 // @Param APIGetParamListInputs query APIGetParamListInputs true "根据查询条件分页查询参数列表"
 // @Success 200 {object} APIGetParamListOutputs
-// @Failure 400 {object} APIGetParamListOutputs
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/param/list [get]
 func ParamList(c *gin.Context) {
 	var inputs APIGetParamListInputs
@@ -69,7 +70,8 @@ func ParamList(c *gin.Context) {
 // @Produce json
 // @Param id query string true "param id"
 // @Success 200 {object} sys.Param
-// @Failure 400 json error
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/param/info [get]
 func ParamInfo(c *gin.Context) {
 	id := c.Query("id")
@@ -98,7 +100,8 @@ type APIPostParamCreateInputs struct {
 // @Produce json
 // @Param APIPostParamCreateInputs body APIPostParamCreateInputs true "创建新参数"
 // @Success 200 json sys.Param
-// @Failure 400 json errors
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/param/create [post]
 func ParamCreate(c *gin.Context) {
 	var inputs APIPostParamCreateInputs
@@ -127,7 +130,8 @@ func ParamCreate(c *gin.Context) {
 // @Produce json
 // @Param APIPostParamCreateInputs body APIPostParamCreateInputs true "更新参数"
 // @Success 200 json sys.Param
-// @Failure 400 json errors
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/param/update [put]
 func ParamUpdate(c *gin.Context) {
 	var inputs APIPostParamCreateInputs

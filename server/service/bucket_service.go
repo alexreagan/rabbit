@@ -47,7 +47,7 @@ func (s *bucketService) Sort(hosts []*node.Host, tags []*app.Tag) (map[int64]*ap
 		tagged := false
 		for _, tag := range host.RelatedTags() {
 			if _, ok := intersectTagMap[tag.ID]; ok {
-				//intersectTagMap[tag.ID].RelatedHosts = append(intersectTagMap[tag.ID].RelatedHosts, host)
+				//intersectTagMap[tag.Tag].RelatedHosts = append(intersectTagMap[tag.Tag].RelatedHosts, host)
 				tagged = true
 			}
 		}

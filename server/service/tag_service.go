@@ -8,7 +8,7 @@ import (
 	"sort"
 )
 
-type TagRouterGraphNode struct {
+type TagGraphNode struct {
 	app.Tag
 	// 当前tag下关联的所有机器
 	Path              []int64      `json:"path" gorm:"-"`
@@ -23,11 +23,11 @@ type TagRouterGraphNode struct {
 	// 当前tag下未关联到子tag的Pod
 	UnTaggedPods      []*caas.Pod `json:"unTaggedPods" gorm:"-"`
 	UnTaggedPodsCount int         `json:"UnTaggedPodsCount" gorm:"-"`
-	Next              map[int64]*TagRouterGraphNode
+	Next              map[int64]*TagGraphNode
 }
 
-func (t *TagRouterGraphNode) Nexts() []*TagRouterGraphNode {
-	var nodes TagRouterGraphNodes
+func (t *TagGraphNode) Nexts() []*TagGraphNode {
+	var nodes TagGraphNodes
 	for _, x := range t.Next {
 		nodes = append(nodes, x)
 	}
@@ -35,36 +35,36 @@ func (t *TagRouterGraphNode) Nexts() []*TagRouterGraphNode {
 	return nodes
 }
 
-type TagRouterGraphNodes []*TagRouterGraphNode
+type TagGraphNodes []*TagGraphNode
 
-func (t TagRouterGraphNodes) Len() int { return len(t) }
+func (t TagGraphNodes) Len() int { return len(t) }
 
-func (t TagRouterGraphNodes) Less(i, j int) bool {
+func (t TagGraphNodes) Less(i, j int) bool {
 	return t[i].Name < t[j].Name
 }
 
-func (t TagRouterGraphNodes) Swap(i, j int) {
+func (t TagGraphNodes) Swap(i, j int) {
 	t[i], t[j] = t[j], t[i]
 }
 
-func (t TagRouterGraphNodes) Sort() {
+func (t TagGraphNodes) Sort() {
 	sort.Sort(t)
 }
 
-func newTagRouterGraphNode(n *app.Tag) *TagRouterGraphNode {
-	return &TagRouterGraphNode{
+func newTagRouterGraphNode(n *app.Tag) *TagGraphNode {
+	return &TagGraphNode{
 		Tag:  *n,
-		Next: make(map[int64]*TagRouterGraphNode),
+		Next: make(map[int64]*TagGraphNode),
 	}
 }
 
-var globalTagRouterGraphNode *TagRouterGraphNode
+var globalTagGraphNode *TagGraphNode
 
 type tagService struct {
 }
 
-func (s *tagService) GlobalTagRouterGraph() *TagRouterGraphNode {
-	return globalTagRouterGraphNode
+func (s *tagService) GlobalTagGraphNode() *TagGraphNode {
+	return globalTagGraphNode
 }
 
 func (s *tagService) Get(id int64) *app.Tag {
@@ -107,12 +107,12 @@ func BucketTags(categoryNames []string, tags []*app.Tag) [][]*app.Tag {
 	return bucketTags
 }
 
-func (s *tagService) ReBuildGraph() *TagRouterGraphNode {
-	globalTagRouterGraphNode = nil
+func (s *tagService) ReBuildGraph() *TagGraphNode {
+	globalTagGraphNode = nil
 	return s.BuildGraph()
 }
 
-func build(bucketTags [][]*app.Tag, idx int, nodePath []int64, node *TagRouterGraphNode) {
+func build(bucketTags [][]*app.Tag, idx int, nodePath []int64, node *TagGraphNode) {
 	if idx >= len(bucketTags) {
 		return
 	}
@@ -132,7 +132,7 @@ func build(bucketTags [][]*app.Tag, idx int, nodePath []int64, node *TagRouterGr
 
 // 计算未打到子标签的机器信息
 // 末级节点RelatedHosts和unTaggedHosts一致，因为所有的节点都未被关联到子节点
-func calUnTaggedInformation(n *TagRouterGraphNode) {
+func calUnTaggedInformation(n *TagGraphNode) {
 	var unTaggedHosts node.Hosts
 	hostMap := make(map[int64]*node.Host)
 	for _, nd := range n.Next {
@@ -189,9 +189,9 @@ func (s *tagService) RelatedHosts(tag *app.Tag) []*node.Host {
 }
 
 // 根据host上打的tag信息创建树
-func (s *tagService) BuildGraph() *TagRouterGraphNode {
-	if globalTagRouterGraphNode != nil {
-		return globalTagRouterGraphNode
+func (s *tagService) BuildGraph() *TagGraphNode {
+	if globalTagGraphNode != nil {
+		return globalTagGraphNode
 	}
 
 	// 获取树结构
@@ -201,14 +201,14 @@ func (s *tagService) BuildGraph() *TagRouterGraphNode {
 	}
 
 	// tag路由图
-	globalTagRouterGraphNode = newTagRouterGraphNode(&app.Tag{})
+	globalTagGraphNode = newTagRouterGraphNode(&app.Tag{})
 
 	// 组织host tag路由图
 	for _, host := range HostService.GetAll() {
 		tags := host.RelatedTags()
 		bucketTags := BucketTags(categoryNames, tags)
 
-		build(bucketTags, 0, globalTagRouterGraphNode.Path, globalTagRouterGraphNode)
+		build(bucketTags, 0, globalTagGraphNode.Path, globalTagGraphNode)
 	}
 
 	// 组织pod tag路由图
@@ -216,13 +216,13 @@ func (s *tagService) BuildGraph() *TagRouterGraphNode {
 		tags := CaasService.GetServiceRelatedTags(service)
 		bucketTags := BucketTags(categoryNames, tags)
 
-		build(bucketTags, 0, globalTagRouterGraphNode.Path, globalTagRouterGraphNode)
+		build(bucketTags, 0, globalTagGraphNode.Path, globalTagGraphNode)
 	}
 
 	// 补充未关联的节点信息
-	calUnTaggedInformation(globalTagRouterGraphNode)
+	calUnTaggedInformation(globalTagGraphNode)
 
-	return globalTagRouterGraphNode
+	return globalTagGraphNode
 }
 
 func newTagService() *tagService {

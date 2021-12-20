@@ -30,12 +30,53 @@ func (input APIGetTagListInputs) checkInputsContain() error {
 	return nil
 }
 
+type APIGetTagAllInputs struct {
+	OrderBy string `json:"orderBy" form:"orderBy"`
+	Order   string `json:"order" form:"order"`
+}
+
+// @Summary 全部tag数据
+// @Description
+// @Produce json
+// @Param APIGetTagAllInputs query APIGetTagAllInputs true "查询全部tag列表"
+// @Success 200 {object} APIGetTagListOutputs
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
+// @Router /api/v1/tag/all [get]
+func TagAll(c *gin.Context) {
+	var inputs APIGetTagAllInputs
+	if err := c.Bind(&inputs); err != nil {
+		h.JSONR(c, h.BadStatus, err)
+		return
+	}
+
+	var tags []*app.Tag
+	var totalCount int64
+	db := g.Con().Portal.Model(app.Tag{})
+	db = db.Select("`tag`.*, `tag_category`.`name` as category_name")
+	db = db.Joins("left join `tag_category` on `tag`.`category_id` = `tag_category`.`id`")
+	db = db.Order("`tag`.`name`")
+	db.Count(&totalCount)
+	if inputs.OrderBy != "" {
+		db = db.Order(utils.Camel2Case(inputs.OrderBy) + " " + inputs.Order)
+	}
+	db.Find(&tags)
+
+	resp := &APIGetTagListOutputs{
+		List:       tags,
+		TotalCount: totalCount,
+	}
+	h.JSONR(c, http.StatusOK, resp)
+	return
+}
+
 // @Summary tag列表
 // @Description
 // @Produce json
 // @Param APIGetTagListInputs query APIGetTagListInputs true "根据查询条件分页查询tag列表"
 // @Success 200 {object} APIGetTagListOutputs
-// @Failure 400 {object} APIGetTagListOutputs
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/tag/list [get]
 func TagList(c *gin.Context) {
 	var inputs APIGetTagListInputs
@@ -56,10 +97,9 @@ func TagList(c *gin.Context) {
 
 	var tags []*app.Tag
 	var totalCount int64
-	db := g.Con().Portal.Debug().Model(app.Tag{})
-	db = db.Select("`tag`.*, `tag_category`.name as category_name, `ptag`.`name` as parent_name")
+	db := g.Con().Portal.Model(app.Tag{})
+	db = db.Select("`tag`.*, `tag_category`.`name` as category_name")
 	db = db.Joins("left join `tag_category` on `tag`.`category_id` = `tag_category`.`id`")
-	db = db.Joins("left join `tag` as `ptag` on `ptag`.`id` = `tag`.`parent_id`")
 	if inputs.Name != "" {
 		db = db.Where("`tag`.`name` regexp ?", inputs.Name)
 	}
@@ -89,8 +129,8 @@ func TagList(c *gin.Context) {
 // @Description
 // @Produce json
 // @Param id query string true "tag id"
-// @Success 200 {object} app.Tag
-// @Failure 400 json error
+// @Success 200 {object} app.G6Edge
+// @Failure 400 "bad arguments"
 // @Router /api/v1/tag/info [get]
 func TagInfo(c *gin.Context) {
 	id := c.Query("id")
@@ -112,8 +152,7 @@ type APIPostTagCreateInputs struct {
 	Name       string `json:"name" form:"name"`
 	CnName     string `json:"cnName" form:"cnName"`
 	CategoryID int64  `json:"categoryID" form:"categoryID"`
-	//ParentID   int64  `json:"parentID" form:"parentID"`
-	Remark string `json:"remark" form:"remark"`
+	Remark     string `json:"remark" form:"remark"`
 }
 
 // @Summary 创建新tag
@@ -121,7 +160,8 @@ type APIPostTagCreateInputs struct {
 // @Produce json
 // @Param APIPostTagCreateInputs body APIPostTagCreateInputs true "创建新tag"
 // @Success 200 {object} APIPostTagCreateInputs
-// @Failure 400 {object} APIPostTagCreateInputs
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/tag/create [post]
 func TagCreate(c *gin.Context) {
 	var inputs APIPostTagCreateInputs
@@ -151,7 +191,8 @@ func TagCreate(c *gin.Context) {
 // @Produce json
 // @Param APIPostTagCreateInputs body APIPostTagCreateInputs true "更新tag"
 // @Success 200 {object} APIPostTagCreateInputs
-// @Failure 400 {object} APIPostTagCreateInputs
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/tag/update [put]
 func TagUpdate(c *gin.Context) {
 	var inputs APIPostTagCreateInputs
@@ -196,7 +237,45 @@ type APIGetTagCategoryListOutputs struct {
 // @Produce json
 // @Param APIGetTagCategoryListInputs query APIGetTagCategoryListInputs true "根据查询条件分页查询tag category列表"
 // @Success 200 {object} APIGetTagCategoryListOutputs
-// @Failure 400 {object} APIGetTagCategoryListOutputs
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
+// @Router /api/v1/tag_category/all [get]
+func TagCategoryAll(c *gin.Context) {
+	var inputs APIGetTagCategoryListInputs
+
+	if err := c.Bind(&inputs); err != nil {
+		h.JSONR(c, h.BadStatus, err)
+		return
+	}
+
+	var categorys []*app.TagCategory
+	var totalCount int64
+	db := g.Con().Portal.Debug().Model(app.TagCategory{})
+	if inputs.Name != "" {
+		db = db.Where("`name` regexp ?", inputs.Name)
+	}
+
+	db.Count(&totalCount)
+	if inputs.OrderBy != "" {
+		db = db.Order(utils.Camel2Case(inputs.OrderBy) + " " + inputs.Order)
+	}
+	db.Find(&categorys)
+
+	resp := &APIGetTagCategoryListOutputs{
+		List:       categorys,
+		TotalCount: totalCount,
+	}
+	h.JSONR(c, http.StatusOK, resp)
+	return
+}
+
+// @Summary tag category列表
+// @Description
+// @Produce json
+// @Param APIGetTagCategoryListInputs query APIGetTagCategoryListInputs true "根据查询条件分页查询tag category列表"
+// @Success 200 {object} APIGetTagCategoryListOutputs
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/tag_category/list [get]
 func TagCategoryList(c *gin.Context) {
 	var inputs APIGetTagCategoryListInputs
@@ -238,7 +317,8 @@ func TagCategoryList(c *gin.Context) {
 // @Produce json
 // @Param id query string true "tag category id"
 // @Success 200 {object} app.TagCategory
-// @Failure 400 json error
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/tag_category/info [get]
 func TagCategoryInfo(c *gin.Context) {
 	id := c.Query("id")
@@ -268,7 +348,8 @@ type APIPostTagCategoryCreateInputs struct {
 // @Produce json
 // @Param APIPostTagCategoryCreateInputs body APIPostTagCategoryCreateInputs true "创建tag category"
 // @Success 200 {object} app.TagCategory
-// @Failure 400 {object} app.TagCategory
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/tag_category/create [post]
 func TagCategoryCreate(c *gin.Context) {
 	var inputs APIPostTagCategoryCreateInputs
@@ -298,7 +379,8 @@ func TagCategoryCreate(c *gin.Context) {
 // @Produce json
 // @Param APIPostTagCategoryCreateInputs body APIPostTagCategoryCreateInputs true "更新tag category"
 // @Success 200 {object} app.TagCategory
-// @Failure 400 {object} app.TagCategory
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/tag_category/update [put]
 func TagCategoryUpdate(c *gin.Context) {
 	var inputs APIPostTagCategoryCreateInputs
@@ -338,7 +420,8 @@ type APIGetTagCategoryTagsInputs struct {
 // @Produce json
 // @Param id query APIGetTagCategoryTagsInputs true "查看tag category下的tag"
 // @Success 200 {object} APIGetTagCategoryTagsOutputs
-// @Failure 400 json error
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/tag_category/tags [get]
 func TagCategoryTags(c *gin.Context) {
 	var inputs APIGetTagCategoryTagsInputs

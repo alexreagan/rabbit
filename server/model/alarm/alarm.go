@@ -1,11 +1,11 @@
-package alert
+package alarm
 
 import (
 	"github.com/alexreagan/rabbit/g"
 	"github.com/alexreagan/rabbit/server/model/gtime"
 )
 
-type Alert struct {
+type Alarm struct {
 	ID            int64       `json:"id" gorm:"primary_key;column:id"`
 	AlertLevel    string      `json:"alertLevel" gorm:"column:alert_level;type:string;size:128;comment:"`
 	AlertName     string      `json:"alertName" gorm:"column:alert_name;type:string;size:128;comment:"`
@@ -24,16 +24,16 @@ type Alert struct {
 	UpdateTime    gtime.GTime `json:"updateTime" gorm:"column:update_time;default:null;comment:"`
 }
 
-func (this Alert) TableName() string {
-	return "alert"
+func (this Alarm) TableName() string {
+	return "alarm"
 }
 
-func (this Alert) LatestRecords() []*Alert {
-	var alerts []*Alert
+func (this Alarm) LatestRecords() []*Alarm {
+	var alarms []*Alarm
 	db := g.Con().Portal.Debug()
-	db = db.Model(Alert{})
-	db = db.Select("`alert`.*")
-	db = db.Joins("right join (select max(id) as id from alert group by prod_ip) as tbl on alert.id = tbl.id")
-	db = db.Find(&alerts)
-	return alerts
+	db = db.Model(Alarm{})
+	db = db.Select("`alarm`.*")
+	db = db.Joins("right join (select max(id) as id from alarm group by prod_ip) as tbl on alarm.id = tbl.id")
+	db = db.Find(&alarms)
+	return alarms
 }

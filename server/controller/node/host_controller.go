@@ -33,7 +33,7 @@ type APIGetHostListInputs struct {
 	FsUsageLowerLimit     float64 `json:"fsUsageLowerLimit" form:"fsUsageLowerLimit"`
 	MemoryUsageUpperLimit float64 `json:"memoryUsageUpperLimit" form:"memoryUsageUpperLimit"`
 	MemoryUsageLowerLimit float64 `json:"memoryUsageLowerLimit" form:"memoryUsageLowerLimit"`
-	//Group                 string  `json:"group" form:"group"`
+	//G6Group                 string  `json:"group" form:"group"`
 	//BoundGroup            string  `json:"boundGroup" form:"boundGroup"`
 	TagIDs     []int64 `json:"tagIDs[]" form:"tagIDs[]"`
 	RelatedTag string  `json:"relatedTag" form:"relatedTag"`
@@ -58,7 +58,8 @@ func (input APIGetHostListInputs) checkInputsContain() error {
 // @Produce json
 // @Param APIGetHostListInputs query APIGetHostListInputs true "根据查询条件分页查询机器列表"
 // @Success 200 {object} APIGetHostListOutputs
-// @Failure 400 {object} APIGetHostListOutputs
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/host/list [get]
 func HostList(c *gin.Context) {
 	var inputs APIGetHostListInputs
@@ -191,7 +192,8 @@ type APIGetHostSelectOutputs struct {
 // @Produce json
 // @Param APIGetHostSelectInputs query APIGetHostSelectInputs true "机器查找"
 // @Success 200 {object} APIGetHostListOutputs
-// @Failure 400 {object} APIGetHostListOutputs
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/host/select [get]
 func HostSelect(c *gin.Context) {
 	var inputs APIGetHostSelectInputs
@@ -257,7 +259,8 @@ type APIPostHostUpdateInputs struct {
 // @Param Module formData string false "创建Module"
 // @Param DevOwner formData string false "创建DevOwner"
 // @Success 200 {object} APIPostHostUpdateInputs
-// @Failure 400 {object} APIPostHostUpdateInputs
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/host/create [post]
 func HostCreate(c *gin.Context) {
 	var inputs APIPostHostUpdateInputs
@@ -306,7 +309,8 @@ func HostCreate(c *gin.Context) {
 // @Param GroupID formData string false "更新HostGroup"
 // @Param DevOwner formData string false "更新DevOwner"
 // @Success 200 {object} APIPostHostUpdateInputs
-// @Failure 400 {object} APIPostHostUpdateInputs
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/host/update [put]
 func HostUpdate(c *gin.Context) {
 	var inputs APIPostHostUpdateInputs
@@ -365,7 +369,8 @@ type APIPostHostBatchUpdateInputs struct {
 // @Produce json
 // @Param APIPostHostBatchUpdateInputs body APIPostHostBatchUpdateInputs false "更新机器标签和负责人信息"
 // @Success 200 {object} APIPostHostBatchUpdateInputs
-// @Failure 400 {object} APIPostHostBatchUpdateInputs
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/host/batch/update [put]
 func HostBatchUpdate(c *gin.Context) {
 	var inputs APIPostHostBatchUpdateInputs
@@ -409,7 +414,8 @@ func HostBatchUpdate(c *gin.Context) {
 // @Produce json
 // @Param id query int true "根据机器ID获取机器详细信息"
 // @Success 200 {object} node.Host
-// @Failure 400 {object} node.Host
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/host/info [get]
 func HostInfo(c *gin.Context) {
 	id := c.Query("id")
@@ -427,7 +433,8 @@ func HostInfo(c *gin.Context) {
 // @Param id query string true "根据机器ID获取机器详细信息"
 // @Param ip query string true "根据机器IP获取机器详细信息"
 // @Success 200 {object} node.Host
-// @Failure 400 {object} node.Host
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/host/detail [get]
 func HostDetail(c *gin.Context) {
 	id := c.Query("id")
@@ -447,7 +454,8 @@ func HostDetail(c *gin.Context) {
 // @Description
 // @Produce json
 // @Success 200 {object} model.APIGetVariableOutputs
-// @Failure 400 {object} model.APIGetVariableOutputs
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/host/physical_system_choices [get]
 func HostPhysicalSystemChoices(c *gin.Context) {
 	var data []*model.APIGetVariableItem
@@ -467,7 +475,8 @@ func HostPhysicalSystemChoices(c *gin.Context) {
 // @Description
 // @Produce json
 // @Success 200 {object} model.APIGetVariableOutputs
-// @Failure 400 {object} model.APIGetVariableOutputs
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/host/area_choices [get]
 func HostAreaChoices(c *gin.Context) {
 	var data []*model.APIGetVariableItem

@@ -25,7 +25,7 @@ var doc = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/v1/alert/list": {
+        "/api/v1/alarm/list": {
             "get": {
                 "produces": [
                     "application/json"
@@ -72,19 +72,19 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/alert.APIGetAlertListOutputs"
+                            "$ref": "#/definitions/alarm.APIGetAlarmListOutputs"
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/alert.APIGetAlertListOutputs"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
         },
-        "/api/v1/alert/physical_system_choices": {
+        "/api/v1/alarm/physical_system_choices": {
             "get": {
                 "produces": [
                     "application/json"
@@ -98,10 +98,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/model.APIGetVariableOutputs"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -129,10 +129,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/caas.App"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -168,10 +168,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/caas.APIGetCaasAppListOutputs"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -222,10 +222,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/caas.APIGetCaasNamespaceListOutputs"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -253,10 +253,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/caas.Pod"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -312,10 +312,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/caas.APIGetPodListOutputs"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -343,10 +343,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/caas.Service"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -382,10 +382,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/caas.APIGetCaasServiceListOutputs"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -421,10 +421,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/caas.APIGetCaasServiceListOutputs"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -443,10 +443,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/caas.APIPutServiceUpdateInputs"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -482,10 +482,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/caas.APIGetCaasWorkspaceListOutputs"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -504,10 +504,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/chart.APIGetChartBarOutputs"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -526,10 +526,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/chart.APIGetChartStatOutputs"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -548,10 +548,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/chart.APIGetChartBarOutputs"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -570,10 +570,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/chart.APIGetChartStatOutputs"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -592,10 +592,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/model.APIGetVariableOutputs"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -624,10 +624,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/node.APIPostHostBatchUpdateInputs"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -697,10 +697,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/node.APIPostHostUpdateInputs"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -735,10 +735,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/node.Host"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -766,10 +766,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/node.Host"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -866,7 +866,7 @@ var doc = `{
                         "items": {
                             "type": "integer"
                         },
-                        "description": "Group                 string  ` + "`" + `json:\"group\" form:\"group\"` + "`" + `\nBoundGroup            string  ` + "`" + `json:\"boundGroup\" form:\"boundGroup\"` + "`" + `",
+                        "description": "G6Group                 string  ` + "`" + `json:\"group\" form:\"group\"` + "`" + `\nBoundGroup            string  ` + "`" + `json:\"boundGroup\" form:\"boundGroup\"` + "`" + `",
                         "name": "tagIDs[]",
                         "in": "query"
                     }
@@ -879,10 +879,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/node.APIGetHostListOutputs"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -901,10 +901,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/model.APIGetVariableOutputs"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -930,10 +930,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/node.APIGetHostListOutputs"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -979,10 +979,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/node.APIPostHostUpdateInputs"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -1012,10 +1012,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "json"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -1045,10 +1045,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "json"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -1076,10 +1076,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/node.Host"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -1125,10 +1125,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/node.APIGetHostApplyRequestListOutputs"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -1147,10 +1147,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/node.APIGetHostGroupListOutputs"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -1214,10 +1214,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/node.APIGetHostGroupListOutputs"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -1266,17 +1266,11 @@ var doc = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/node.HostGroup"
-                        }
-                    },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/node.HostGroup"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -1312,10 +1306,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/node.APIGetHostGroupListOutputs"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -1379,7 +1373,7 @@ var doc = `{
                     },
                     {
                         "type": "integer",
-                        "name": "parentId",
+                        "name": "parentID",
                         "in": "query"
                     },
                     {
@@ -1402,10 +1396,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/node.HostGroup"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -1433,10 +1427,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/sys.Menu"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -1455,10 +1449,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "json"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -1492,7 +1486,7 @@ var doc = `{
                     {
                         "type": "string",
                         "description": "更新ParentId",
-                        "name": "ParentId",
+                        "name": "ParentID",
                         "in": "formData"
                     },
                     {
@@ -1510,10 +1504,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/sys.APIPostMenuUpdateInputs"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -1543,10 +1537,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "json"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -1574,10 +1568,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "json"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -1623,10 +1617,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/sys.APIGetParamListOutputs"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -1656,10 +1650,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "json"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -1700,10 +1694,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/uic.APIGetPermCreateOutputs"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -1731,10 +1725,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/uic.APIGetPermInfoOutputs"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -1785,10 +1779,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/uic.APIGetPermListOutputs"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -1807,10 +1801,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/uic.APIGetPermInfoOutputs"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -1851,10 +1845,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/uic.APIGetPermCreateOutputs"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -1903,10 +1897,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/uic.APIGetRoleCreateOutputs"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -1934,10 +1928,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/uic.APIGetRoleInfoOutputs"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -1983,10 +1977,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/uic.APIGetRoleListOutputs"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -2035,10 +2029,44 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
+                    }
+                }
+            }
+        },
+        "/api/v1/tag/all": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "全部tag数据",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "orderBy",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/uic.APIGetRoleCreateOutputs"
+                            "$ref": "#/definitions/app.APIGetTagListOutputs"
                         }
+                    },
+                    "400": {
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -2068,10 +2096,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/app.APIPostTagCreateInputs"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -2095,14 +2123,11 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app.Tag"
+                            "$ref": "#/definitions/app.G6Edge"
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "json"
-                        }
+                        "description": "bad arguments"
                     }
                 }
             }
@@ -2158,10 +2183,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/app.APIGetTagListOutputs"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -2191,10 +2216,59 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
+                    }
+                }
+            }
+        },
+        "/api/v1/tag_category/all": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "tag category列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "orderBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app.APIPostTagCreateInputs"
+                            "$ref": "#/definitions/app.APIGetTagCategoryListOutputs"
                         }
+                    },
+                    "400": {
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -2224,10 +2298,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/app.TagCategory"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -2255,10 +2329,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "json"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -2304,10 +2378,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/app.APIGetTagCategoryListOutputs"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -2338,10 +2412,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "json"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -2371,10 +2445,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/app.TagCategory"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -2404,10 +2478,43 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
+                    }
+                }
+            }
+        },
+        "/api/v1/template/design": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "模板设计",
+                "parameters": [
+                    {
+                        "description": "模板设计",
+                        "name": "APIPostTemplateDesignInputs",
+                        "in": "body",
+                        "required": true,
                         "schema": {
-                            "$ref": "#/definitions/app.APIPostTemplateUpdateInputs"
+                            "$ref": "#/definitions/app.APIPostTemplateDesignInputs"
                         }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.Template"
+                        }
+                    },
+                    "400": {
+                        "description": "bad parameters"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -2435,10 +2542,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/app.Template"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -2489,7 +2596,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "error"
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -2550,10 +2660,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/app.APIGetHostGroupTreeOutputs"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -2575,13 +2685,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/node.HostGroup"
-                            }
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -2609,10 +2716,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/uic.APIGetUserInfoOutputs"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -2650,10 +2757,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/uic.APIGetUserListOutputs"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -2672,10 +2779,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/uic.User"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -2709,10 +2816,10 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/uic.User"
-                        }
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
@@ -2740,17 +2847,48 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
+                    }
+                }
+            }
+        },
+        "/api/v3/tree": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "V3版根据tags获取tags下所有的机器",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "根据tags获取tags下所有的机器",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/app.APIGetHostGroupTreeOutputs"
                         }
+                    },
+                    "400": {
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
                     }
                 }
             }
         }
     },
     "definitions": {
-        "alert.APIGetAlertListInputs": {
+        "alarm.APIGetAlarmListInputs": {
             "type": "object",
             "properties": {
                 "ip": {
@@ -2776,13 +2914,13 @@ var doc = `{
                 }
             }
         },
-        "alert.APIGetAlertListOutputs": {
+        "alarm.APIGetAlarmListOutputs": {
             "type": "object",
             "properties": {
                 "list": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/alert.Alert"
+                        "$ref": "#/definitions/alarm.Alarm"
                     }
                 },
                 "totalCount": {
@@ -2790,7 +2928,7 @@ var doc = `{
                 }
             }
         },
-        "alert.Alert": {
+        "alarm.Alarm": {
             "type": "object",
             "properties": {
                 "alertLevel": {
@@ -2854,6 +2992,17 @@ var doc = `{
                     "items": {
                         "$ref": "#/definitions/node.HostGroup"
                     }
+                }
+            }
+        },
+        "app.APIGetTagAllInputs": {
+            "type": "object",
+            "properties": {
+                "order": {
+                    "type": "string"
+                },
+                "orderBy": {
+                    "type": "string"
                 }
             }
         },
@@ -3029,8 +3178,33 @@ var doc = `{
                     "type": "string"
                 },
                 "remark": {
-                    "description": "ParentID   int64  ` + "`" + `json:\"parentID\" form:\"parentID\"` + "`" + `",
                     "type": "string"
+                }
+            }
+        },
+        "app.APIPostTemplateDesignInputs": {
+            "type": "object",
+            "properties": {
+                "edges": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/app.G6Edge"
+                    }
+                },
+                "groups": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/app.G6Group"
+                    }
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "nodes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/app.G6Node"
+                    }
                 }
             }
         },
@@ -3051,6 +3225,129 @@ var doc = `{
                 }
             }
         },
+        "app.G6Edge": {
+            "type": "object",
+            "properties": {
+                "end": {
+                    "type": "object",
+                    "$ref": "#/definitions/app.G6Point"
+                },
+                "endPoint": {
+                    "type": "object",
+                    "$ref": "#/definitions/app.G6Point"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "shape": {
+                    "type": "string"
+                },
+                "source": {
+                    "type": "string"
+                },
+                "sourceId": {
+                    "description": "edge.sourceID 指向 node.id",
+                    "type": "integer"
+                },
+                "start": {
+                    "type": "object",
+                    "$ref": "#/definitions/app.G6Point"
+                },
+                "startPoint": {
+                    "type": "object",
+                    "$ref": "#/definitions/app.G6Point"
+                },
+                "target": {
+                    "type": "string"
+                },
+                "targetId": {
+                    "type": "integer"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.G6Group": {
+            "type": "object"
+        },
+        "app.G6Node": {
+            "type": "object",
+            "properties": {
+                "color": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "image": {
+                    "type": "string"
+                },
+                "inPoints": {
+                    "type": "array",
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "type": "number"
+                        }
+                    }
+                },
+                "label": {
+                    "type": "string"
+                },
+                "name": {
+                    "description": "TagID      int64       ` + "`" + `json:\"tagID\" form:\"tagID\"` + "`" + `",
+                    "type": "string"
+                },
+                "offsetX": {
+                    "type": "integer"
+                },
+                "offsetY": {
+                    "type": "integer"
+                },
+                "outPoints": {
+                    "type": "array",
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "type": "number"
+                        }
+                    }
+                },
+                "shape": {
+                    "type": "string"
+                },
+                "size": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "stateImage": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "x": {
+                    "type": "integer"
+                },
+                "y": {
+                    "type": "integer"
+                }
+            }
+        },
+        "app.G6Point": {
+            "type": "object",
+            "properties": {
+                "x": {
+                    "type": "number"
+                },
+                "y": {
+                    "type": "number"
+                }
+            }
+        },
         "app.Tag": {
             "type": "object",
             "properties": {
@@ -3063,6 +3360,9 @@ var doc = `{
                 "cnName": {
                     "type": "string"
                 },
+                "color": {
+                    "type": "string"
+                },
                 "createAt": {
                     "type": "object",
                     "$ref": "#/definitions/gtime.GTime"
@@ -3070,11 +3370,47 @@ var doc = `{
                 "id": {
                     "type": "integer"
                 },
+                "image": {
+                    "type": "string"
+                },
+                "inPoints": {
+                    "type": "string"
+                },
+                "isDoingEnd": {
+                    "type": "boolean"
+                },
+                "isDoingStart": {
+                    "type": "boolean"
+                },
+                "label": {
+                    "type": "string"
+                },
                 "name": {
+                    "type": "string"
+                },
+                "outPoints": {
                     "type": "string"
                 },
                 "remark": {
                     "type": "string"
+                },
+                "shape": {
+                    "type": "string"
+                },
+                "size": {
+                    "type": "string"
+                },
+                "stateImage": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "x": {
+                    "type": "integer"
+                },
+                "y": {
+                    "type": "integer"
                 }
             }
         },
@@ -3102,6 +3438,9 @@ var doc = `{
         "app.Template": {
             "type": "object",
             "properties": {
+                "content": {
+                    "type": "string"
+                },
                 "createAt": {
                     "type": "object",
                     "$ref": "#/definitions/gtime.GTime"
@@ -3119,6 +3458,9 @@ var doc = `{
                     "type": "string"
                 },
                 "state": {
+                    "type": "string"
+                },
+                "type": {
                     "type": "string"
                 },
                 "updateAt": {
@@ -4036,7 +4378,7 @@ var doc = `{
                     "type": "string"
                 },
                 "tagIDs[]": {
-                    "description": "Group                 string  ` + "`" + `json:\"group\" form:\"group\"` + "`" + `\nBoundGroup            string  ` + "`" + `json:\"boundGroup\" form:\"boundGroup\"` + "`" + `",
+                    "description": "G6Group                 string  ` + "`" + `json:\"group\" form:\"group\"` + "`" + `\nBoundGroup            string  ` + "`" + `json:\"boundGroup\" form:\"boundGroup\"` + "`" + `",
                     "type": "array",
                     "items": {
                         "type": "integer"
@@ -4187,7 +4529,7 @@ var doc = `{
                 "name": {
                     "type": "string"
                 },
-                "parentId": {
+                "parentID": {
                     "type": "integer"
                 },
                 "parentName": {
@@ -4392,7 +4734,7 @@ var doc = `{
                 "name": {
                     "type": "string"
                 },
-                "parentId": {
+                "parentID": {
                     "type": "integer"
                 },
                 "parentName": {
@@ -4495,7 +4837,7 @@ var doc = `{
                 "name": {
                     "type": "string"
                 },
-                "parentId": {
+                "parentID": {
                     "type": "integer"
                 },
                 "type": {
@@ -4547,7 +4889,7 @@ var doc = `{
                 "orderNum": {
                     "type": "integer"
                 },
-                "parentId": {
+                "parentID": {
                     "type": "integer"
                 },
                 "url": {
@@ -4565,11 +4907,11 @@ var doc = `{
                 "deleted": {
                     "type": "boolean"
                 },
+                "id": {
+                    "type": "integer"
+                },
                 "key": {
                     "type": "string"
-                },
-                "menuId": {
-                    "type": "integer"
                 },
                 "remark": {
                     "type": "string"
@@ -4845,20 +5187,20 @@ var doc = `{
                 "email": {
                     "type": "string"
                 },
-                "firstInstId": {
+                "firstInstID": {
                     "type": "string"
                 },
                 "id": {
                     "description": "gorm.Model",
                     "type": "integer"
                 },
-                "instId": {
+                "instID": {
                     "type": "string"
                 },
                 "isSuperuser": {
                     "type": "boolean"
                 },
-                "jgygUserId": {
+                "jgygUserID": {
                     "type": "string"
                 },
                 "mobile": {

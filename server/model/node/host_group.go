@@ -3,7 +3,7 @@ package node
 import (
 	"encoding/json"
 	"github.com/alexreagan/rabbit/g"
-	"github.com/alexreagan/rabbit/server/model/alert"
+	"github.com/alexreagan/rabbit/server/model/alarm"
 	"github.com/alexreagan/rabbit/server/model/caas"
 	"strings"
 )
@@ -17,10 +17,10 @@ type HostGroup struct {
 	Type              string       `json:"type" gorm:"column:type;type:enum('vmGroup','containerGroup');default:'vmGroup';comment:"`
 	Name              string       `json:"name" gorm:"column:name;type:string;size:128;comment:"`
 	ParentName        string       `json:"parentName" gorm:"column:parent_name;type:string;size:128;comment:"`
-	ParentId          int64        `json:"parentId" gorm:"column:parent_id;comment:"`
+	ParentID          int64        `json:"parentID" gorm:"column:parent_id;comment:"`
 	Path              string       `json:"path" gorm:"column:path;type:string;size:512;comment:"`
 	PathArray         string       `json:"pathArray" gorm:"column:path_array;type:json;comment:"`
-	CaasServiceId     int64        `json:"caasServiceId" gorm:"column:caas_service_id;comment:"`
+	CaasServiceID     int64        `json:"caasServiceId" gorm:"column:caas_service_id;comment:"`
 	Desc              string       `json:"desc" gorm:"column:desc;type:string;size:256;comment:"`
 	CreateUser        string       `json:"createUser" gorm:"column:create_user;type:string;size:32;comment:"`
 	Children          []*HostGroup `json:"children" gorm:"-"`
@@ -69,7 +69,7 @@ func (this *HostGroup) UpdateChildrenPath() {
 func (this HostGroup) GetParentName() string {
 	var hostGroup HostGroup
 	db := g.Con().Portal.Model(HostGroup{})
-	db = db.Where("id = ?", this.ParentId)
+	db = db.Where("id = ?", this.ParentID)
 	db.Find(&hostGroup)
 	return hostGroup.Name
 }
@@ -95,10 +95,10 @@ func (this HostGroup) BuildTree(id int64) ([]*HostGroup, map[int64]*HostGroup) {
 		globalNodeMap[grp.ID] = grp
 	}
 	for _, grp := range hostGroups {
-		if grp.ParentId == 0 {
+		if grp.ParentID == 0 {
 			globalTree = append(globalTree, grp)
-		} else if _, ok := globalNodeMap[grp.ParentId]; ok {
-			globalNodeMap[grp.ParentId].Children = append(globalNodeMap[grp.ParentId].Children, grp)
+		} else if _, ok := globalNodeMap[grp.ParentID]; ok {
+			globalNodeMap[grp.ParentID].Children = append(globalNodeMap[grp.ParentID].Children, grp)
 
 			// 设置报警状态
 			if grp.MeetWarningCondition() == true {
@@ -108,11 +108,11 @@ func (this HostGroup) BuildTree(id int64) ([]*HostGroup, map[int64]*HostGroup) {
 				// 所有的父节点设置为报警
 				t := grp
 				for {
-					if t.ParentId == 0 {
+					if t.ParentID == 0 {
 						break
 					}
-					globalNodeMap[t.ParentId].IsWarning = true
-					t = globalNodeMap[t.ParentId]
+					globalNodeMap[t.ParentID].IsWarning = true
+					t = globalNodeMap[t.ParentID]
 				}
 			}
 		}
@@ -121,7 +121,7 @@ func (this HostGroup) BuildTree(id int64) ([]*HostGroup, map[int64]*HostGroup) {
 	for _, grp := range globalNodeMap {
 		grp.SubGroupCount = len(grp.Children)
 		grp.RelatedHostCount = len(HostGroup{ID: grp.ID}.RelatedHosts())
-		grp.RelatedPodCount = len(HostGroup{ID: grp.ID, CaasServiceId: grp.CaasServiceId}.RelatedPods())
+		grp.RelatedPodCount = len(HostGroup{ID: grp.ID, CaasServiceID: grp.CaasServiceID}.RelatedPods())
 
 		// 叶子节点加权
 		if len(grp.Children) == 0 {
@@ -130,13 +130,13 @@ func (this HostGroup) BuildTree(id int64) ([]*HostGroup, map[int64]*HostGroup) {
 
 			t := grp
 			for {
-				if t.ParentId == 0 {
+				if t.ParentID == 0 {
 					break
 				}
-				globalNodeMap[t.ParentId].ChildrenHostCount += grp.ChildrenHostCount
-				globalNodeMap[t.ParentId].ChildrenPodCount += grp.ChildrenPodCount
+				globalNodeMap[t.ParentID].ChildrenHostCount += grp.ChildrenHostCount
+				globalNodeMap[t.ParentID].ChildrenPodCount += grp.ChildrenPodCount
 
-				t = globalNodeMap[t.ParentId]
+				t = globalNodeMap[t.ParentID]
 			}
 		}
 	}
@@ -158,10 +158,10 @@ func (this HostGroup) GetPath() []string {
 		db.Where("id = ?", id).Find(&hostGroup)
 		pathArray = append(pathArray, hostGroup.Name)
 
-		if hostGroup.ParentId == 0 {
+		if hostGroup.ParentID == 0 {
 			break
 		}
-		id = hostGroup.ParentId
+		id = hostGroup.ParentID
 	}
 	var reversePathArray []string
 	for i := len(pathArray) - 1; i >= 0; i-- {
@@ -192,7 +192,7 @@ func (this HostGroup) GetChildren() []*HostGroup {
 
 func (this HostGroup) RelatedHosts() []*Host {
 	//var hostGroupRels []*HostGroupRel
-	//g.Con().Portal.Model(HostGroupRel{}).Where("`group_id` = ?", this.ID).Find(&hostGroupRels)
+	//g.Con().Portal.Model(HostGroupRel{}).Where("`group_id` = ?", this.Tag).Find(&hostGroupRels)
 	//var hostIds []int64
 	//for _, t := range hostGroupRels {
 	//	hostIds = append(hostIds, t.HostID)
@@ -206,10 +206,10 @@ func (this HostGroup) RelatedHosts() []*Host {
 	//}
 
 	// 报警信息
-	alerts := alert.Alert{}.LatestRecords()
-	alertMap := make(map[string]*alert.Alert)
-	for _, alert := range alerts {
-		alertMap[alert.ProdIP] = alert
+	alarms := alarm.Alarm{}.LatestRecords()
+	alarmMap := make(map[string]*alarm.Alarm)
+	for _, alm := range alarms {
+		alarmMap[alm.ProdIP] = alm
 	}
 
 	// 当前组关联的机器
@@ -225,7 +225,7 @@ func (this HostGroup) RelatedHosts() []*Host {
 	for _, h := range hosts {
 		h.Type = "host"
 
-		alt, ok := alertMap[h.IP]
+		alt, ok := alarmMap[h.IP]
 		if ok {
 			h.IsWarning = alt.Resolved == false
 		} else {
@@ -251,7 +251,7 @@ func (this HostGroup) RelatedPods() []*caas.Pod {
 	tx := g.Con().Portal.Model(caas.Pod{}).Debug()
 	tx = tx.Select("`caas_pod`.*")
 	tx = tx.Joins("left join `caas_service_pod_rel` on `caas_pod`.`id` = `caas_service_pod_rel`.`pod`")
-	tx = tx.Where("`caas_service_pod_rel`.`service` = ?", this.CaasServiceId)
+	tx = tx.Where("`caas_service_pod_rel`.`service` = ?", this.CaasServiceID)
 	tx = tx.Find(&pods)
 
 	// 添加报警标识

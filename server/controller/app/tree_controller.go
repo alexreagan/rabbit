@@ -34,7 +34,8 @@ type APIGetHostGroupNodeOutputs struct {
 // @Produce json
 // @Param id query int64 true "根据ID获取host group树状信息"
 // @Success 200 {object} APIGetHostGroupTreeOutputs
-// @Failure 400 {object} APIGetHostGroupTreeOutputs
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/tree [get]
 func Tree(c *gin.Context) {
 	var inputs APIGetHostGroupTreeInputs
@@ -90,7 +91,8 @@ func Tree(c *gin.Context) {
 // @Description
 // @Produce json
 // @Success 200 {object} []node.HostGroup
-// @Failure 400 {object} []node.HostGroup
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/tree/rebuild [get]
 func TreeRebuild(c *gin.Context) {
 	resp := service.TagService.ReBuildGraph()
@@ -103,7 +105,8 @@ func TreeRebuild(c *gin.Context) {
 //// @Produce json
 //// @Param id query int64 true "获取某个节点的所有子节点"
 //// @Success 200 {object} APIGetHostGroupTreeOutputs
-//// @Failure 400 {object} APIGetHostGroupTreeOutputs
+//// @Failure 400 "bad arguments"
+//// @Failure 417 "internal error"
 //// @Router /api/v1/host_group/children [get]
 //func HostGroupChildren(c *gin.Context) {
 //	var inputs APIGetHostGroupTreeInputs
@@ -113,13 +116,13 @@ func TreeRebuild(c *gin.Context) {
 //		return
 //	}
 //
-//	resp := node.HostGroup{ID: inputs.ID}.GetChildren()
+//	resp := node.HostGroup{Tag: inputs.Tag}.GetChildren()
 //	h.JSONR(c, http.StatusOK, resp)
 //	return
 //}
 //
 //type APIGetHostGroupHostsInputs struct {
-//	Id int64 `json:"id" form:"id"`
+//	ID int64 `json:"id" form:"id"`
 //}
 //
 //// @Summary 获取某个节点的所有机器
@@ -127,7 +130,8 @@ func TreeRebuild(c *gin.Context) {
 //// @Produce json
 //// @Param id query int64 true "获取某个节点的所有机器"
 //// @Success 200 {object} APIGetHostGroupTreeOutputs
-//// @Failure 400 {object} APIGetHostGroupTreeOutputs
+//// @Failure 400 "bad arguments"
+//// @Failure 417 "internal error"
 //// @Router /api/v1/host_group/hosts [get]
 //func HostGroupHosts(c *gin.Context) {
 //	var inputs APIGetHostGroupHostsInputs
@@ -139,7 +143,7 @@ func TreeRebuild(c *gin.Context) {
 //
 //	var resp []*node.Host
 //	hostGroup := &node.HostGroup{
-//		ID: inputs.Id,
+//		Tag: inputs.ID,
 //	}
 //	dt := g.Con().Portal.Table(hostGroup.TableName()).Where(hostGroup).Find(&hostGroup)
 //	if dt.Error != nil {
@@ -157,9 +161,9 @@ func TreeRebuild(c *gin.Context) {
 //}
 //
 //type APIGetHostGroupMoveInputs struct {
-//	Id       int64  `json:"id" form:"id"`
+//	ID       int64  `json:"id" form:"id"`
 //	ServiceName     string `json:"name" form:"name"`
-//	ParentId int64  `json:"parentId" form:"parentId"`
+//	ParentID int64  `json:"parentID" form:"parentID"`
 //}
 //
 //// @Summary 将节点ID移动到parent，作为parent的父节点
@@ -167,7 +171,8 @@ func TreeRebuild(c *gin.Context) {
 //// @Produce json
 //// @Param APIGetHostGroupMoveInputs query APIGetHostGroupMoveInputs true "获取某个节点的所有机器"
 //// @Success 200 {object} APIGetHostGroupTreeOutputs
-//// @Failure 400 {object} APIGetHostGroupTreeOutputs
+//// @Failure 400 "bad arguments"
+//// @Failure 417 "internal error"
 //// @Router /api/v1/host_group/move [post]
 //func HostGroupMove(c *gin.Context) {
 //	var inputs APIGetHostGroupMoveInputs
@@ -178,7 +183,7 @@ func TreeRebuild(c *gin.Context) {
 //	}
 //
 //	db := g.Con().Portal.Table(node.HostGroup{}.TableName())
-//	db.Where(node.HostGroup{ID: inputs.Id}).Updates(node.HostGroup{ParentId: inputs.ParentId})
+//	db.Where(node.HostGroup{Tag: inputs.ID}).Updates(node.HostGroup{ParentID: inputs.ParentID})
 //	node.HostGroup{}.ReBuildGraph()
 //
 //	h.JSONR(c, http.StatusOK, "ok")
@@ -186,9 +191,9 @@ func TreeRebuild(c *gin.Context) {
 //}
 
 type APIPostHostGroupDraggingInputs struct {
-	DraggingNodeId   int64  `json:"draggingNodeId" form:"draggingNodeId"`
+	DraggingNodeID   int64  `json:"draggingNodeID" form:"draggingNodeID"`
 	DraggingNodeType string `json:"draggingNodeType" form:"draggingNodeType"`
-	DropNodeId       int64  `json:"dropNodeId" form:"dropNodeId"`
+	DropNodeID       int64  `json:"dropNodeID" form:"dropNodeID"`
 	DropNodeType     string `json:"dropNodeType" form:"dropNodeType"`
 }
 
@@ -197,7 +202,8 @@ type APIPostHostGroupDraggingInputs struct {
 //// @Produce json
 //// @Param APIGetHostGroupMoveInputs query APIGetHostGroupMoveInputs true "获取某个节点的所有机器"
 //// @Success 200 {object} APIGetHostGroupTreeOutputs
-//// @Failure 400 {object} APIGetHostGroupTreeOutputs
+//// @Failure 400 "bad arguments"
+//// @Failure 417 "internal error"
 //// @Router /api/v1/tree/dragging [post]
 //func TreeDragging(c *gin.Context) {
 //	var inputs APIPostHostGroupDraggingInputs
@@ -212,14 +218,14 @@ type APIPostHostGroupDraggingInputs struct {
 //		// 拖动虚拟机
 //		if inputs.DropNodeType != "" {
 //			tx := g.Con().Portal.Model(node.HostGroupRel{}).Begin()
-//			if dt := tx.Debug().Where(node.HostGroupRel{HostID: inputs.DraggingNodeId}).Delete(node.HostGroupRel{}); dt.Error != nil {
+//			if dt := tx.Debug().Where(node.HostGroupRel{HostID: inputs.DraggingNodeID}).Delete(node.HostGroupRel{}); dt.Error != nil {
 //				h.JSONR(c, h.ExpecStatus, dt.Error)
 //				dt.Rollback()
 //				return
 //			}
 //			if dt := tx.Debug().Create(&node.HostGroupRel{
-//				HostID:  inputs.DraggingNodeId,
-//				GroupID: inputs.DropNodeId,
+//				HostID:  inputs.DraggingNodeID,
+//				GroupID: inputs.DropNodeID,
 //			}); dt.Error != nil {
 //				h.JSONR(c, h.ExpecStatus, dt.Error)
 //				dt.Rollback()
@@ -231,13 +237,13 @@ type APIPostHostGroupDraggingInputs struct {
 //		// 拖动群组
 //		if inputs.DropNodeType != "" {
 //			db := g.Con().Portal.Model(node.HostGroup{}).Debug()
-//			db.Where(node.HostGroup{ID: inputs.DraggingNodeId}).Updates(node.HostGroup{ParentId: inputs.DropNodeId})
+//			db.Where(node.HostGroup{Tag: inputs.DraggingNodeID}).Updates(node.HostGroup{ParentID: inputs.DropNodeID})
 //		}
 //	case "containerGroup":
 //		// 拖动群组
 //		if inputs.DropNodeType != "" {
 //			db := g.Con().Portal.Model(node.HostGroup{}).Debug()
-//			db.Where(node.HostGroup{ID: inputs.DraggingNodeId}).Updates(node.HostGroup{ParentId: inputs.DropNodeId})
+//			db.Where(node.HostGroup{Tag: inputs.DraggingNodeID}).Updates(node.HostGroup{ParentID: inputs.DropNodeID})
 //		}
 //	}
 //
@@ -258,7 +264,8 @@ type APIGetV2TreeInputs struct {
 // @Produce json
 // @Param id query int64 true "根据tags获取tags下所有的机器"
 // @Success 200 {object} APIGetHostGroupTreeOutputs
-// @Failure 400 {object} APIGetHostGroupTreeOutputs
+//// @Failure 400 "bad arguments"
+//// @Failure 417 "internal error"
 // @Router /api/v2/tree [get]
 func V2Tree(c *gin.Context) {
 	var inputs APIGetV2TreeInputs
@@ -272,14 +279,14 @@ func V2Tree(c *gin.Context) {
 	switch method {
 	case "1":
 		////////////// method 1: 路由图
-		globalTagRouterGraphNode := service.TagService.GlobalTagRouterGraph()
-		if globalTagRouterGraphNode == nil {
-			globalTagRouterGraphNode = service.TagService.BuildGraph()
+		globalTagGraphNode := service.TagService.GlobalTagGraphNode()
+		if globalTagGraphNode == nil {
+			globalTagGraphNode = service.TagService.BuildGraph()
 		}
 		// 根节点
 		if len(inputs.TagIDs) == 0 {
-			var resp []*service.TagRouterGraphNode
-			for _, n := range globalTagRouterGraphNode.Nexts() {
+			var resp []*service.TagGraphNode
+			for _, n := range globalTagGraphNode.Nexts() {
 				resp = append(resp, n)
 			}
 			h.JSONR(c, http.StatusOK, resp)
@@ -288,7 +295,7 @@ func V2Tree(c *gin.Context) {
 
 		// 其他节点
 		// 找到inputs的末级节点
-		graphNode := globalTagRouterGraphNode
+		graphNode := globalTagGraphNode
 		for _, id := range inputs.TagIDs {
 			graphNode = graphNode.Next[id]
 		}

@@ -34,7 +34,8 @@ func (input APIGetUserListInputs) checkInputsContain() error {
 // @Produce json
 // @Param APIGetUserListInputs query APIGetUserListInputs true "根据查询条件分页查询用户列表"
 // @Success 200 {object} APIGetUserListOutputs
-// @Failure 400 {object} APIGetUserListOutputs
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/user/list [get]
 func UserList(c *gin.Context) {
 	var inputs APIGetUserListInputs
@@ -76,7 +77,7 @@ type APIUserCreateInputs struct {
 	UserName   string      `json:"username" form:"username" binding:"required"`
 	CnName     string      `json:"cnName" form:"cn_name" binding:"required"`
 	Password   string      `json:"password" form:"password" binding:"required"`
-	JgygUserId string      `json:"jgygUserId" form:"jgyg_user_id" binding:"required"`
+	JgygUserID string      `json:"jgygUserID" form:"jgyg_user_id" binding:"required"`
 	Birthday   gtime.GTime `json:"birthday" form:"birthday"`
 }
 
@@ -105,8 +106,8 @@ func UserCreate(c *gin.Context) {
 		Password: password,
 		CnName:   inputs.CnName,
 		//Birthday:   inputs.Birthday,
-		JgygUserId: inputs.JgygUserId,
-		AdUserName: inputs.JgygUserId,
+		JgygUserID: inputs.JgygUserID,
+		AdUserName: inputs.JgygUserID,
 	}
 
 	dt := db.Table(user.TableName()).Create(&user)
@@ -144,7 +145,8 @@ type APIGetUserInfoOutputs struct {
 // @Produce json
 // @Param request query string true "查看用户信息"
 // @Success 200 {object} APIGetUserInfoOutputs
-// @Failure 400 {object} APIGetUserInfoOutputs
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/user/info [get]
 func UserInfo(c *gin.Context) {
 	_, err := h.GetUser(c)
@@ -177,7 +179,8 @@ func UserInfo(c *gin.Context) {
 // @Description
 // @Produce json
 // @Success 200 {object} uic.User
-// @Failure 400 {object} uic.User
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/user/myself [get]
 func UserMyself(c *gin.Context) {
 	user, err := h.GetUser(c)
@@ -200,7 +203,8 @@ type APIPutUserUpdateInputs struct {
 // @Produce json
 // @Param APIPutUserUpdateInputs query APIPutUserUpdateInputs true "根据查询条件分页查询用户列表"
 // @Success 200 {object} uic.User
-// @Failure 400 {object} uic.User
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/user/update [put]
 func UserUpdate(c *gin.Context) {
 	var inputs APIPutUserUpdateInputs

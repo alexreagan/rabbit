@@ -10,7 +10,7 @@ type Menu struct {
 	//Type     int64  `json:"type" gorm:"column:type;comment:"`
 	Name     string `json:"name" gorm:"column:name;type:string;size:256;comment:"`
 	Url      string `json:"url" gorm:"column:url;type:string;size:512;comment:"`
-	ParentId int64  `json:"parentId" gorm:"column:parent_id;comment:"`
+	ParentID int64  `json:"parentID" gorm:"column:parent_id;comment:"`
 	Icon     string `json:"icon" gorm:"column:icon;type:string;size:512;comment:"`
 	OrderNum int64  `json:"orderNum" gorm:"column:order_num;comment:"`
 	//Open     string `json:"open" gorm:"column:open;type:string;size:128;comment:"`
@@ -34,10 +34,10 @@ func (this Menu) BuildTree() []*Menu {
 		menuMap[menu.ID] = menu
 	}
 	for _, menu := range menus {
-		if menu.ParentId == 0 {
+		if menu.ParentID == 0 {
 			rootMenu = append(rootMenu, menu)
-		} else if _, ok := menuMap[menu.ParentId]; ok {
-			menuMap[menu.ParentId].Children = append(menuMap[menu.ParentId].Children, menu)
+		} else if _, ok := menuMap[menu.ParentID]; ok {
+			menuMap[menu.ParentID].Children = append(menuMap[menu.ParentID].Children, menu)
 		}
 	}
 	return rootMenu

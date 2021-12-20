@@ -20,7 +20,7 @@ func (this Port) TableName() string {
 type Service struct {
 	ID          int64  `json:"id" gorm:"primary_key;column:id"`
 	Type        string `json:"type" gorm:"column:type;type:string;size:128;comment:"`
-	AppId       int64  `json:"appId" gorm:"column:app_id;comment:"`
+	AppID       int64  `json:"appId" gorm:"column:app_id;comment:"`
 	AppName     string `json:"appName" gorm:"column:app_name;type:string;size:128;comment:"`
 	ServiceName string `json:"serviceName" gorm:"column:service_name;type:string;size:128;comment:"`
 	//Ports        []*Port `json:"ports,omitempty" gorm:"many2many:caas_service_port_rel;foreignkey:service_name;association_foreignkey:host;association_jointable_foreignkey:host;jointable_foreignkey:service_name;"`

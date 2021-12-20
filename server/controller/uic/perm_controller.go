@@ -30,7 +30,8 @@ type APIGetPermListOutputs struct {
 // @Produce json
 // @Param request query APIGetPermListInputs true "根据查询条件分页查询权限列表"
 // @Success 200 {object} APIGetPermListOutputs
-// @Failure 400 {object} APIGetPermListOutputs
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/perm/list [get]
 func PermList(c *gin.Context) {
 	var inputs APIGetPermListInputs
@@ -85,7 +86,8 @@ type APIGetPermCreateOutputs struct {
 // @Produce json
 // @Param request query APIGetPermCreateInputs true "新建权限接口"
 // @Success 200 {object} APIGetPermCreateOutputs
-// @Failure 400 {object} APIGetPermCreateOutputs
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/perm/create [post]
 func PermCreate(c *gin.Context) {
 	var inputs APIGetPermCreateInputs
@@ -119,7 +121,8 @@ func PermCreate(c *gin.Context) {
 // @Produce json
 // @Param request query APIGetPermCreateInputs true "更新权限接口"
 // @Success 200 {object} APIGetPermCreateOutputs
-// @Failure 400 {object} APIGetPermCreateOutputs
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/perm/update [put]
 func PermUpdate(c *gin.Context) {
 	var inputs APIGetPermCreateInputs
@@ -158,7 +161,8 @@ type APIGetPermInfoOutputs struct {
 // @Produce json
 // @Param request query string true "查看权限接口"
 // @Success 200 {object} APIGetPermInfoOutputs
-// @Failure 400 {object} APIGetPermInfoOutputs
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/perm/info [get]
 func PermInfo(c *gin.Context) {
 	id := c.Query("id")
@@ -186,7 +190,8 @@ type APIGetPermMyselfOutputs struct {
 // @Description
 // @Produce json
 // @Success 200 {object} APIGetPermInfoOutputs
-// @Failure 400 {object} APIGetPermInfoOutputs
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/perm/myself [get]
 func PermMyself(c *gin.Context) {
 	user, _ := h.GetUser(c)

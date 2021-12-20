@@ -38,7 +38,8 @@ type APIGetHostApplyRequestListOutputs struct {
 // @Produce json
 // @Param APIGetHostApplyRequestListInputs query APIGetHostApplyRequestListInputs true "根据查询条件分页查询机器资源申请列表"
 // @Success 200 {object} APIGetHostApplyRequestListOutputs
-// @Failure 400 {object} APIGetHostApplyRequestListOutputs
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/host_apply_request/list [get]
 func HostApplyRequestList(c *gin.Context) {
 	var inputs APIGetHostApplyRequestListInputs
@@ -107,7 +108,8 @@ func HostApplyRequestList(c *gin.Context) {
 // @Produce json
 // @Param id query int true "根据请求单ID获取详细信息"
 // @Success 200 {object} node.Host
-// @Failure 400 {object} node.Host
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/host_apply_request/info [get]
 func HostApplyRequestInfo(c *gin.Context) {
 	id := c.Query("id")
@@ -132,7 +134,8 @@ type APIPostHostApplyRequestCreateInputs struct {
 // @Produce json
 // @Param APIPostHostApplyRequestCreateInputs body APIPostHostApplyRequestCreateInputs true "创建机器申请单"
 // @Success 200 json node.HostApplyRequest
-// @Failure 400 json error
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/host_apply_request/create [post]
 func HostApplyRequestCreate(c *gin.Context) {
 	var inputs APIPostHostApplyRequestCreateInputs
@@ -151,7 +154,7 @@ func HostApplyRequestCreate(c *gin.Context) {
 		Memory:    memory,
 		Applier:   inputs.Applier,
 		Remark:    inputs.Remark,
-		Creator:   user.JgygUserId,
+		Creator:   user.JgygUserID,
 		CreateAt:  gtime.Now(),
 		ReleaseAt: gtime.NewGTime(inputs.ReleaseAt),
 		State:     node.HostApplyStateSubmitted,
@@ -179,7 +182,8 @@ type APIPostHostApplyRequestAssignInputs struct {
 // @Produce json
 // @Param APIPostHostApplyRequestAssignInputs body APIPostHostApplyRequestAssignInputs true "创建机器申请单处理"
 // @Success 200 json node.HostApplyAssignRequest
-// @Failure 400 json error
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/host_apply_request/assign [put]
 func HostApplyRequestAssign(c *gin.Context) {
 	var inputs APIPostHostApplyRequestAssignInputs
@@ -193,7 +197,7 @@ func HostApplyRequestAssign(c *gin.Context) {
 	hostIDArrayBytes, _ := json.Marshal(inputs.HostIDs)
 	tagIDsArrayBytes, _ := json.Marshal(inputs.TagIDs)
 	req := &node.HostApplyRequest{
-		Assigner: user.JgygUserId,
+		Assigner: user.JgygUserID,
 		AssignAt: gtime.Now(),
 		State:    node.HostApplyStateSuccess,
 		HostIDs:  string(hostIDArrayBytes),

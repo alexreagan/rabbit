@@ -5,11 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/alexreagan/rabbit/g"
-	alert2 "github.com/alexreagan/rabbit/server/model/alert"
+	"github.com/alexreagan/rabbit/server/model/alarm"
 	"github.com/alexreagan/rabbit/server/model/gtime"
 	"github.com/alexreagan/rabbit/server/model/node"
+	"github.com/alexreagan/rabbit/server/service"
 	log "github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -23,6 +23,51 @@ const timeFormat = "2006-01-02 15:04:05"
 const tTimeFormat = "2006-01-02T15:04:05"
 
 // sync host information from kunyuan
+
+var kunyuanConfig *KunYuanSyncerConfig
+
+type KunYuanSyncerLoginConfig struct {
+	URL      string `json:"url"`
+	User     string `json:"user"`
+	Password string `json:"password"`
+}
+
+type KunYuanSyncerBaseConfig struct {
+	URL             string   `json:"url"`
+	PhysicalSystems []string `json:"physical_systems"`
+	Duration        int      `json:"duration"`
+}
+
+type KunYuanSyncerMonitorConfig struct {
+	URL             string   `json:"url"`
+	PhysicalSystems []string `json:"physical_systems"`
+	CloudPools      []string `json:"cloud_pools"`
+	Duration        int      `json:"duration"`
+}
+
+type KunYuanSyncerAlarmConfig struct {
+	URL          string `json:"url"`
+	IntervalDays int    `json:"interval_days"`
+	Duration     int    `json:"duration"`
+}
+
+type KunYuanSyncerConfig struct {
+	Enable  bool                       `json:"enable"`
+	Login   KunYuanSyncerLoginConfig   `json:"login"`
+	Base    KunYuanSyncerBaseConfig    `json:"base"`
+	Monitor KunYuanSyncerMonitorConfig `json:"monitor"`
+	Alarm   KunYuanSyncerAlarmConfig   `json:"alarm"`
+}
+
+func initKunYuanSyncerConfigFromDB() (*KunYuanSyncerConfig, error) {
+	value, err := service.ParamService.Get("kunyuan.syncer")
+	if err != nil {
+		return nil, err
+	}
+	var config KunYuanSyncerConfig
+	err = json.Unmarshal([]byte(value), &config)
+	return &config, err
+}
 
 type KunYuanSyncer struct {
 	wg     sync.WaitGroup
@@ -41,7 +86,16 @@ func (s *KunYuanSyncer) Close() {
 }
 
 func (s *KunYuanSyncer) Start() {
-	if viper.GetBool("kunyuan_syncer.enable") == false {
+	//if viper.GetBool("kunyuan.syncer.enable") == false {
+	//	return
+	//}
+	var err error
+	kunyuanConfig, err = initKunYuanSyncerConfigFromDB()
+	if err != nil {
+		log.Error(err)
+		return
+	}
+	if kunyuanConfig.Enable == false {
 		return
 	}
 
@@ -76,7 +130,7 @@ func (s *KunYuanSyncer) Start() {
 				log.Error(err)
 			}
 		}()
-		s.StartAlertSyncer()
+		s.StartAlarmSyncer()
 		defer s.wg.Done()
 	}()
 }
@@ -84,7 +138,8 @@ func (s *KunYuanSyncer) Start() {
 func (s *KunYuanSyncer) StartBaseSyncer() {
 	log.Println("StartBaseSyncer")
 	s.SyncBase()
-	dur := viper.GetDuration("kunyuan_syncer.base.duration") * time.Second
+	//dur := viper.GetDuration("kunyuan.syncer.base.duration") * time.Second
+	dur := time.Duration(kunyuanConfig.Base.Duration) * time.Second
 	ticker := time.NewTicker(dur)
 	for {
 		select {
@@ -100,7 +155,8 @@ func (s *KunYuanSyncer) StartBaseSyncer() {
 func (s *KunYuanSyncer) StartMonitorSyncer() {
 	log.Println("StartMonitorSyncer")
 	s.SyncMonitor()
-	dur := viper.GetDuration("kunyuan_syncer.monitor.duration") * time.Second
+	//dur := viper.GetDuration("kunyuan.syncer.monitor.duration") * time.Second
+	dur := time.Duration(kunyuanConfig.Monitor.Duration) * time.Second
 	ticker := time.NewTicker(dur)
 	for {
 		select {
@@ -113,10 +169,11 @@ func (s *KunYuanSyncer) StartMonitorSyncer() {
 	}
 }
 
-func (s *KunYuanSyncer) StartAlertSyncer() {
-	log.Println("StartAlertSyncer")
-	s.SyncAlert()
-	dur := viper.GetDuration("kunyuan_syncer.alert.duration") * time.Second
+func (s *KunYuanSyncer) StartAlarmSyncer() {
+	log.Println("StartAlarmSyncer")
+	s.SyncAlarm()
+	//dur := viper.GetDuration("kunyuan.syncer.alarm.duration") * time.Second
+	dur := time.Duration(kunyuanConfig.Alarm.Duration) * time.Second
 	ticker := time.NewTicker(dur)
 	for {
 		select {
@@ -124,7 +181,7 @@ func (s *KunYuanSyncer) StartAlertSyncer() {
 			log.Println("ctx done")
 			return
 		case <-ticker.C:
-			s.SyncAlert()
+			s.SyncAlarm()
 		}
 	}
 }
@@ -143,7 +200,7 @@ type SyncerBaseRecord struct {
 	DeployDate        string `json:"deployDate,omitempty"`
 	DevAreaCode       string `json:"devAreaCode,omitempty"`
 	FunDesc           string `json:"funDesc,omitempty"`
-	InstanceId        string `json:"instanceId,omitempty"`
+	InstanceID        string `json:"instanceId,omitempty"`
 	ManagerA          string `json:"managerA,omitempty"`
 	MemorySize        int    `json:"memSizeMB,omitempty"`
 	OsVersion         string `json:"osVersion,omitempty"`
@@ -230,11 +287,15 @@ type KunYuanLoginResult struct {
 func (s *KunYuanSyncer) Login() (*KunYuanLoginResult, error) {
 	log.Println("Login...")
 	lr := &KunYuanLoginResult{}
-	loginUrl := viper.GetString("kunyuan_syncer.login.url")
+	//loginUrl := viper.GetString("kunyuan.syncer.login.url")
+	loginUrl := kunyuanConfig.Login.URL
 	payload := make(url.Values)
-	payload.Add("name", viper.GetString("kunyuan_syncer.login.user"))
-	payload.Add("username", viper.GetString("kunyuan_syncer.login.user"))
-	payload.Add("password", viper.GetString("kunyuan_syncer.login.password"))
+	//payload.Add("name", viper.GetString("kunyuan.syncer.login.user"))
+	//payload.Add("username", viper.GetString("kunyuan.syncer.login.user"))
+	//payload.Add("password", viper.GetString("kunyuan.syncer.login.password"))
+	payload.Add("name", kunyuanConfig.Login.User)
+	payload.Add("username", kunyuanConfig.Login.User)
+	payload.Add("password", kunyuanConfig.Login.Password)
 	payload.Add("grant_type", "password")
 	payload.Add("scope", "server")
 	req, _ := http.NewRequest(http.MethodPost, loginUrl, strings.NewReader(payload.Encode()))
@@ -256,7 +317,8 @@ func (s *KunYuanSyncer) Login() (*KunYuanLoginResult, error) {
 
 func (s *KunYuanSyncer) GetKunyuanBaseResult(abbr string, page int, lr *KunYuanLoginResult) (*SyncerBaseResult, error) {
 	syncerResult := &SyncerBaseResult{}
-	syncUrl := viper.GetString("kunyuan_syncer.base.url")
+	//syncUrl := viper.GetString("kunyuan.syncer.base.url")
+	syncUrl := kunyuanConfig.Base.URL
 	req, _ := http.NewRequest(http.MethodGet, syncUrl, nil)
 	query := req.URL.Query()
 	query.Add("areaName", "")
@@ -290,7 +352,8 @@ func (s *KunYuanSyncer) SyncBase() {
 		return
 	}
 
-	abbrs := viper.GetStringSlice("kunyuan_syncer.base.physical_systems")
+	//abbrs := viper.GetStringSlice("kunyuan.syncer.base.physical_systems")
+	abbrs := kunyuanConfig.Base.PhysicalSystems
 	for _, abbr := range abbrs {
 		page := 1
 		for {
@@ -316,7 +379,7 @@ func (s *KunYuanSyncer) SyncBase() {
 					DeployDate:           vt,
 					DevAreaCode:          record.DevAreaCode,
 					FunDesc:              record.FunDesc,
-					InstanceId:           record.InstanceId,
+					InstanceID:           record.InstanceID,
 					IP:                   record.ProdIp,
 					ManIp:                record.ManIp,
 					ManagerA:             record.ManagerA,
@@ -356,7 +419,8 @@ func (s *KunYuanSyncer) SyncBase() {
 
 func (s *KunYuanSyncer) GetKunyuanMonitorResult(abbr string, page int, lr *KunYuanLoginResult) (*SyncerMonitorResult, error) {
 	syncerResult := &SyncerMonitorResult{}
-	syncUrl := viper.GetString("kunyuan_syncer.monitor.url")
+	//syncUrl := viper.GetString("kunyuan.syncer.monitor.url")
+	syncUrl := kunyuanConfig.Monitor.URL
 	req, _ := http.NewRequest(http.MethodGet, syncUrl, nil)
 	query := req.URL.Query()
 	query.Add("isMine", "1")
@@ -418,7 +482,8 @@ type SyncerAlertResult struct {
 
 func (s *KunYuanSyncer) GetKunyuanAlertResult(page int, lr *KunYuanLoginResult) (*SyncerAlertResult, error) {
 	syncerResult := &SyncerAlertResult{}
-	syncUrl := viper.GetString("kunyuan_syncer.alert.url")
+	//syncUrl := viper.GetString("kunyuan.syncer.alarm.url")
+	syncUrl := kunyuanConfig.Alarm.URL
 	req, _ := http.NewRequest(http.MethodGet, syncUrl, nil)
 	query := req.URL.Query()
 	query.Add("isMine", "1")
@@ -432,8 +497,11 @@ func (s *KunYuanSyncer) GetKunyuanAlertResult(page int, lr *KunYuanLoginResult) 
 	query.Add("page", strconv.Itoa(page))
 	now := time.Now()
 	startTime := now.AddDate(0, 0, -30)
-	if viper.GetInt("kunyuan_syncer.alert.interval_days") != 0 {
-		startTime = now.AddDate(0, 0, viper.GetInt("kunyuan_syncer.alert.interval_days")*(-1))
+	//if viper.GetInt("kunyuan.syncer.alarm.interval_days") != 0 {
+	//	startTime = now.AddDate(0, 0, viper.GetInt("kunyuan.syncer.alarm.interval_days")*(-1))
+	//}
+	if kunyuanConfig.Alarm.IntervalDays != 0 {
+		startTime = now.AddDate(0, 0, kunyuanConfig.Alarm.IntervalDays*-1)
 	}
 	formatTimeStart := startTime.Format(timeFormat)
 	query.Add("firingTimeStart", formatTimeStart)
@@ -454,14 +522,14 @@ func (s *KunYuanSyncer) GetKunyuanAlertResult(page int, lr *KunYuanLoginResult) 
 		log.Errorln(err)
 		return syncerResult, err
 	}
-	log.Debugf("[KunyuanSync] SyncAlertResult: %s", buf)
+	log.Debugf("[KunyuanSync] SyncAlarmResult: %s", buf)
 	err = json.Unmarshal(buf, &syncerResult)
-	log.Debugf("[KunyuanSync] SyncAlertObj: %+v", syncerResult)
+	log.Debugf("[KunyuanSync] SyncAlarmObj: %+v", syncerResult)
 	return syncerResult, err
 }
 
-func (s *KunYuanSyncer) SyncAlert() {
-	log.Println("SyncAlert...")
+func (s *KunYuanSyncer) SyncAlarm() {
+	log.Println("SyncAlarm...")
 	lr, err := s.Login()
 	if err != nil || lr.AccessToken == "" || lr.ExpiresIn <= 0 {
 		log.Errorln(err)
@@ -484,7 +552,7 @@ func (s *KunYuanSyncer) SyncAlert() {
 		for _, record := range syncerResult.Data.Alerts {
 			firingTime, _ := time.ParseInLocation(timeFormat, record.FiringTime, time.Local)
 			resolvedTime, _ := time.ParseInLocation(timeFormat, record.ResolvedTime, time.Local)
-			al := &alert2.Alert{
+			alm := &alarm.Alarm{
 				ID:            record.ID,
 				AlertLevel:    record.AlertLevel,
 				AlertName:     record.AlertName,
@@ -503,13 +571,13 @@ func (s *KunYuanSyncer) SyncAlert() {
 				UpdateTime:    gtime.NewGTime(time.Now()),
 			}
 
-			var alert alert2.Alert
+			var oalm alarm.Alarm
 			if record.ID != 0 {
-				db.Model(alert).Where(alert2.Alert{ID: record.ID}).First(&alert)
-				if alert.ID == 0 {
-					db.Model(alert).Create(al)
+				db.Model(oalm).Where(alarm.Alarm{ID: record.ID}).First(&oalm)
+				if oalm.ID == 0 {
+					db.Model(oalm).Create(alm)
 				} else {
-					db.Model(alert).Where(alert2.Alert{ID: record.ID}).Updates(al)
+					db.Model(oalm).Where(alarm.Alarm{ID: record.ID}).Updates(alm)
 				}
 			}
 		}
@@ -527,7 +595,8 @@ func (s *KunYuanSyncer) SyncMonitor() {
 		return
 	}
 
-	abbrs := viper.GetStringSlice("kunyuan_syncer.monitor.physical_systems")
+	//abbrs := viper.GetStringSlice("kunyuan.syncer.monitor.physical_systems")
+	abbrs := kunyuanConfig.Monitor.PhysicalSystems
 	for _, abbr := range abbrs {
 		page := 1
 		for {

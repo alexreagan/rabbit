@@ -7,8 +7,8 @@ type Depart struct {
 	Type      string  `json:"type" gorm:"column:type;type:string;size:1;comment:'机构类型'"`
 	Level     string  `json:"level" gorm:"column:level;type:string;size:11;comment:'级别'"`
 	Parent    *Depart `json:"parent" gorm:"-;comment:'上级机构'"`
-	ParentID  int64   `json:"parentId" gorm:"column:parent_depart;comment:上级机构ID"`
-	InstId    string  `json:"instId" gorm:"column:inst_id;type:string;size:10;comment:'行政机构编码'"`
+	ParentID  int64   `json:"parentID" gorm:"column:parent_depart;comment:上级机构ID"`
+	InstID    string  `json:"instID" gorm:"column:inst_id;type:string;size:10;comment:'行政机构编码'"`
 	FullName  string  `json:"fullName" gorm:"column:fullname;type:string;size:1024;null;comment:'机构全称'"`
 	ShortName string  `json:"shortName" gorm:"column:shortname;type:string;size:256;null;comment:'简称'"`
 	Deleted   bool    `json:"deleted" gorm:"column:deleted;type:tinyint;size:1;comment:'是否删除'"`
@@ -18,7 +18,7 @@ type Depart struct {
 	//HasChildren      bool      `json:"has_children" gorm:"column:has_children;type:tinyint;size:1;comment:'是否有子节点'"`
 	//ChildrenNum      int       `json:"children_num" gorm:"column:children_num;type:int;comment:'子节点个数'"`
 	//BelongKfzx       int       `json:"belong_kfzx" gorm:"column:belong_kfzx;type:int;comment:'删除标志'"`
-	//FirstInstId      string    `json:"first_inst_id" gorm:"column:first_inst_id;type:string;size:10;comment:'所属一级机构编码'"`
+	//FirstInstID      string    `json:"first_inst_id" gorm:"column:first_inst_id;type:string;size:10;comment:'所属一级机构编码'"`
 	//TypeCode  string `json:"type_code" gorm:"column:type_code;type:string;size:9;comment:'类型编码'"`
 	//Telephone string `json:"telephone" gorm:"column:telephone;type:string;size:20;comment:'电话'"`
 	//Email     string `json:"email" gorm:"column:email;type:string;size:128;comment:'邮件'"`

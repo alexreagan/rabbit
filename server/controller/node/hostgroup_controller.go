@@ -28,7 +28,8 @@ type APIGetHostGroupListOutputs struct {
 // @Produce json
 // @Param APIGetHostGroupListInputs query APIGetHostGroupListInputs true "获取host group列表"
 // @Success 200 {object} APIGetHostGroupListOutputs
-// @Failure 400 {object} APIGetHostGroupListOutputs
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/host_group/list [get]
 func HostGroupList(c *gin.Context) {
 	var inputs APIGetHostGroupListInputs
@@ -64,7 +65,8 @@ func HostGroupList(c *gin.Context) {
 // @Description
 // @Produce json
 // @Success 200 {object} APIGetHostGroupListOutputs
-// @Failure 400 {object} APIGetHostGroupListOutputs
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/host_group/all [get]
 func HostGroupAll(c *gin.Context) {
 	var hostGroups []*node.HostGroup
@@ -83,9 +85,9 @@ func HostGroupAll(c *gin.Context) {
 type APIPostCreateHostGroup struct {
 	Name          string `json:"name" form:"name" binding:"required"`
 	Type          string `json:"type" form:"type" binding:"required"`
-	CaasServiceId int64  `json:"caasServiceId" form:"caasServiceId"`
+	CaasServiceID int64  `json:"caasServiceId" form:"caasServiceId"`
 	ParentName    string `json:"parentName" form:"parentName"`
-	ParentId      int64  `json:"parentId" form:"parentId"`
+	ParentID      int64  `json:"parentID" form:"parentID"`
 	Desc          string `json:"desc" form:"desc"`
 }
 
@@ -94,7 +96,8 @@ type APIPostCreateHostGroup struct {
 // @Produce json
 // @Param APIGetHostGroupListInputs query APIGetHostGroupListInputs true "更新host group信息"
 // @Success 200 {object} APIGetHostGroupListOutputs
-// @Failure 400 {object} APIGetHostGroupListOutputs
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/host_group/create [post]
 func HostGroupCreate(c *gin.Context) {
 	var inputs APIPostCreateHostGroup
@@ -106,7 +109,7 @@ func HostGroupCreate(c *gin.Context) {
 
 	// get group path
 	pGroup := node.HostGroup{}
-	pGroup.ID = inputs.ParentId
+	pGroup.ID = inputs.ParentID
 	pGroupPathArray := pGroup.GetPath()
 	pGroupPathArray = append(pGroupPathArray, inputs.Name)
 	hostGroupPathArrayBytes, _ := json.Marshal(pGroupPathArray)
@@ -116,8 +119,8 @@ func HostGroupCreate(c *gin.Context) {
 		Name:          inputs.Name,
 		Type:          inputs.Type,
 		ParentName:    inputs.ParentName,
-		ParentId:      inputs.ParentId,
-		CaasServiceId: inputs.CaasServiceId,
+		ParentID:      inputs.ParentID,
+		CaasServiceID: inputs.CaasServiceID,
 		Path:          strings.Join(pGroupPathArray, node.GroupPathSeperator),
 		PathArray:     string(hostGroupPathArrayBytes),
 		Desc:          inputs.Desc,
@@ -134,8 +137,8 @@ func HostGroupCreate(c *gin.Context) {
 }
 
 type APIBindHostToHostGroupInput struct {
-	HostId  int64 `json:"hostId" form:"hostId" binding:"required"`
-	GroupId int64 `json:"groupId" form:"groupId"  binding:"required"`
+	HostID  int64 `json:"hostID" form:"hostID" binding:"required"`
+	GroupID int64 `json:"groupID" form:"groupID"  binding:"required"`
 }
 
 // @Summary 获取host group信息
@@ -153,14 +156,14 @@ func BindHostToHostGroup(c *gin.Context) {
 	}
 
 	tx := g.Con().Portal.Model(node.HostGroupRel{}).Begin()
-	if dt := tx.Where("host_id = ?", inputs.HostId).Delete(&node.HostGroupRel{}); dt.Error != nil {
+	if dt := tx.Where("host_id = ?", inputs.HostID).Delete(&node.HostGroupRel{}); dt.Error != nil {
 		h.JSONR(c, h.ExpecStatus, dt.Error)
 		dt.Rollback()
 		return
 	}
 	rel := &node.HostGroupRel{
-		HostID:  inputs.HostId,
-		GroupID: inputs.GroupId,
+		HostID:  inputs.HostID,
+		GroupID: inputs.GroupID,
 	}
 	if dt := tx.Debug().Create(rel); dt.Error != nil {
 		h.JSONR(c, h.ExpecStatus, dt.Error)
@@ -181,8 +184,8 @@ type APIGetHostGroupGetInputs struct {
 // @Description
 // @Produce json
 // @Param id query int true "根据机器群组名称获取机器群组详细信息"
-// @Success 200 {object} node.HostGroup
-// @Failure 400 {object} node.HostGroup
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/host_group/get [get]
 func HostGroupGet(c *gin.Context) {
 	var inputs APIGetHostGroupGetInputs
@@ -211,7 +214,8 @@ type APIPutHostGroupInputs struct {
 // @Produce json
 // @Param APIPutHostGroupInputs query APIPutHostGroupInputs true "更新host group信息"
 // @Success 200 {object} node.HostGroup
-// @Failure 400 {object} node.HostGroup
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/host_group/update [put]
 func HostGroupPut(c *gin.Context) {
 	var inputs APIPutHostGroupInputs
@@ -236,7 +240,7 @@ func HostGroupPut(c *gin.Context) {
 
 	// get group path
 	pGroup := node.HostGroup{}
-	pGroup.ID = inputs.ParentId
+	pGroup.ID = inputs.ParentID
 	pGroupPathArray := pGroup.GetPath()
 	pGroupPathArray = append(pGroupPathArray, inputs.Name)
 	hostGroupPathArrayBytes, _ := json.Marshal(pGroupPathArray)
@@ -244,9 +248,9 @@ func HostGroupPut(c *gin.Context) {
 	// update attr
 	hostGroup.Name = inputs.Name
 	hostGroup.Type = inputs.Type
-	hostGroup.CaasServiceId = inputs.CaasServiceId
+	hostGroup.CaasServiceID = inputs.CaasServiceID
 	hostGroup.ParentName = inputs.ParentName
-	hostGroup.ParentId = inputs.ParentId
+	hostGroup.ParentID = inputs.ParentID
 	hostGroup.Desc = inputs.Desc
 	hostGroup.Path = strings.Join(pGroupPathArray, node.GroupPathSeperator)
 	hostGroup.PathArray = string(hostGroupPathArrayBytes)

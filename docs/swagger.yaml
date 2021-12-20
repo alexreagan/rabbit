@@ -1,5 +1,5 @@
 definitions:
-  alert.APIGetAlertListInputs:
+  alarm.APIGetAlarmListInputs:
     properties:
       ip:
         type: string
@@ -16,16 +16,16 @@ definitions:
       resolved:
         type: string
     type: object
-  alert.APIGetAlertListOutputs:
+  alarm.APIGetAlarmListOutputs:
     properties:
       list:
         items:
-          $ref: '#/definitions/alert.Alert'
+          $ref: '#/definitions/alarm.Alarm'
         type: array
       totalCount:
         type: integer
     type: object
-  alert.Alert:
+  alarm.Alarm:
     properties:
       alertLevel:
         type: string
@@ -69,6 +69,13 @@ definitions:
         items:
           $ref: '#/definitions/node.HostGroup'
         type: array
+    type: object
+  app.APIGetTagAllInputs:
+    properties:
+      order:
+        type: string
+      orderBy:
+        type: string
     type: object
   app.APIGetTagCategoryListInputs:
     properties:
@@ -182,8 +189,24 @@ definitions:
       name:
         type: string
       remark:
-        description: ParentID   int64  `json:"parentID" form:"parentID"`
         type: string
+    type: object
+  app.APIPostTemplateDesignInputs:
+    properties:
+      edges:
+        items:
+          $ref: '#/definitions/app.G6Edge'
+        type: array
+      groups:
+        items:
+          $ref: '#/definitions/app.G6Group'
+        type: array
+      id:
+        type: integer
+      nodes:
+        items:
+          $ref: '#/definitions/app.G6Node'
+        type: array
     type: object
   app.APIPostTemplateUpdateInputs:
     properties:
@@ -196,6 +219,89 @@ definitions:
       state:
         type: string
     type: object
+  app.G6Edge:
+    properties:
+      end:
+        $ref: '#/definitions/app.G6Point'
+        type: object
+      endPoint:
+        $ref: '#/definitions/app.G6Point'
+        type: object
+      id:
+        type: string
+      shape:
+        type: string
+      source:
+        type: string
+      sourceId:
+        description: edge.sourceID 指向 node.id
+        type: integer
+      start:
+        $ref: '#/definitions/app.G6Point'
+        type: object
+      startPoint:
+        $ref: '#/definitions/app.G6Point'
+        type: object
+      target:
+        type: string
+      targetId:
+        type: integer
+      type:
+        type: string
+    type: object
+  app.G6Group:
+    type: object
+  app.G6Node:
+    properties:
+      color:
+        type: string
+      id:
+        type: integer
+      image:
+        type: string
+      inPoints:
+        items:
+          items:
+            type: number
+          type: array
+        type: array
+      label:
+        type: string
+      name:
+        description: TagID      int64       `json:"tagID" form:"tagID"`
+        type: string
+      offsetX:
+        type: integer
+      offsetY:
+        type: integer
+      outPoints:
+        items:
+          items:
+            type: number
+          type: array
+        type: array
+      shape:
+        type: string
+      size:
+        items:
+          type: string
+        type: array
+      stateImage:
+        type: string
+      type:
+        type: string
+      x:
+        type: integer
+      "y":
+        type: integer
+    type: object
+  app.G6Point:
+    properties:
+      x:
+        type: number
+      "y":
+        type: number
+    type: object
   app.Tag:
     properties:
       categoryID:
@@ -204,15 +310,41 @@ definitions:
         type: string
       cnName:
         type: string
+      color:
+        type: string
       createAt:
         $ref: '#/definitions/gtime.GTime'
         type: object
       id:
         type: integer
+      image:
+        type: string
+      inPoints:
+        type: string
+      isDoingEnd:
+        type: boolean
+      isDoingStart:
+        type: boolean
+      label:
+        type: string
       name:
+        type: string
+      outPoints:
         type: string
       remark:
         type: string
+      shape:
+        type: string
+      size:
+        type: string
+      stateImage:
+        type: string
+      type:
+        type: string
+      x:
+        type: integer
+      "y":
+        type: integer
     type: object
   app.TagCategory:
     properties:
@@ -230,6 +362,8 @@ definitions:
     type: object
   app.Template:
     properties:
+      content:
+        type: string
       createAt:
         $ref: '#/definitions/gtime.GTime'
         type: object
@@ -242,6 +376,8 @@ definitions:
       remark:
         type: string
       state:
+        type: string
+      type:
         type: string
       updateAt:
         $ref: '#/definitions/gtime.GTime'
@@ -872,7 +1008,7 @@ definitions:
         type: string
       tagIDs[]:
         description: |-
-          Group                 string  `json:"group" form:"group"`
+          G6Group                 string  `json:"group" form:"group"`
           BoundGroup            string  `json:"boundGroup" form:"boundGroup"`
         items:
           type: integer
@@ -968,7 +1104,7 @@ definitions:
         type: integer
       name:
         type: string
-      parentId:
+      parentID:
         type: integer
       parentName:
         type: string
@@ -1108,7 +1244,7 @@ definitions:
         type: boolean
       name:
         type: string
-      parentId:
+      parentID:
         type: integer
       parentName:
         type: string
@@ -1173,7 +1309,7 @@ definitions:
         type: integer
       name:
         type: string
-      parentId:
+      parentID:
         type: integer
       type:
         type: integer
@@ -1210,7 +1346,7 @@ definitions:
         type: string
       orderNum:
         type: integer
-      parentId:
+      parentID:
         type: integer
       url:
         type: string
@@ -1222,10 +1358,10 @@ definitions:
         type: object
       deleted:
         type: boolean
+      id:
+        type: integer
       key:
         type: string
-      menuId:
-        type: integer
       remark:
         type: string
       value:
@@ -1406,16 +1542,16 @@ definitions:
         type: string
       email:
         type: string
-      firstInstId:
+      firstInstID:
         type: string
       id:
         description: gorm.Model
         type: integer
-      instId:
+      instID:
         type: string
       isSuperuser:
         type: boolean
-      jgygUserId:
+      jgygUserID:
         type: string
       mobile:
         type: string
@@ -1434,7 +1570,7 @@ info:
   license: {}
   title: rabbit
 paths:
-  /api/v1/alert/list:
+  /api/v1/alarm/list:
     get:
       parameters:
       - in: query
@@ -1464,13 +1600,13 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/alert.APIGetAlertListOutputs'
+            $ref: '#/definitions/alarm.APIGetAlarmListOutputs'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/alert.APIGetAlertListOutputs'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 监控报警接口
-  /api/v1/alert/physical_system_choices:
+  /api/v1/alarm/physical_system_choices:
     get:
       produces:
       - application/json
@@ -1480,9 +1616,9 @@ paths:
           schema:
             $ref: '#/definitions/model.APIGetVariableOutputs'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/model.APIGetVariableOutputs'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 物理子系统类别
   /api/v1/caas/app/info:
     get:
@@ -1500,9 +1636,9 @@ paths:
           schema:
             $ref: '#/definitions/caas.App'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/caas.App'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 获取app详细信息
   /api/v1/caas/app/list:
     get:
@@ -1524,9 +1660,9 @@ paths:
           schema:
             $ref: '#/definitions/caas.APIGetCaasAppListOutputs'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/caas.APIGetCaasAppListOutputs'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 获取caas应用信息
   /api/v1/caas/namespace/list:
     get:
@@ -1557,9 +1693,9 @@ paths:
           schema:
             $ref: '#/definitions/caas.APIGetCaasNamespaceListOutputs'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/caas.APIGetCaasNamespaceListOutputs'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 获取caas项目空间信息
   /api/v1/caas/pod/info:
     get:
@@ -1577,9 +1713,9 @@ paths:
           schema:
             $ref: '#/definitions/caas.Pod'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/caas.Pod'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 根据机器ID获取机器详细信息
   /api/v1/caas/pod/list:
     get:
@@ -1613,9 +1749,9 @@ paths:
           schema:
             $ref: '#/definitions/caas.APIGetPodListOutputs'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/caas.APIGetPodListOutputs'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: pod列表接口
   /api/v1/caas/service/info:
     get:
@@ -1633,9 +1769,9 @@ paths:
           schema:
             $ref: '#/definitions/caas.Service'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/caas.Service'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 获取service详细信息
   /api/v1/caas/service/list:
     get:
@@ -1657,9 +1793,9 @@ paths:
           schema:
             $ref: '#/definitions/caas.APIGetCaasServiceListOutputs'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/caas.APIGetCaasServiceListOutputs'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 更新host group信息
   /api/v1/caas/service/refresh_pods:
     get:
@@ -1681,9 +1817,9 @@ paths:
           schema:
             $ref: '#/definitions/caas.APIGetCaasServiceListOutputs'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/caas.APIGetCaasServiceListOutputs'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 更新service下的pods信息
   /api/v1/caas/service/update:
     put:
@@ -1695,9 +1831,9 @@ paths:
           schema:
             $ref: '#/definitions/caas.APIPutServiceUpdateInputs'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/caas.APIPutServiceUpdateInputs'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 更新service信息
   /api/v1/caas/workspace/list:
     get:
@@ -1719,9 +1855,9 @@ paths:
           schema:
             $ref: '#/definitions/caas.APIGetCaasWorkspaceListOutputs'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/caas.APIGetCaasWorkspaceListOutputs'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 获取caas组织空间信息
   /api/v1/chart/bar:
     get:
@@ -1733,9 +1869,9 @@ paths:
           schema:
             $ref: '#/definitions/chart.APIGetChartBarOutputs'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/chart.APIGetChartBarOutputs'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 按照tag统计tag下的CPU个数
   /api/v1/chart/container/stat:
     get:
@@ -1747,9 +1883,9 @@ paths:
           schema:
             $ref: '#/definitions/chart.APIGetChartStatOutputs'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/chart.APIGetChartStatOutputs'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 统计平台收纳的容器使用量/cpu数/已分配机器数/已分配cpu数
   /api/v1/chart/pie:
     get:
@@ -1761,9 +1897,9 @@ paths:
           schema:
             $ref: '#/definitions/chart.APIGetChartBarOutputs'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/chart.APIGetChartBarOutputs'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 按照tag统计tag下的CPU个数
   /api/v1/chart/vm/stat:
     get:
@@ -1775,9 +1911,9 @@ paths:
           schema:
             $ref: '#/definitions/chart.APIGetChartStatOutputs'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/chart.APIGetChartStatOutputs'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 统计平台收纳的所有机器数/cpu数/已分配机器数/已分配cpu数
   /api/v1/host/area_choices:
     get:
@@ -1789,9 +1925,9 @@ paths:
           schema:
             $ref: '#/definitions/model.APIGetVariableOutputs'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/model.APIGetVariableOutputs'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 区域类别
   /api/v1/host/batch/update:
     put:
@@ -1809,9 +1945,9 @@ paths:
           schema:
             $ref: '#/definitions/node.APIPostHostBatchUpdateInputs'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/node.APIPostHostBatchUpdateInputs'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 更新机器标签和负责人
   /api/v1/host/create:
     post:
@@ -1857,9 +1993,9 @@ paths:
           schema:
             $ref: '#/definitions/node.APIPostHostUpdateInputs'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/node.APIPostHostUpdateInputs'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 创建新机器
   /api/v1/host/detail:
     get:
@@ -1882,9 +2018,9 @@ paths:
           schema:
             $ref: '#/definitions/node.Host'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/node.Host'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 根据机器ID或IP获取机器详细信息
   /api/v1/host/info:
     get:
@@ -1902,9 +2038,9 @@ paths:
           schema:
             $ref: '#/definitions/node.Host'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/node.Host'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 根据机器ID获取机器详细信息
   /api/v1/host/list:
     get:
@@ -1958,7 +2094,7 @@ paths:
         name: status
         type: string
       - description: |-
-          Group                 string  `json:"group" form:"group"`
+          G6Group                 string  `json:"group" form:"group"`
           BoundGroup            string  `json:"boundGroup" form:"boundGroup"`
         in: query
         items:
@@ -1973,9 +2109,9 @@ paths:
           schema:
             $ref: '#/definitions/node.APIGetHostListOutputs'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/node.APIGetHostListOutputs'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 机器列表接口
   /api/v1/host/physical_system_choices:
     get:
@@ -1987,9 +2123,9 @@ paths:
           schema:
             $ref: '#/definitions/model.APIGetVariableOutputs'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/model.APIGetVariableOutputs'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 物理子系统类别
   /api/v1/host/select:
     get:
@@ -2005,9 +2141,9 @@ paths:
           schema:
             $ref: '#/definitions/node.APIGetHostListOutputs'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/node.APIGetHostListOutputs'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 机器查找
   /api/v1/host/update:
     put:
@@ -2037,9 +2173,9 @@ paths:
           schema:
             $ref: '#/definitions/node.APIPostHostUpdateInputs'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/node.APIPostHostUpdateInputs'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 更新机器信息
   /api/v1/host_apply_request/assign:
     put:
@@ -2058,9 +2194,9 @@ paths:
           schema:
             type: json
         "400":
-          description: Bad Request
-          schema:
-            type: json
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 创建机器申请单处理
   /api/v1/host_apply_request/create:
     post:
@@ -2079,9 +2215,9 @@ paths:
           schema:
             type: json
         "400":
-          description: Bad Request
-          schema:
-            type: json
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 创建机器申请单
   /api/v1/host_apply_request/info:
     get:
@@ -2099,9 +2235,9 @@ paths:
           schema:
             $ref: '#/definitions/node.Host'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/node.Host'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 根据请求单ID获取详细信息
   /api/v1/host_apply_request/list:
     get:
@@ -2129,9 +2265,9 @@ paths:
           schema:
             $ref: '#/definitions/node.APIGetHostApplyRequestListOutputs'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/node.APIGetHostApplyRequestListOutputs'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 机器资源申请列表
   /api/v1/host_group/all:
     get:
@@ -2143,9 +2279,9 @@ paths:
           schema:
             $ref: '#/definitions/node.APIGetHostGroupListOutputs'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/node.APIGetHostGroupListOutputs'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 获取所有host group信息
   /api/v1/host_group/bind_host:
     post:
@@ -2185,9 +2321,9 @@ paths:
           schema:
             $ref: '#/definitions/node.APIGetHostGroupListOutputs'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/node.APIGetHostGroupListOutputs'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 创建host group信息
   /api/v1/host_group/delete:
     post:
@@ -2218,14 +2354,10 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/node.HostGroup'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/node.HostGroup'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 根据机器群组名称获取机器群组详细信息
   /api/v1/host_group/list:
     get:
@@ -2247,9 +2379,9 @@ paths:
           schema:
             $ref: '#/definitions/node.APIGetHostGroupListOutputs'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/node.APIGetHostGroupListOutputs'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 获取host group列表
   /api/v1/host_group/related_hosts:
     get:
@@ -2287,7 +2419,7 @@ paths:
         required: true
         type: string
       - in: query
-        name: parentId
+        name: parentID
         type: integer
       - in: query
         name: parentName
@@ -2304,9 +2436,9 @@ paths:
           schema:
             $ref: '#/definitions/node.HostGroup'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/node.HostGroup'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 更新host group信息
   /api/v1/menu/info/:id:
     get:
@@ -2324,9 +2456,9 @@ paths:
           schema:
             $ref: '#/definitions/sys.Menu'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/sys.Menu'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 根据ID获取菜单信息
   /api/v1/menu/nav:
     get:
@@ -2338,9 +2470,9 @@ paths:
           schema:
             $ref: '#/definitions/sys.APIGetMenuNavListOutputs'
         "400":
-          description: Bad Request
-          schema:
-            type: json
+          description: bad arguments
+        "417":
+          description: internal error
       summary: menu列表
   /api/v1/menu/update:
     post:
@@ -2360,7 +2492,7 @@ paths:
         type: string
       - description: 更新ParentId
         in: formData
-        name: ParentId
+        name: ParentID
         type: string
       - description: 更新Icon
         in: formData
@@ -2374,9 +2506,9 @@ paths:
           schema:
             $ref: '#/definitions/sys.APIPostMenuUpdateInputs'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/sys.APIPostMenuUpdateInputs'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 更新机器信息
   /api/v1/param/create:
     post:
@@ -2395,9 +2527,9 @@ paths:
           schema:
             type: json
         "400":
-          description: Bad Request
-          schema:
-            type: json
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 创建新参数
   /api/v1/param/info:
     get:
@@ -2415,9 +2547,9 @@ paths:
           schema:
             $ref: '#/definitions/sys.Param'
         "400":
-          description: Bad Request
-          schema:
-            type: json
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 参数详情
   /api/v1/param/list:
     get:
@@ -2445,9 +2577,9 @@ paths:
           schema:
             $ref: '#/definitions/sys.APIGetParamListOutputs'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/sys.APIGetParamListOutputs'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 参数列表接口
   /api/v1/param/update:
     put:
@@ -2466,9 +2598,9 @@ paths:
           schema:
             type: json
         "400":
-          description: Bad Request
-          schema:
-            type: json
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 更新参数
   /api/v1/perm/create:
     post:
@@ -2493,9 +2625,9 @@ paths:
           schema:
             $ref: '#/definitions/uic.APIGetPermCreateOutputs'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/uic.APIGetPermCreateOutputs'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 新建权限接口
   /api/v1/perm/info:
     get:
@@ -2513,9 +2645,9 @@ paths:
           schema:
             $ref: '#/definitions/uic.APIGetPermInfoOutputs'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/uic.APIGetPermInfoOutputs'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 查看权限接口
   /api/v1/perm/list:
     get:
@@ -2546,9 +2678,9 @@ paths:
           schema:
             $ref: '#/definitions/uic.APIGetPermListOutputs'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/uic.APIGetPermListOutputs'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 权限列表接口
   /api/v1/perm/myself:
     get:
@@ -2560,9 +2692,9 @@ paths:
           schema:
             $ref: '#/definitions/uic.APIGetPermInfoOutputs'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/uic.APIGetPermInfoOutputs'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 查看当前用户的权限
   /api/v1/perm/update:
     put:
@@ -2587,9 +2719,9 @@ paths:
           schema:
             $ref: '#/definitions/uic.APIGetPermCreateOutputs'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/uic.APIGetPermCreateOutputs'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 更新权限接口
   /api/v1/role/create:
     post:
@@ -2619,9 +2751,9 @@ paths:
           schema:
             $ref: '#/definitions/uic.APIGetRoleCreateOutputs'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/uic.APIGetRoleCreateOutputs'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 新建权限接口
   /api/v1/role/info:
     get:
@@ -2639,9 +2771,9 @@ paths:
           schema:
             $ref: '#/definitions/uic.APIGetRoleInfoOutputs'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/uic.APIGetRoleInfoOutputs'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 查看权限接口
   /api/v1/role/list:
     get:
@@ -2669,9 +2801,9 @@ paths:
           schema:
             $ref: '#/definitions/uic.APIGetRoleListOutputs'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/uic.APIGetRoleListOutputs'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 角色列表接口
   /api/v1/role/update:
     put:
@@ -2701,10 +2833,31 @@ paths:
           schema:
             $ref: '#/definitions/uic.APIGetRoleCreateOutputs'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/uic.APIGetRoleCreateOutputs'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 更新角色接口
+  /api/v1/tag/all:
+    get:
+      parameters:
+      - in: query
+        name: order
+        type: string
+      - in: query
+        name: orderBy
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.APIGetTagListOutputs'
+        "400":
+          description: bad arguments
+        "417":
+          description: internal error
+      summary: 全部tag数据
   /api/v1/tag/create:
     post:
       parameters:
@@ -2722,9 +2875,9 @@ paths:
           schema:
             $ref: '#/definitions/app.APIPostTagCreateInputs'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/app.APIPostTagCreateInputs'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 创建新tag
   /api/v1/tag/info:
     get:
@@ -2740,11 +2893,9 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app.Tag'
+            $ref: '#/definitions/app.G6Edge'
         "400":
-          description: Bad Request
-          schema:
-            type: json
+          description: bad arguments
       summary: tag 详情
   /api/v1/tag/list:
     get:
@@ -2778,9 +2929,9 @@ paths:
           schema:
             $ref: '#/definitions/app.APIGetTagListOutputs'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/app.APIGetTagListOutputs'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: tag列表
   /api/v1/tag/update:
     put:
@@ -2799,10 +2950,40 @@ paths:
           schema:
             $ref: '#/definitions/app.APIPostTagCreateInputs'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/app.APIPostTagCreateInputs'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 更新tag
+  /api/v1/tag_category/all:
+    get:
+      parameters:
+      - in: query
+        name: limit
+        type: integer
+      - in: query
+        name: name
+        type: string
+      - in: query
+        name: order
+        type: string
+      - in: query
+        name: orderBy
+        type: string
+      - in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.APIGetTagCategoryListOutputs'
+        "400":
+          description: bad arguments
+        "417":
+          description: internal error
+      summary: tag category列表
   /api/v1/tag_category/create:
     post:
       parameters:
@@ -2820,9 +3001,9 @@ paths:
           schema:
             $ref: '#/definitions/app.TagCategory'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/app.TagCategory'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 创建tag category
   /api/v1/tag_category/info:
     get:
@@ -2840,9 +3021,9 @@ paths:
           schema:
             $ref: '#/definitions/app.TagCategory'
         "400":
-          description: Bad Request
-          schema:
-            type: json
+          description: bad arguments
+        "417":
+          description: internal error
       summary: tag category 详情
   /api/v1/tag_category/list:
     get:
@@ -2870,9 +3051,9 @@ paths:
           schema:
             $ref: '#/definitions/app.APIGetTagCategoryListOutputs'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/app.APIGetTagCategoryListOutputs'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: tag category列表
   /api/v1/tag_category/tags:
     get:
@@ -2891,9 +3072,9 @@ paths:
           schema:
             $ref: '#/definitions/app.APIGetTagCategoryTagsOutputs'
         "400":
-          description: Bad Request
-          schema:
-            type: json
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 查看某一tag category下的tag
   /api/v1/tag_category/update:
     put:
@@ -2912,9 +3093,9 @@ paths:
           schema:
             $ref: '#/definitions/app.TagCategory'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/app.TagCategory'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 更新tag category
   /api/v1/template/create:
     post:
@@ -2933,10 +3114,31 @@ paths:
           schema:
             $ref: '#/definitions/app.APIPostTemplateUpdateInputs'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/app.APIPostTemplateUpdateInputs'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 创建新模板
+  /api/v1/template/design:
+    post:
+      parameters:
+      - description: 模板设计
+        in: body
+        name: APIPostTemplateDesignInputs
+        required: true
+        schema:
+          $ref: '#/definitions/app.APIPostTemplateDesignInputs'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Template'
+        "400":
+          description: bad parameters
+        "417":
+          description: internal error
+      summary: 模板设计
   /api/v1/template/info:
     get:
       parameters:
@@ -2953,9 +3155,9 @@ paths:
           schema:
             $ref: '#/definitions/app.Template'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/app.Template'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 根据机器ID获取模板详细信息
   /api/v1/template/list:
     get:
@@ -2986,7 +3188,9 @@ paths:
           schema:
             $ref: '#/definitions/app.APIGetTemplateListOutputs'
         "400":
-          description: error
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 展现模板列表接口
   /api/v1/template/update:
     put:
@@ -3025,9 +3229,9 @@ paths:
           schema:
             $ref: '#/definitions/app.APIGetHostGroupTreeOutputs'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/app.APIGetHostGroupTreeOutputs'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 获取host group信息
   /api/v1/tree/rebuild:
     get:
@@ -3041,11 +3245,9 @@ paths:
               $ref: '#/definitions/node.HostGroup'
             type: array
         "400":
-          description: Bad Request
-          schema:
-            items:
-              $ref: '#/definitions/node.HostGroup'
-            type: array
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 重建群组树
   /api/v1/user/info:
     get:
@@ -3063,9 +3265,9 @@ paths:
           schema:
             $ref: '#/definitions/uic.APIGetUserInfoOutputs'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/uic.APIGetUserInfoOutputs'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 查看用户信息
   /api/v1/user/list:
     get:
@@ -3089,9 +3291,9 @@ paths:
           schema:
             $ref: '#/definitions/uic.APIGetUserListOutputs'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/uic.APIGetUserListOutputs'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 用户列表接口
   /api/v1/user/myself:
     get:
@@ -3103,9 +3305,9 @@ paths:
           schema:
             $ref: '#/definitions/uic.User'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/uic.User'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 查看当前用户信息
   /api/v1/user/update:
     put:
@@ -3126,9 +3328,9 @@ paths:
           schema:
             $ref: '#/definitions/uic.User'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/uic.User'
+          description: bad arguments
+        "417":
+          description: internal error
       summary: 更新用户信息
   /api/v2/tree:
     get:
@@ -3146,8 +3348,28 @@ paths:
           schema:
             $ref: '#/definitions/app.APIGetHostGroupTreeOutputs'
         "400":
-          description: Bad Request
+          description: bad arguments
+        "417":
+          description: internal error
+      summary: 根据tags获取tags下所有的机器
+  /api/v3/tree:
+    get:
+      parameters:
+      - description: 根据tags获取tags下所有的机器
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
           schema:
             $ref: '#/definitions/app.APIGetHostGroupTreeOutputs'
-      summary: 根据tags获取tags下所有的机器
+        "400":
+          description: bad arguments
+        "417":
+          description: internal error
+      summary: V3版根据tags获取tags下所有的机器
 swagger: "2.0"

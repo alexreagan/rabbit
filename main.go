@@ -6,7 +6,7 @@ import (
 	_ "github.com/alexreagan/rabbit/docs"
 	"github.com/alexreagan/rabbit/g"
 	"github.com/alexreagan/rabbit/server"
-	"github.com/alexreagan/rabbit/server/model/alert"
+	"github.com/alexreagan/rabbit/server/model/alarm"
 	"github.com/alexreagan/rabbit/server/model/app"
 	"github.com/alexreagan/rabbit/server/model/caas"
 	"github.com/alexreagan/rabbit/server/model/node"
@@ -81,7 +81,7 @@ func main() {
 		g.Con().Portal.AutoMigrate(&caas.Pod{})
 		g.Con().Portal.AutoMigrate(&caas.ServicePodRel{})
 		g.Con().Portal.AutoMigrate(&caas.ServiceTagRel{})
-		g.Con().Portal.AutoMigrate(&alert.Alert{})
+		g.Con().Portal.AutoMigrate(&alarm.Alarm{})
 	}
 
 	// start gin server
@@ -94,6 +94,10 @@ func main() {
 	// sync hosts from caas
 	caasSyncer := worker.InitCaasSyncer()
 	caasSyncer.Start()
+
+	// clean
+	caasCleaner := worker.InitCaasCleaner()
+	caasCleaner.Start()
 
 	// tree ReBuilder
 	treeReBuilder := worker.InitTreeReBuilder()
@@ -115,10 +119,13 @@ func main() {
 		log.Println("kunyuanSyncer ctx done, closing")
 	case <-caasSyncer.Ctx().Done():
 		log.Println("caasSyncer ctx done, closing")
+	case <-caasCleaner.Ctx().Done():
+		log.Println("caasCleaner ctx done, closing")
 	case <-treeReBuilder.Ctx().Done():
 		log.Println("treeReBuilder ctx done, closing")
 	}
 	kunyuanSyncer.Close()
 	caasSyncer.Close()
+	caasCleaner.Close()
 	treeReBuilder.Close()
 }

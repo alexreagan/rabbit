@@ -28,7 +28,8 @@ type APIGetRoleListOutputs struct {
 // @Produce json
 // @Param request query APIGetRoleListInputs true "根据查询条件分页查询角色列表"
 // @Success 200 {object} APIGetRoleListOutputs
-// @Failure 400 {object} APIGetRoleListOutputs
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/role/list [get]
 func RoleList(c *gin.Context) {
 	var inputs APIGetRoleListInputs
@@ -107,7 +108,8 @@ type APIGetRoleCreateOutputs struct {
 // @Produce json
 // @Param request query APIGetRoleCreateInputs true "新建权限接口"
 // @Success 200 {object} APIGetRoleCreateOutputs
-// @Failure 400 {object} APIGetRoleCreateOutputs
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/role/create [post]
 func RoleCreate(c *gin.Context) {
 	var inputs APIGetRoleCreateInputs
@@ -149,7 +151,8 @@ func RoleCreate(c *gin.Context) {
 // @Produce json
 // @Param request query APIGetRoleCreateInputs true "更新角色接口"
 // @Success 200 {object} APIGetRoleCreateOutputs
-// @Failure 400 {object} APIGetRoleCreateOutputs
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/role/update [put]
 func RoleUpdate(c *gin.Context) {
 	var inputs APIGetRoleCreateInputs
@@ -203,7 +206,8 @@ type APIGetRoleInfoOutputs struct {
 // @Produce json
 // @Param request query string true "查看权限接口"
 // @Success 200 {object} APIGetRoleInfoOutputs
-// @Failure 400 {object} APIGetRoleInfoOutputs
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
 // @Router /api/v1/role/info [get]
 func RoleInfo(c *gin.Context) {
 	id := c.Query("id")

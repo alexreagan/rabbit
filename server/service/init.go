@@ -7,6 +7,7 @@ var (
 	ParamService       *paramService
 	BucketService      *bucketService
 	CaasService        *caasService
+	TemplateService    *templateService
 )
 
 func init() {
@@ -16,4 +17,5 @@ func init() {
 	ParamService = newParamService()
 	BucketService = newBucketService()
 	CaasService = newCaasService()
+	TemplateService = newTemplateService()
 }
