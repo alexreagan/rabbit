@@ -54,8 +54,8 @@ func TagAll(c *gin.Context) {
 	var tags []*app.Tag
 	var totalCount int64
 	db := g.Con().Portal.Model(app.Tag{})
-	db = db.Select("`tag`.*, `tag_category`.`name` as category_name")
-	db = db.Joins("left join `tag_category` on `tag`.`category_id` = `tag_category`.`id`")
+	//db = db.Select("`tag`.*, `tag_category`.`name` as category_name")
+	//db = db.Joins("left join `tag_category` on `tag`.`category_id` = `tag_category`.`id`")
 	db = db.Order("`tag`.`name`")
 	db.Count(&totalCount)
 	if inputs.OrderBy != "" {

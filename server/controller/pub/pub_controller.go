@@ -67,7 +67,9 @@ type APIPostPubUpdateInputs struct {
 	DeployUnitID          int64       `json:"deployUnitID" form:"deployUnitID"`
 	DeployUnitName        string      `json:"deployUnitName" form:"deployUnitName"`
 	VersionDate           gtime.GTime `json:"versionDate" form:"versionDate"`
-	Content               string      `json:"content" form:"content"`
+	PubContent            string      `json:"pubContent" form:"pubContent"`
+	PubStep               string      `json:"pubStep" form:"pubStep"`
+	RollbackStep          string      `json:"rollbackStep" form:"rollbackStep"`
 	Requirement           string      `json:"requirement" form:"requirement"`
 	AppDesign             string      `json:"appDesign" form:"appDesign"`
 	AppAssemblyTestDesign string      `json:"appAssemblyTestDesign" form:"appAssemblyTestDesign"`
@@ -105,7 +107,9 @@ func Create(c *gin.Context) {
 		DeployUnitID:          inputs.DeployUnitID,
 		DeployUnitName:        deployUnit.Name,
 		VersionDate:           inputs.VersionDate,
-		Content:               inputs.Content,
+		PubContent:            inputs.PubContent,
+		PubStep:               inputs.PubStep,
+		RollbackStep:          inputs.RollbackStep,
 		Requirement:           inputs.Requirement,
 		AppDesign:             inputs.AppDesign,
 		AppAssemblyTestDesign: inputs.AppAssemblyTestDesign,
@@ -153,7 +157,9 @@ func Update(c *gin.Context) {
 		DeployUnitID:          inputs.DeployUnitID,
 		DeployUnitName:        deployUnit.Name,
 		VersionDate:           inputs.VersionDate,
-		Content:               inputs.Content,
+		PubContent:            inputs.PubContent,
+		PubStep:               inputs.PubStep,
+		RollbackStep:          inputs.RollbackStep,
 		Requirement:           inputs.Requirement,
 		AppDesign:             inputs.AppDesign,
 		AppAssemblyTestDesign: inputs.AppAssemblyTestDesign,

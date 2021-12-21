@@ -9,7 +9,9 @@ type Pub struct {
 	DeployUnitID          int64       `json:"deployUnitID" gorm:"column:deploy_unit_id;comment:"`
 	DeployUnitName        string      `json:"deployUnitName" gorm:"column:deploy_unit_name;type:string;size:128;comment:"`
 	VersionDate           gtime.GTime `json:"versionDate" gorm:"column:versionDate;comment:"`
-	Content               string      `json:"content" gorm:"column:content;type:text;comment:"`
+	PubContent            string      `json:"pubContent" gorm:"column:pub_content;type:text;comment:"`
+	PubStep               string      `json:"pubStep" gorm:"column:pub_step;type:text;comment:"`
+	RollbackStep          string      `json:"rollbackStep" gorm:"column:rollback_step;type:text;comment:"`
 	Requirement           string      `json:"requirement" gorm:"column:requirement;type:text;comment:"`
 	AppDesign             string      `json:"appDesign" gorm:"column:app_design;type:enum('notstart','running','finished','trim');comment:"`
 	AppAssemblyTestDesign string      `json:"appAssemblyTestDesign" gorm:"column:app_assembly_test_design;type:enum('notstart','running','finished','trim');comment:"`

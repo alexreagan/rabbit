@@ -49,14 +49,14 @@ type G6Node struct {
 	Label      string      `json:"label" form:"label"`
 	Size       []string    `json:"size" form:"size"`
 	Type       string      `json:"type" form:"type"`
-	X          int         `json:"x" form:"x"`
-	Y          int         `json:"y" form:"y"`
+	X          float64     `json:"x" form:"x"`
+	Y          float64     `json:"y" form:"y"`
 	Shape      string      `json:"shape" form:"shape"`
 	Color      string      `json:"color" form:"color"`
 	Image      string      `json:"image" form:"image"`
 	StateImage string      `json:"stateImage" form:"stateImage"`
-	OffsetX    int         `json:"offsetX" form:"offsetX"`
-	OffsetY    int         `json:"offsetY" form:"offsetY"`
+	OffsetX    float64     `json:"offsetX" form:"offsetX"`
+	OffsetY    float64     `json:"offsetY" form:"offsetY"`
 	InPoints   [][]float64 `json:"inPoints" form:"inPoints"`
 	OutPoints  [][]float64 `json:"outPoints" form:"outPoints"`
 }
