@@ -10,6 +10,7 @@ import (
 	"github.com/alexreagan/rabbit/server/model/app"
 	"github.com/alexreagan/rabbit/server/model/caas"
 	"github.com/alexreagan/rabbit/server/model/node"
+	"github.com/alexreagan/rabbit/server/model/pub"
 	"github.com/alexreagan/rabbit/server/model/sys"
 	"github.com/alexreagan/rabbit/server/model/uic"
 	"github.com/alexreagan/rabbit/server/worker"
@@ -82,6 +83,9 @@ func main() {
 		g.Con().Portal.AutoMigrate(&caas.ServicePodRel{})
 		g.Con().Portal.AutoMigrate(&caas.ServiceTagRel{})
 		g.Con().Portal.AutoMigrate(&alarm.Alarm{})
+
+		// pub
+		g.Con().Portal.AutoMigrate(&pub.Pub{})
 	}
 
 	// start gin server

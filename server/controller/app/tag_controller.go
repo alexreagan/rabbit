@@ -12,13 +12,14 @@ import (
 )
 
 type APIGetTagListInputs struct {
-	Name       string `json:"name" form:"name"`
-	Remark     string `json:"remark" form:"remark"`
-	CategoryID string `json:"categoryID" form:"categoryID"`
-	Limit      int    `json:"limit" form:"limit"`
-	Page       int    `json:"page" form:"page"`
-	OrderBy    string `json:"orderBy" form:"orderBy"`
-	Order      string `json:"order" form:"order"`
+	Name         string `json:"name" form:"name"`
+	Remark       string `json:"remark" form:"remark"`
+	CategoryID   string `json:"categoryID" form:"categoryID"`
+	CategoryName string `json:"categoryName" form:"categoryName"`
+	Limit        int    `json:"limit" form:"limit"`
+	Page         int    `json:"page" form:"page"`
+	OrderBy      string `json:"orderBy" form:"orderBy"`
+	Order        string `json:"order" form:"order"`
 }
 
 type APIGetTagListOutputs struct {
@@ -106,6 +107,9 @@ func TagList(c *gin.Context) {
 	if inputs.CategoryID != "" {
 		db = db.Where("`tag`.`category_id` = ?", inputs.CategoryID)
 	}
+	if inputs.CategoryName != "" {
+		db = db.Where("`tag_category`.`name` = ?", inputs.CategoryName)
+	}
 	if inputs.Remark != "" {
 		db = db.Where("`tag`.`remark` regexp ?", inputs.Remark)
 	}
@@ -170,12 +174,16 @@ func TagCreate(c *gin.Context) {
 		return
 	}
 
+	var tagCategory *app.TagCategory
+	g.Con().Portal.Model(app.TagCategory{}).Where("id = ?", inputs.CategoryID).Find(&tagCategory)
+
 	tag := app.Tag{
-		Name:       inputs.Name,
-		CnName:     inputs.CnName,
-		CategoryID: inputs.CategoryID,
-		Remark:     inputs.Remark,
-		CreateAt:   gtime.Now(),
+		Name:         inputs.Name,
+		CnName:       inputs.CnName,
+		CategoryID:   inputs.CategoryID,
+		CategoryName: tagCategory.Name,
+		Remark:       inputs.Remark,
+		CreateAt:     gtime.Now(),
 	}
 	tx := g.Con().Portal
 	if dt := tx.Model(app.Tag{}).Create(&tag); dt.Error != nil {
@@ -201,14 +209,17 @@ func TagUpdate(c *gin.Context) {
 		return
 	}
 
+	var tagCategory *app.TagCategory
+	g.Con().Portal.Model(app.TagCategory{}).Where("id = ?", inputs.CategoryID).Find(&tagCategory)
+
 	tag := app.Tag{
-		ID:         inputs.ID,
-		Name:       inputs.Name,
-		CnName:     inputs.CnName,
-		CategoryID: inputs.CategoryID,
-		//ParentID:   inputs.ParentID,
-		Remark:   inputs.Remark,
-		CreateAt: gtime.Now(),
+		ID:           inputs.ID,
+		Name:         inputs.Name,
+		CnName:       inputs.CnName,
+		CategoryID:   inputs.CategoryID,
+		CategoryName: tagCategory.Name,
+		Remark:       inputs.Remark,
+		CreateAt:     gtime.Now(),
 	}
 	tx := g.Con().Portal
 	if dt := tx.Model(app.Tag{}).Where("id = ?", inputs.ID).Updates(&tag); dt.Error != nil {

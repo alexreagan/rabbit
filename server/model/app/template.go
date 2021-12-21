@@ -30,11 +30,11 @@ type G6Edge struct {
 	EndPoint   G6Point `json:"endPoint" form:"endPoint"`
 	ID         string  `json:"id" form:"id"`
 	Shape      string  `json:"shape" form:"shape"`
-	Source     string  `json:"source" form:"source"`
+	Source     int64   `json:"source" form:"source"`
 	SourceID   int64   `json:"sourceId" form:"sourceId"` // edge.sourceID 指向 node.id
 	Start      G6Point `json:"start" form:"start"`
 	StartPoint G6Point `json:"startPoint" form:"startPoint"`
-	Target     string  `json:"target" form:"target"`
+	Target     int64   `json:"target" form:"target"`
 	TargetID   int64   `json:"targetId" form:"targetId"`
 	Type       string  `json:"type" form:"type"`
 }

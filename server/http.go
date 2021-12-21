@@ -8,6 +8,7 @@ import (
 	"github.com/alexreagan/rabbit/server/controller/caas"
 	"github.com/alexreagan/rabbit/server/controller/chart"
 	"github.com/alexreagan/rabbit/server/controller/node"
+	"github.com/alexreagan/rabbit/server/controller/pub"
 	"github.com/alexreagan/rabbit/server/controller/sys"
 	"github.com/alexreagan/rabbit/server/controller/uic"
 	"github.com/alexreagan/rabbit/server/utils"
@@ -49,6 +50,7 @@ func Start() {
 	alarm.Routes(r)
 	chart.Routes(r)
 	caas.Routes(r)
+	pub.Routes(r)
 
 	// start server graceful
 	endless.ListenAndServe(viper.GetString("serv.addr"), r)
