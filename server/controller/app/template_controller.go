@@ -156,6 +156,7 @@ func TemplateUpdate(c *gin.Context) {
 
 	user, _ := h.GetUser(c)
 	template = &app.Template{
+		ID:       inputs.ID,
 		Name:     inputs.Name,
 		Remark:   inputs.Remark,
 		State:    inputs.State,
@@ -307,19 +308,18 @@ func TemplateDesign(c *gin.Context) {
 }
 
 type APIGetV3TreeInputs struct {
-	Params string  `json:"params" form:"params"`
 	TagIDs []int64 `json:"tagIDs[]" form:"tagIDs[]"`
 }
 
-// @Summary V3版根据tags获取tags下所有的机器
+// @Summary V3版根据tags路径获取tag信息
 // @Description
 // @Produce json
-// @Param id query int64 true "根据tags获取tags下所有的机器"
-// @Success 200 {object} APIGetHostGroupTreeOutputs
+// @Param APIGetV3TreeInputs query APIGetV3TreeInputs true "V3版根据tags路径获取tag信息"
+// @Success 200 {object} []service.TagGraphNode
 // @Failure 400 "bad arguments"
 // @Failure 417 "internal error"
-// @Router /api/v3/tree [get]
-func V3Tree(c *gin.Context) {
+// @Router /api/v3/tree/node [get]
+func V3TreeNode(c *gin.Context) {
 	var inputs APIGetV3TreeInputs
 
 	if err := c.Bind(&inputs); err != nil {
@@ -327,12 +327,52 @@ func V3Tree(c *gin.Context) {
 		return
 	}
 
-	globalTemplateGraphNode := service.TemplateService.GlobalTagTreeNode()
+	globalTemplateGraphNode := service.TemplateService.GlobalTagGraphNodeV3()
 	if globalTemplateGraphNode == nil {
 		template, _ := service.TemplateService.ValidTemplate()
 		g6Graph, _ := service.TemplateService.UnSerialize(template.Content)
-		globalTemplateGraphNode = service.TemplateService.BuildTree(g6Graph)
+		globalTemplateGraphNode = service.TemplateService.BuildGraphV3(g6Graph)
 	}
+
+	// 根节点
+	if len(inputs.TagIDs) == 0 {
+		h.JSONR(c, http.StatusOK, globalTemplateGraphNode)
+		return
+	}
+
+	// 其他节点
+	// 找到inputs的末级节点
+	graphNode := globalTemplateGraphNode
+	for _, id := range inputs.TagIDs {
+		graphNode = graphNode.Next[id]
+	}
+	h.JSONR(c, http.StatusOK, graphNode)
+	return
+}
+
+// @Summary V3版根据tags获取tags下所有的机器
+// @Description
+// @Produce json
+// @Param APIGetV3TreeInputs query APIGetV3TreeInputs true "根据tags获取tags下所有的机器"
+// @Success 200 {object} []interface{}
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
+// @Router /api/v3/tree/children [get]
+func V3TreeChildren(c *gin.Context) {
+	var inputs APIGetV3TreeInputs
+
+	if err := c.Bind(&inputs); err != nil {
+		h.JSONR(c, h.BadStatus, err)
+		return
+	}
+
+	globalTemplateGraphNode := service.TemplateService.GlobalTagGraphNodeV3()
+	if globalTemplateGraphNode == nil {
+		template, _ := service.TemplateService.ValidTemplate()
+		g6Graph, _ := service.TemplateService.UnSerialize(template.Content)
+		globalTemplateGraphNode = service.TemplateService.BuildGraphV3(g6Graph)
+	}
+
 	// 根节点
 	if len(inputs.TagIDs) == 0 {
 		var resp []*service.TagGraphNode

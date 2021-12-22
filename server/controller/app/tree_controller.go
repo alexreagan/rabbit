@@ -36,8 +36,8 @@ type APIGetHostGroupNodeOutputs struct {
 // @Success 200 {object} APIGetHostGroupTreeOutputs
 // @Failure 400 "bad arguments"
 // @Failure 417 "internal error"
-// @Router /api/v1/tree [get]
-func Tree(c *gin.Context) {
+// @Router /api/v1/tree/children [get]
+func TreeChildren(c *gin.Context) {
 	var inputs APIGetHostGroupTreeInputs
 
 	if err := c.Bind(&inputs); err != nil {
@@ -254,7 +254,6 @@ type APIPostHostGroupDraggingInputs struct {
 //}
 
 type APIGetV2TreeInputs struct {
-	Params      string  `json:"params" form:"params"`
 	CategoryIDs []int64 `json:"categoryIDs[]" form:"categoryIDs[]"`
 	TagIDs      []int64 `json:"tagIDs[]" form:"tagIDs[]"`
 }
@@ -266,8 +265,8 @@ type APIGetV2TreeInputs struct {
 // @Success 200 {object} APIGetHostGroupTreeOutputs
 //// @Failure 400 "bad arguments"
 //// @Failure 417 "internal error"
-// @Router /api/v2/tree [get]
-func V2Tree(c *gin.Context) {
+// @Router /api/v2/tree/children [get]
+func V2TreeChildren(c *gin.Context) {
 	var inputs APIGetV2TreeInputs
 
 	if err := c.Bind(&inputs); err != nil {
@@ -279,17 +278,13 @@ func V2Tree(c *gin.Context) {
 	switch method {
 	case "1":
 		////////////// method 1: 路由图
-		globalTagGraphNode := service.TagService.GlobalTagGraphNode()
+		globalTagGraphNode := service.TagService.GlobalTagGraphNodeV2()
 		if globalTagGraphNode == nil {
-			globalTagGraphNode = service.TagService.BuildGraph()
+			globalTagGraphNode = service.TagService.BuildGraphV2()
 		}
 		// 根节点
 		if len(inputs.TagIDs) == 0 {
-			var resp []*service.TagGraphNode
-			for _, n := range globalTagGraphNode.Nexts() {
-				resp = append(resp, n)
-			}
-			h.JSONR(c, http.StatusOK, resp)
+			h.JSONR(c, http.StatusOK, globalTagGraphNode.Children)
 			return
 		}
 
@@ -300,40 +295,43 @@ func V2Tree(c *gin.Context) {
 			graphNode = graphNode.Next[id]
 		}
 
+		h.JSONR(c, h.OKStatus, graphNode.Children)
+		return
 		//下一个标签类型
-		categoryNames, err := service.ParamService.GetTreeOrder()
-		if err != nil {
-			h.JSONR(c, h.ExpecStatus, err)
-			return
-		}
-		if len(inputs.CategoryIDs) < len(categoryNames) {
-			// 末级节点的子节点
-			var resp []interface{}
-			for _, x := range graphNode.Nexts() {
-				resp = append(resp, x)
-			}
-
-			for _, x := range graphNode.UnTaggedHosts {
-				resp = append(resp, x)
-			}
-
-			for _, x := range graphNode.UnTaggedPods {
-				resp = append(resp, x)
-			}
-
-			h.JSONR(c, h.OKStatus, resp)
-			return
-		} else {
-			var resp []interface{}
-			for _, x := range graphNode.RelatedHosts {
-				resp = append(resp, x)
-			}
-			for _, x := range graphNode.RelatedPods {
-				resp = append(resp, x)
-			}
-			h.JSONR(c, h.OKStatus, resp)
-			return
-		}
+		//categoryNames, err := service.ParamService.GetTreeOrder()
+		//if err != nil {
+		//	h.JSONR(c, h.ExpecStatus, err)
+		//	return
+		//}
+		//if len(inputs.CategoryIDs) < len(categoryNames) {
+		//
+		//	// 末级节点的子节点
+		//	var resp []interface{}
+		//	for _, x := range graphNode.Nexts() {
+		//		resp = append(resp, x)
+		//	}
+		//
+		//	for _, x := range graphNode.UnTaggedHosts {
+		//		resp = append(resp, x)
+		//	}
+		//
+		//	for _, x := range graphNode.UnTaggedPods {
+		//		resp = append(resp, x)
+		//	}
+		//
+		//	h.JSONR(c, h.OKStatus, graphNode.Children)
+		//	return
+		//} else {
+		//	var resp []interface{}
+		//	for _, x := range graphNode.RelatedHosts {
+		//		resp = append(resp, x)
+		//	}
+		//	for _, x := range graphNode.RelatedPods {
+		//		resp = append(resp, x)
+		//	}
+		//	h.JSONR(c, h.OKStatus, resp)
+		//	return
+		//}
 	case "2":
 		//////////// method 2: 顺序遍历
 		// 当前标签顺序下的所有机器

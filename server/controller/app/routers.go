@@ -10,15 +10,15 @@ func Routes(r *gin.Engine) {
 	apiV1.Use(utils.AuthSessionMidd)
 
 	tGroup := r.Group("/api/v1/tree")
-	tGroup.GET("", Tree)
+	tGroup.GET("/children", TreeChildren)
 	tGroup.GET("/rebuild", TreeRebuild)
-	//tGroup.POST("/dragging", TreeDragging)
 
-	v2TreeGroup := r.Group("/api/v2/tree")
-	v2TreeGroup.GET("", V2Tree)
+	v2TreeGroup := r.Group("/api/v2")
+	v2TreeGroup.GET("/tree/children", V2TreeChildren)
 
-	v3TreeGroup := r.Group("/api/v3/tree")
-	v3TreeGroup.GET("", V3Tree)
+	v3TreeGroup := r.Group("/api/v3")
+	v3TreeGroup.GET("/tree/children", V3TreeChildren)
+	v3TreeGroup.GET("/tree/node", V3TreeNode)
 
 	tagGroup := r.Group("/api/v1/tag")
 	tagGroup.GET("/list", TagList)

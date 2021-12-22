@@ -16,7 +16,7 @@ func init() {
 }
 
 func TestBuildGraph(t *testing.T) {
-	graph := TagService.BuildGraph()
+	graph := TagService.BuildGraphV2()
 	var resp []*TagGraphNode
 	for _, n := range graph.Next {
 		log.Printf("%#v", n)

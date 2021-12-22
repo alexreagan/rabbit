@@ -1853,6 +1853,145 @@ var doc = `{
                 }
             }
         },
+        "/api/v1/pub/create": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "创建新发布单",
+                "parameters": [
+                    {
+                        "description": "创建新发布单",
+                        "name": "APIPostPubUpdateInputs",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/pub.APIPostPubUpdateInputs"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pub.APIPostPubUpdateInputs"
+                        }
+                    },
+                    "400": {
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
+                    }
+                }
+            }
+        },
+        "/api/v1/pub/info": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "根据ID获取发布单详细信息",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "根据ID获取发布单详细信息",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pub.Pub"
+                        }
+                    },
+                    "400": {
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
+                    }
+                }
+            }
+        },
+        "/api/v1/pub/list": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "发布列表接口",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "orderBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pub.APIGetPubListOutputs"
+                        }
+                    },
+                    "400": {
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
+                    }
+                }
+            }
+        },
+        "/api/v1/pub/update": {
+            "put": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "更新发布单信息",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "更新发布单信息",
+                        "name": "IP",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pub.APIPostPubUpdateInputs"
+                        }
+                    },
+                    "400": {
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
+                    }
+                }
+            }
+        },
         "/api/v1/role/create": {
             "post": {
                 "produces": [
@@ -2142,6 +2281,11 @@ var doc = `{
                     {
                         "type": "string",
                         "name": "categoryID",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "categoryName",
                         "in": "query"
                     },
                     {
@@ -2637,7 +2781,7 @@ var doc = `{
                 }
             }
         },
-        "/api/v1/tree": {
+        "/api/v1/tree/children": {
             "get": {
                 "produces": [
                     "application/json"
@@ -2824,7 +2968,7 @@ var doc = `{
                 }
             }
         },
-        "/api/v2/tree": {
+        "/api/v2/tree/children": {
             "get": {
                 "produces": [
                     "application/json"
@@ -2855,7 +2999,7 @@ var doc = `{
                 }
             }
         },
-        "/api/v3/tree": {
+        "/api/v3/tree/children": {
             "get": {
                 "produces": [
                     "application/json"
@@ -2863,18 +3007,57 @@ var doc = `{
                 "summary": "V3版根据tags获取tags下所有的机器",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "根据tags获取tags下所有的机器",
-                        "name": "id",
-                        "in": "query",
-                        "required": true
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "name": "tagIDs[]",
+                        "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app.APIGetHostGroupTreeOutputs"
+                            "type": "array",
+                            "items": {
+                                "type": "object"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
+                    }
+                }
+            }
+        },
+        "/api/v3/tree/node": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "V3版根据tags路径获取tag信息",
+                "parameters": [
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "name": "tagIDs[]",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/service.TagGraphNode"
+                            }
                         }
                     },
                     "400": {
@@ -3071,6 +3254,9 @@ var doc = `{
                 "categoryID": {
                     "type": "string"
                 },
+                "categoryName": {
+                    "type": "string"
+                },
                 "limit": {
                     "type": "integer"
                 },
@@ -3139,6 +3325,17 @@ var doc = `{
                 },
                 "totalCount": {
                     "type": "integer"
+                }
+            }
+        },
+        "app.APIGetV3TreeInputs": {
+            "type": "object",
+            "properties": {
+                "tagIDs[]": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 }
             }
         },
@@ -3243,7 +3440,7 @@ var doc = `{
                     "type": "string"
                 },
                 "source": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "sourceId": {
                     "description": "edge.sourceID 指向 node.id",
@@ -3258,7 +3455,7 @@ var doc = `{
                     "$ref": "#/definitions/app.G6Point"
                 },
                 "target": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "targetId": {
                     "type": "integer"
@@ -3300,10 +3497,10 @@ var doc = `{
                     "type": "string"
                 },
                 "offsetX": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "offsetY": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "outPoints": {
                     "type": "array",
@@ -3330,10 +3527,10 @@ var doc = `{
                     "type": "string"
                 },
                 "x": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "y": {
-                    "type": "integer"
+                    "type": "number"
                 }
             }
         },
@@ -3360,9 +3557,6 @@ var doc = `{
                 "cnName": {
                     "type": "string"
                 },
-                "color": {
-                    "type": "string"
-                },
                 "createAt": {
                     "type": "object",
                     "$ref": "#/definitions/gtime.GTime"
@@ -3370,47 +3564,15 @@ var doc = `{
                 "id": {
                     "type": "integer"
                 },
-                "image": {
-                    "type": "string"
-                },
-                "inPoints": {
-                    "type": "string"
-                },
-                "isDoingEnd": {
-                    "type": "boolean"
-                },
-                "isDoingStart": {
-                    "type": "boolean"
-                },
-                "label": {
-                    "type": "string"
-                },
                 "name": {
-                    "type": "string"
-                },
-                "outPoints": {
                     "type": "string"
                 },
                 "remark": {
                     "type": "string"
                 },
-                "shape": {
-                    "type": "string"
-                },
-                "size": {
-                    "type": "string"
-                },
-                "stateImage": {
-                    "type": "string"
-                },
                 "type": {
+                    "description": "Label        string      ` + "`" + `json:\"label\" gorm:\"column:label;type:string;size:128;comment:画布上的展现文字\"` + "`" + `\nSize         string      ` + "`" + `json:\"size\" gorm:\"column:size;type:string;size:64;comment:大小，譬如170*34\"` + "`" + `",
                     "type": "string"
-                },
-                "x": {
-                    "type": "integer"
-                },
-                "y": {
-                    "type": "integer"
                 }
             }
         },
@@ -4768,6 +4930,259 @@ var doc = `{
                 },
                 "hostID": {
                     "type": "integer"
+                }
+            }
+        },
+        "pub.APIGetPubListInputs": {
+            "type": "object",
+            "properties": {
+                "limit": {
+                    "type": "integer"
+                },
+                "order": {
+                    "type": "string"
+                },
+                "orderBy": {
+                    "type": "string"
+                },
+                "page": {
+                    "type": "integer"
+                }
+            }
+        },
+        "pub.APIGetPubListOutputs": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/pub.Pub"
+                    }
+                },
+                "totalCount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "pub.APIPostPubUpdateInputs": {
+            "type": "object",
+            "properties": {
+                "appAssemblyTestCase": {
+                    "type": "string"
+                },
+                "appAssemblyTestDesign": {
+                    "type": "string"
+                },
+                "appAssemblyTestReport": {
+                    "type": "string"
+                },
+                "appDesign": {
+                    "type": "string"
+                },
+                "codeReview": {
+                    "type": "string"
+                },
+                "deployUnitID": {
+                    "type": "integer"
+                },
+                "deployUnitName": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "pubContent": {
+                    "type": "string"
+                },
+                "pubControlTable": {
+                    "type": "string"
+                },
+                "pubShellReview": {
+                    "type": "string"
+                },
+                "pubStep": {
+                    "type": "string"
+                },
+                "requirement": {
+                    "type": "string"
+                },
+                "rollbackStep": {
+                    "type": "string"
+                },
+                "trialOperationCase": {
+                    "type": "string"
+                },
+                "trialOperationDesign": {
+                    "type": "string"
+                },
+                "userTestCase": {
+                    "type": "string"
+                },
+                "userTestReport": {
+                    "type": "string"
+                },
+                "versionDate": {
+                    "type": "object",
+                    "$ref": "#/definitions/gtime.GTime"
+                }
+            }
+        },
+        "pub.Pub": {
+            "type": "object",
+            "properties": {
+                "appAssemblyTestCase": {
+                    "type": "string"
+                },
+                "appAssemblyTestDesign": {
+                    "type": "string"
+                },
+                "appAssemblyTestReport": {
+                    "type": "string"
+                },
+                "appDesign": {
+                    "type": "string"
+                },
+                "codeReview": {
+                    "type": "string"
+                },
+                "createAt": {
+                    "type": "object",
+                    "$ref": "#/definitions/gtime.GTime"
+                },
+                "creator": {
+                    "type": "string"
+                },
+                "deployUnitID": {
+                    "type": "integer"
+                },
+                "deployUnitName": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "pubContent": {
+                    "type": "string"
+                },
+                "pubControlTable": {
+                    "type": "string"
+                },
+                "pubShellReview": {
+                    "type": "string"
+                },
+                "pubStep": {
+                    "type": "string"
+                },
+                "requirement": {
+                    "type": "string"
+                },
+                "rollbackStep": {
+                    "type": "string"
+                },
+                "trialOperationCase": {
+                    "type": "string"
+                },
+                "trialOperationDesign": {
+                    "type": "string"
+                },
+                "userTestCase": {
+                    "type": "string"
+                },
+                "userTestReport": {
+                    "type": "string"
+                },
+                "versionDate": {
+                    "type": "object",
+                    "$ref": "#/definitions/gtime.GTime"
+                }
+            }
+        },
+        "service.TagGraphNode": {
+            "type": "object",
+            "properties": {
+                "UnTaggedHostsCount": {
+                    "type": "integer"
+                },
+                "UnTaggedPodsCount": {
+                    "type": "integer"
+                },
+                "categoryID": {
+                    "type": "integer"
+                },
+                "categoryName": {
+                    "type": "string"
+                },
+                "children": {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    }
+                },
+                "cnName": {
+                    "type": "string"
+                },
+                "createAt": {
+                    "type": "object",
+                    "$ref": "#/definitions/gtime.GTime"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "next": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/service.TagGraphNode"
+                    }
+                },
+                "path": {
+                    "description": "当前tag下关联的所有机器",
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "relatedHosts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/node.Host"
+                    }
+                },
+                "relatedHostsCount": {
+                    "type": "integer"
+                },
+                "relatedPods": {
+                    "description": "当前tag下关联的所有Pod",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/caas.Pod"
+                    }
+                },
+                "relatedPodsCount": {
+                    "type": "integer"
+                },
+                "remark": {
+                    "type": "string"
+                },
+                "type": {
+                    "description": "Label        string      ` + "`" + `json:\"label\" gorm:\"column:label;type:string;size:128;comment:画布上的展现文字\"` + "`" + `\nSize         string      ` + "`" + `json:\"size\" gorm:\"column:size;type:string;size:64;comment:大小，譬如170*34\"` + "`" + `",
+                    "type": "string"
+                },
+                "unTaggedHosts": {
+                    "description": "当前tag下未关联到子tag的机器",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/node.Host"
+                    }
+                },
+                "unTaggedPods": {
+                    "description": "当前tag下未关联到子tag的Pod",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/caas.Pod"
+                    }
                 }
             }
         },

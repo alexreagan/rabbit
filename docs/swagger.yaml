@@ -119,6 +119,8 @@ definitions:
     properties:
       categoryID:
         type: string
+      categoryName:
+        type: string
       limit:
         type: integer
       name:
@@ -164,6 +166,13 @@ definitions:
         type: array
       totalCount:
         type: integer
+    type: object
+  app.APIGetV3TreeInputs:
+    properties:
+      tagIDs[]:
+        items:
+          type: integer
+        type: array
     type: object
   app.APIPostTagCategoryCreateInputs:
     properties:
@@ -232,7 +241,7 @@ definitions:
       shape:
         type: string
       source:
-        type: string
+        type: integer
       sourceId:
         description: edge.sourceID 指向 node.id
         type: integer
@@ -243,7 +252,7 @@ definitions:
         $ref: '#/definitions/app.G6Point'
         type: object
       target:
-        type: string
+        type: integer
       targetId:
         type: integer
       type:
@@ -271,9 +280,9 @@ definitions:
         description: TagID      int64       `json:"tagID" form:"tagID"`
         type: string
       offsetX:
-        type: integer
+        type: number
       offsetY:
-        type: integer
+        type: number
       outPoints:
         items:
           items:
@@ -291,9 +300,9 @@ definitions:
       type:
         type: string
       x:
-        type: integer
+        type: number
       "y":
-        type: integer
+        type: number
     type: object
   app.G6Point:
     properties:
@@ -310,41 +319,20 @@ definitions:
         type: string
       cnName:
         type: string
-      color:
-        type: string
       createAt:
         $ref: '#/definitions/gtime.GTime'
         type: object
       id:
         type: integer
-      image:
-        type: string
-      inPoints:
-        type: string
-      isDoingEnd:
-        type: boolean
-      isDoingStart:
-        type: boolean
-      label:
-        type: string
       name:
-        type: string
-      outPoints:
         type: string
       remark:
         type: string
-      shape:
-        type: string
-      size:
-        type: string
-      stateImage:
-        type: string
       type:
+        description: |-
+          Label        string      `json:"label" gorm:"column:label;type:string;size:128;comment:画布上的展现文字"`
+          Size         string      `json:"size" gorm:"column:size;type:string;size:64;comment:大小，譬如170*34"`
         type: string
-      x:
-        type: integer
-      "y":
-        type: integer
     type: object
   app.TagCategory:
     properties:
@@ -1267,6 +1255,178 @@ definitions:
         type: integer
       hostID:
         type: integer
+    type: object
+  pub.APIGetPubListInputs:
+    properties:
+      limit:
+        type: integer
+      order:
+        type: string
+      orderBy:
+        type: string
+      page:
+        type: integer
+    type: object
+  pub.APIGetPubListOutputs:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/pub.Pub'
+        type: array
+      totalCount:
+        type: integer
+    type: object
+  pub.APIPostPubUpdateInputs:
+    properties:
+      appAssemblyTestCase:
+        type: string
+      appAssemblyTestDesign:
+        type: string
+      appAssemblyTestReport:
+        type: string
+      appDesign:
+        type: string
+      codeReview:
+        type: string
+      deployUnitID:
+        type: integer
+      deployUnitName:
+        type: string
+      id:
+        type: integer
+      pubContent:
+        type: string
+      pubControlTable:
+        type: string
+      pubShellReview:
+        type: string
+      pubStep:
+        type: string
+      requirement:
+        type: string
+      rollbackStep:
+        type: string
+      trialOperationCase:
+        type: string
+      trialOperationDesign:
+        type: string
+      userTestCase:
+        type: string
+      userTestReport:
+        type: string
+      versionDate:
+        $ref: '#/definitions/gtime.GTime'
+        type: object
+    type: object
+  pub.Pub:
+    properties:
+      appAssemblyTestCase:
+        type: string
+      appAssemblyTestDesign:
+        type: string
+      appAssemblyTestReport:
+        type: string
+      appDesign:
+        type: string
+      codeReview:
+        type: string
+      createAt:
+        $ref: '#/definitions/gtime.GTime'
+        type: object
+      creator:
+        type: string
+      deployUnitID:
+        type: integer
+      deployUnitName:
+        type: string
+      id:
+        type: integer
+      pubContent:
+        type: string
+      pubControlTable:
+        type: string
+      pubShellReview:
+        type: string
+      pubStep:
+        type: string
+      requirement:
+        type: string
+      rollbackStep:
+        type: string
+      trialOperationCase:
+        type: string
+      trialOperationDesign:
+        type: string
+      userTestCase:
+        type: string
+      userTestReport:
+        type: string
+      versionDate:
+        $ref: '#/definitions/gtime.GTime'
+        type: object
+    type: object
+  service.TagGraphNode:
+    properties:
+      UnTaggedHostsCount:
+        type: integer
+      UnTaggedPodsCount:
+        type: integer
+      categoryID:
+        type: integer
+      categoryName:
+        type: string
+      children:
+        items:
+          type: object
+        type: array
+      cnName:
+        type: string
+      createAt:
+        $ref: '#/definitions/gtime.GTime'
+        type: object
+      id:
+        type: integer
+      name:
+        type: string
+      next:
+        additionalProperties:
+          $ref: '#/definitions/service.TagGraphNode'
+        type: object
+      path:
+        description: 当前tag下关联的所有机器
+        items:
+          type: integer
+        type: array
+      relatedHosts:
+        items:
+          $ref: '#/definitions/node.Host'
+        type: array
+      relatedHostsCount:
+        type: integer
+      relatedPods:
+        description: 当前tag下关联的所有Pod
+        items:
+          $ref: '#/definitions/caas.Pod'
+        type: array
+      relatedPodsCount:
+        type: integer
+      remark:
+        type: string
+      type:
+        description: |-
+          Label        string      `json:"label" gorm:"column:label;type:string;size:128;comment:画布上的展现文字"`
+          Size         string      `json:"size" gorm:"column:size;type:string;size:64;comment:大小，譬如170*34"`
+        type: string
+      unTaggedHosts:
+        description: 当前tag下未关联到子tag的机器
+        items:
+          $ref: '#/definitions/node.Host'
+        type: array
+      unTaggedPods:
+        description: 当前tag下未关联到子tag的Pod
+        items:
+          $ref: '#/definitions/caas.Pod'
+        type: array
     type: object
   sys.APIGetMenuNavListOutputs:
     properties:
@@ -2723,6 +2883,94 @@ paths:
         "417":
           description: internal error
       summary: 更新权限接口
+  /api/v1/pub/create:
+    post:
+      parameters:
+      - description: 创建新发布单
+        in: body
+        name: APIPostPubUpdateInputs
+        required: true
+        schema:
+          $ref: '#/definitions/pub.APIPostPubUpdateInputs'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/pub.APIPostPubUpdateInputs'
+        "400":
+          description: bad arguments
+        "417":
+          description: internal error
+      summary: 创建新发布单
+  /api/v1/pub/info:
+    get:
+      parameters:
+      - description: 根据ID获取发布单详细信息
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/pub.Pub'
+        "400":
+          description: bad arguments
+        "417":
+          description: internal error
+      summary: 根据ID获取发布单详细信息
+  /api/v1/pub/list:
+    get:
+      parameters:
+      - in: query
+        name: limit
+        type: integer
+      - in: query
+        name: order
+        type: string
+      - in: query
+        name: orderBy
+        type: string
+      - in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/pub.APIGetPubListOutputs'
+        "400":
+          description: bad arguments
+        "417":
+          description: internal error
+      summary: 发布列表接口
+  /api/v1/pub/update:
+    put:
+      parameters:
+      - description: 更新发布单信息
+        in: formData
+        name: IP
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/pub.APIPostPubUpdateInputs'
+        "400":
+          description: bad arguments
+        "417":
+          description: internal error
+      summary: 更新发布单信息
   /api/v1/role/create:
     post:
       parameters:
@@ -2902,6 +3150,9 @@ paths:
       parameters:
       - in: query
         name: categoryID
+        type: string
+      - in: query
+        name: categoryName
         type: string
       - in: query
         name: limit
@@ -3213,7 +3464,7 @@ paths:
         "417":
           description: internal error
       summary: 更新模板信息
-  /api/v1/tree:
+  /api/v1/tree/children:
     get:
       parameters:
       - description: 根据ID获取host group树状信息
@@ -3332,7 +3583,7 @@ paths:
         "417":
           description: internal error
       summary: 更新用户信息
-  /api/v2/tree:
+  /api/v2/tree/children:
     get:
       parameters:
       - description: 根据tags获取tags下所有的机器
@@ -3352,24 +3603,48 @@ paths:
         "417":
           description: internal error
       summary: 根据tags获取tags下所有的机器
-  /api/v3/tree:
+  /api/v3/tree/children:
     get:
       parameters:
-      - description: 根据tags获取tags下所有的机器
-        in: query
-        name: id
-        required: true
-        type: integer
+      - in: query
+        items:
+          type: integer
+        name: tagIDs[]
+        type: array
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app.APIGetHostGroupTreeOutputs'
+            items:
+              type: object
+            type: array
         "400":
           description: bad arguments
         "417":
           description: internal error
       summary: V3版根据tags获取tags下所有的机器
+  /api/v3/tree/node:
+    get:
+      parameters:
+      - in: query
+        items:
+          type: integer
+        name: tagIDs[]
+        type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/service.TagGraphNode'
+            type: array
+        "400":
+          description: bad arguments
+        "417":
+          description: internal error
+      summary: V3版根据tags路径获取tag信息
 swagger: "2.0"

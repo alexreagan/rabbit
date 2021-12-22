@@ -34,7 +34,7 @@ func (t *templateService) Get(id int64) (*app.Template, error) {
 func (t *templateService) ValidTemplate() (*app.Template, error) {
 	tx := g.Con().Portal
 	template := app.Template{}
-	if dt := tx.Model(app.Template{}).Where("state = 'enable'").Find(&template); dt.Error != nil {
+	if dt := tx.Model(app.Template{}).Where("state = 'enable'").First(&template); dt.Error != nil {
 		return &template, dt.Error
 	}
 	return &template, nil
@@ -42,52 +42,36 @@ func (t *templateService) ValidTemplate() (*app.Template, error) {
 
 // 更新
 func (t *templateService) Updates(template *app.Template) error {
-	db := g.Con().Portal.Debug()
+	db := g.Con().Portal
 	if db = db.Model(app.Template{}).Where("id = ?", template.ID).Updates(template); db.Error != nil {
 		return db.Error
 	}
 	return nil
 }
 
-var globalTagTreeNode *TagGraphNode
+var globalTagGraphNodeV3 *TagGraphNode
 
-func (s *templateService) GlobalTagTreeNode() *TagGraphNode {
-	return globalTagTreeNode
+func (s *templateService) GlobalTagGraphNodeV3() *TagGraphNode {
+	return globalTagGraphNodeV3
 }
 
 // 创建树
-func (t *templateService) BuildTree(g6Graph *app.G6Graph) *TagGraphNode {
+func (t *templateService) BuildGraphV3(g6Graph *app.G6Graph) *TagGraphNode {
 	headMap := make(map[int64]*TagGraphNode)
 	nodeMap := make(map[int64]*TagGraphNode)
 
 	// tag路由图
-	globalTagGraphNode = newTagRouterGraphNode(&app.Tag{})
+	globalTagGraphNodeV3 = newTagGraphNode(&app.Tag{})
 
 	// 初始化
 	for _, n := range g6Graph.Nodes {
-		nSize, _ := json.Marshal(n.Size)
-		nInPoints, _ := json.Marshal(n.InPoints)
-		nOutPoints, _ := json.Marshal(n.OutPoints)
 		tag := &app.Tag{
-			ID:           n.ID,
-			Name:         n.Name,
-			CnName:       n.Label,
-			Label:        n.Label,
-			Size:         string(nSize),
-			Type:         n.Type,
-			Color:        n.Color,
-			Shape:        n.Shape,
-			Image:        n.Image,
-			StateImage:   n.StateImage,
-			X:            n.X,
-			Y:            n.Y,
-			InPoints:     string(nInPoints),
-			OutPoints:    string(nOutPoints),
-			IsDoingStart: false,
-			IsDoingEnd:   false,
+			ID:     n.ID,
+			Name:   n.Name,
+			CnName: n.Label,
 		}
-		nodeMap[n.ID] = newTagRouterGraphNode(tag)
-		headMap[n.ID] = newTagRouterGraphNode(tag)
+		nodeMap[n.ID] = newTagGraphNode(tag)
+		headMap[n.ID] = newTagGraphNode(tag)
 	}
 	// 组织树状结构
 	for _, edge := range g6Graph.Edges {
@@ -97,14 +81,32 @@ func (t *templateService) BuildTree(g6Graph *app.G6Graph) *TagGraphNode {
 		// 将尾节点删除，剩余的只有头节点的数据就是开始节点
 		delete(headMap, edge.TargetID)
 	}
+	// globalTagGraphNode初始节点赋值
 	for k, _ := range headMap {
-		globalTagGraphNode.Next[k] = nodeMap[k]
+		globalTagGraphNodeV3.Next[k] = nodeMap[k]
 	}
 
-	// 补充额外信息
-	calUnTaggedInformation(globalTagGraphNode)
+	// buildTaggedInformationV3
+	buildTaggedInformationV3(globalTagGraphNodeV3.Path, globalTagGraphNodeV3)
 
-	return globalTagGraphNode
+	// 补充额外信息
+	buildUnTaggedInformation(globalTagGraphNodeV3)
+
+	// 补充children信息
+	buildChildrenInformation(globalTagGraphNodeV3)
+
+	return globalTagGraphNodeV3
+}
+
+func buildTaggedInformationV3(nodePath []int64, node *TagGraphNode) {
+	for _, tag := range node.Next {
+		node.Next[tag.ID].Path = append(nodePath, tag.ID)
+		node.Next[tag.ID].RelatedHosts = HostService.HostsHavingTagIDs(node.Next[tag.ID].Path)
+		node.Next[tag.ID].RelatedHostsCount = len(node.Next[tag.ID].RelatedHosts)
+		node.Next[tag.ID].RelatedPods = CaasService.PodsHavingTagIDs(node.Next[tag.ID].Path)
+		node.Next[tag.ID].RelatedPodsCount = len(node.Next[tag.ID].RelatedPods)
+		buildTaggedInformationV3(node.Next[tag.ID].Path, tag)
+	}
 }
 
 func newTemplateService() *templateService {

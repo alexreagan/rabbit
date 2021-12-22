@@ -25,19 +25,19 @@ type Tag struct {
 	CategoryName string      `json:"categoryName" gorm:"column:category_name;type:string;size:128;comment:类别名称"`
 	Remark       string      `json:"remark" gorm:"column:remark;type:string;size:1024;comment:描述"`
 	CreateAt     gtime.GTime `json:"createAt" gorm:"column:create_at;comment:创建时间"`
-	Label        string      `json:"label" gorm:"column:label;type:string;size:128;comment:画布上的展现文字"`
-	Size         string      `json:"size" gorm:"column:size;type:string;size:64;comment:大小，譬如170*34"`
-	Type         string      `json:"type" gorm:"column:type;type:string;size:64;default:node;comment:类型"`
-	Color        string      `json:"color" gorm:"column:color;type:string;size:64;default:#1890ff;comment:颜色"`
-	Shape        string      `json:"shape" gorm:"column:shape;type:string;size:256;default:customNode;comment:形状"`
-	Image        string      `json:"image" gorm:"column:image;type:varchar(512);comment:背景图片url地址"`
-	StateImage   string      `json:"stateImage" gorm:"column:state_image;type:varchar(512);comment:背景图片url地址"`
-	X            float64     `json:"x" gorm:"column:x;default:0;comment:"`
-	Y            float64     `json:"y" gorm:"column:y;default:0;comment:"`
-	InPoints     string      `json:"inPoints" gorm:"column:in_points;comment:"`
-	OutPoints    string      `json:"outPoints" gorm:"column:out_points;comment:"`
-	IsDoingStart bool        `json:"isDoingStart" gorm:"column:is_doing_start;default:false;comment:是否是开始节点"`
-	IsDoingEnd   bool        `json:"isDoingEnd" gorm:"column:is_doing_end;default:false;comment:是否是结束节点"`
+	//Label        string      `json:"label" gorm:"column:label;type:string;size:128;comment:画布上的展现文字"`
+	//Size         string      `json:"size" gorm:"column:size;type:string;size:64;comment:大小，譬如170*34"`
+	Type string `json:"type" gorm:"column:type;type:string;size:64;default:node;comment:类型"`
+	//Color        string      `json:"color" gorm:"column:color;type:string;size:64;default:#1890ff;comment:颜色"`
+	//Shape        string      `json:"shape" gorm:"column:shape;type:string;size:256;default:customNode;comment:形状"`
+	//Image        string      `json:"image" gorm:"column:image;type:varchar(512);comment:背景图片url地址"`
+	//StateImage   string      `json:"stateImage" gorm:"column:state_image;type:varchar(512);comment:背景图片url地址"`
+	//X            float64     `json:"x" gorm:"column:x;default:0;comment:"`
+	//Y            float64     `json:"y" gorm:"column:y;default:0;comment:"`
+	//InPoints     string      `json:"inPoints" gorm:"column:in_points;comment:"`
+	//OutPoints    string      `json:"outPoints" gorm:"column:out_points;comment:"`
+	//IsDoingStart bool        `json:"isDoingStart" gorm:"column:is_doing_start;default:false;comment:是否是开始节点"`
+	//IsDoingEnd   bool        `json:"isDoingEnd" gorm:"column:is_doing_end;default:false;comment:是否是结束节点"`
 }
 
 func (t Tag) TableName() string {
