@@ -13,5 +13,5 @@ func init() {
 
 func TestBuildTree(t *testing.T) {
 	tree := Menu{}.BuildTree()
-	log.Printf("[BuildGraphV3] BuildGraphV3: %+v", tree)
+	log.Printf("[BuildTemplateGraph] BuildTemplateGraph: %+v", tree)
 }

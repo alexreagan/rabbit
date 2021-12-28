@@ -95,7 +95,7 @@ func TreeChildren(c *gin.Context) {
 // @Failure 417 "internal error"
 // @Router /api/v1/tree/rebuild [get]
 func TreeRebuild(c *gin.Context) {
-	resp := service.TagService.ReBuildGraph()
+	resp := service.TagService.ReBuildGraphV2()
 	h.JSONR(c, http.StatusOK, resp)
 	return
 }
@@ -184,7 +184,7 @@ func TreeRebuild(c *gin.Context) {
 //
 //	db := g.Con().Portal.Table(node.HostGroup{}.TableName())
 //	db.Where(node.HostGroup{Tag: inputs.ID}).Updates(node.HostGroup{ParentID: inputs.ParentID})
-//	node.HostGroup{}.ReBuildGraph()
+//	node.HostGroup{}.ReBuildGraphV2()
 //
 //	h.JSONR(c, http.StatusOK, "ok")
 //	return

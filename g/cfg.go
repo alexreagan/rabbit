@@ -69,7 +69,7 @@ func ParseConfig(cfg string) {
 	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
 	pflag.Parse()
 	if err := viper.BindPFlags(pflag.CommandLine); err != nil {
-		log.Println(err)
+		log.Infoln(err)
 		flag.Usage()
 		return
 	}
@@ -78,11 +78,11 @@ func ParseConfig(cfg string) {
 	viper.SetConfigFile(cfg)
 	viper.WatchConfig()
 	viper.OnConfigChange(func(e fsnotify.Event) {
-		log.Println("config changed：", e.Name)
+		log.Infoln("config changed：", e.Name)
 	})
 
 	if err := viper.ReadInConfig(); err != nil {
-		log.Println(err)
+		log.Errorln(err)
 		flag.Usage()
 		return
 	}
@@ -90,5 +90,5 @@ func ParseConfig(cfg string) {
 	lock.Lock()
 	defer lock.Unlock()
 
-	log.Println("read config file:", cfg, "successfully")
+	log.Infoln("read config file:", cfg, "successfully")
 }

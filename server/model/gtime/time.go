@@ -8,6 +8,7 @@ import (
 
 const timeFormat = "2006-01-02 15:04:05"
 const timeFormatLocal = "2006-01-02T15:04:05+08:00"
+const zTimeFormat = "2006-01-02T15:04:05Z"
 
 type GTime struct {
 	time.Time
@@ -43,8 +44,14 @@ func (t *GTime) UnmarshalJSON(data []byte) error {
 	tm, err := time.ParseInLocation(timeFormat, string(data[1:len(data)-1]), time.Local)
 	if err != nil {
 		tm, err = time.ParseInLocation(timeFormatLocal, string(data[1:len(data)-1]), time.Local)
-		*t = NewGTime(tm)
-		return err
+		if err != nil {
+			tm, err = time.ParseInLocation(zTimeFormat, string(data[1:len(data)-1]), time.Local)
+			*t = NewGTime(tm)
+			return err
+		} else {
+			*t = NewGTime(tm)
+			return err
+		}
 	} else {
 		*t = NewGTime(tm)
 		return err

@@ -12,22 +12,18 @@ import (
 
 var treeRebuilderConfig *TreeReBuilderConfig
 
-type TreeReBuilderRebuildConfig struct {
+type TreeReBuilderConfig struct {
 	Enable   bool `json:"enable"`
 	Duration int  `json:"duration"`
 }
 
-type TreeReBuilderConfig struct {
-	Rebuild TreeReBuilderRebuildConfig `json:"rebuild"`
-}
-
 func initTreeReBuilderConfigFromDB() (*TreeReBuilderConfig, error) {
-	value, err := service.ParamService.Get("tree")
+	value, err := service.ParamService.Get("tree.rebuild")
 	if err != nil {
 		return nil, err
 	}
 	if value == "" {
-		return nil, errors.New("tree is empty")
+		return nil, errors.New("tree.rebuild is empty")
 	}
 	var config TreeReBuilderConfig
 	err = json.Unmarshal([]byte(value), &config)
@@ -45,9 +41,10 @@ func (s *TreeReBuilder) Ctx() context.Context {
 }
 
 func (s *TreeReBuilder) Close() {
-	log.Infof("closing...")
+	log.Infoln("[TreeReBuilder] closing...")
 	s.cancel()
 	s.wg.Wait()
+	log.Infoln("[TreeReBuilder] closed...")
 }
 
 func (s *TreeReBuilder) Start() {
@@ -60,7 +57,7 @@ func (s *TreeReBuilder) Start() {
 		log.Error(err)
 		return
 	}
-	if treeRebuilderConfig.Rebuild.Enable == false {
+	if treeRebuilderConfig.Enable == false {
 		return
 	}
 
@@ -72,25 +69,37 @@ func (s *TreeReBuilder) Start() {
 				log.Error(err)
 			}
 		}()
+		treeRebuilderConfig, err = initTreeReBuilderConfigFromDB()
+		if err != nil {
+			log.Error(err)
+			return
+		}
+		if treeRebuilderConfig.Enable == false {
+			return
+		}
 		s.StartReBuilder()
 		defer s.wg.Done()
 	}()
 }
 
 func (s *TreeReBuilder) StartReBuilder() {
-	log.Println("[TreeReBuilder] StartReBuilder...")
+	log.Infoln("[TreeReBuilder] StartReBuilder...")
 
 	// 时间定时器启动
 	//dur := viper.GetDuration("tree.rebuild.duration") * time.Second
-	dur := time.Duration(treeRebuilderConfig.Rebuild.Duration) * time.Second
+	dur := time.Duration(treeRebuilderConfig.Duration) * time.Second
 	ticker := time.NewTicker(dur)
 	for {
 		select {
 		case <-s.ctx.Done():
-			log.Println("ctx done")
+			log.Infoln("[TreeReBuilder] ctx done")
 			return
 		case <-ticker.C:
-			service.TagService.ReBuildGraph()
+			// ReBuildGraphV2
+			service.TagService.ReBuildGraphV2()
+
+			// build template graphs
+			service.TemplateService.BuildGraphs()
 		}
 	}
 }

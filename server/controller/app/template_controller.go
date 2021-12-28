@@ -26,6 +26,46 @@ type APIGetTemplateListOutputs struct {
 	TotalCount int64           `json:"totalCount"`
 }
 
+// @Summary 展现模板所有数据
+// @Description
+// @Produce json
+// @Param APIGetTemplateListInputs query APIGetTemplateListInputs true "展现模板所有数据"
+// @Success 200 {object} APIGetTemplateListOutputs
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
+// @Router /api/v1/template/all [get]
+func TemplateAll(c *gin.Context) {
+	var inputs APIGetTemplateListInputs
+
+	if err := c.Bind(&inputs); err != nil {
+		h.JSONR(c, h.BadStatus, err)
+		return
+	}
+
+	var templates []*app.Template
+	var totalCount int64
+	db := g.Con().Portal.Debug().Model(app.Template{})
+	if inputs.Name != "" {
+		db = db.Where("`template`.`name` = ?", inputs.Name)
+	}
+	if inputs.Remark != "" {
+		db = db.Where("`template`.`remark` regexp ?", inputs.Remark)
+	}
+
+	db.Count(&totalCount)
+	if inputs.OrderBy != "" {
+		db = db.Order(utils.Camel2Case(inputs.OrderBy) + " " + inputs.Order)
+	}
+	db.Find(&templates)
+
+	resp := &APIGetTemplateListOutputs{
+		List:       templates,
+		TotalCount: totalCount,
+	}
+	h.JSONR(c, http.StatusOK, resp)
+	return
+}
+
 // @Summary 展现模板列表接口
 // @Description
 // @Produce json
@@ -215,100 +255,15 @@ func TemplateDesign(c *gin.Context) {
 		return
 	}
 
-	//// template edge
-	//var deletedTemplateEdges []*app.TemplateEdge
-	//dt := db.Model(app.TemplateEdge{}).Debug()
-	//dt = dt.Where("template = ?", inputs.ID)
-	//if dt = dt.Delete(&deletedTemplateEdges); dt.Error != nil {
-	//	dt.Rollback()
-	//	h.JSONR(c, h.ExpecStatus, dt.Error)
-	//	return
-	//}
-	//for _, edge := range inputs.Edges {
-	//	edgeEnd, _ := json.Marshal(edge.End)
-	//	edgeEndPoint, _ := json.Marshal(edge.EndPoint)
-	//	edgeStart, _ := json.Marshal(edge.Start)
-	//	edgeStartPoint, _ := json.Marshal(edge.StartPoint)
-	//	if dt = db.Model(app.TemplateEdge{}).Create(&app.TemplateEdge{
-	//		Template:   inputs.ID,
-	//		End:        string(edgeEnd),
-	//		EndPoint:   string(edgeEndPoint),
-	//		G6Edge:       edge.ID,
-	//		Shape:      edge.Shape,
-	//		Source:     edge.Source,
-	//		SourceID:   edge.SourceID,
-	//		Start:      string(edgeStart),
-	//		StartPoint: string(edgeStartPoint),
-	//		Target:     edge.Target,
-	//		TargetID:   edge.TargetID,
-	//		Type:       edge.Type,
-	//	}); dt.Error != nil {
-	//		dt.Rollback()
-	//		h.JSONR(c, h.ExpecStatus, dt.Error)
-	//		return
-	//	}
-	//}
-	//
-	//// template node
-	//var deletedTemplateNodes []*app.TemplateNode
-	//dt = db.Model(app.TemplateNode{})
-	//dt = dt.Where("template = ?", inputs.ID)
-	//if dt = dt.Delete(&deletedTemplateNodes); dt.Error != nil {
-	//	dt.Rollback()
-	//	h.JSONR(c, h.ExpecStatus, dt.Error)
-	//	return
-	//}
-	//for _, node := range inputs.Nodes {
-	//	nodeSize, _ := json.Marshal(node.Size)
-	//	nodeInPoints, _ := json.Marshal(node.InPoints)
-	//	nodeOutPoints, _ := json.Marshal(node.OutPoints)
-	//	if dt = db.Model(app.TemplateNode{}).Create(&app.TemplateNode{
-	//		Template:   inputs.ID,
-	//		ID:         node.ID,
-	//		Name:       node.Name,
-	//		Label:      node.Label,
-	//		Size:       string(nodeSize),
-	//		Type:       node.Type,
-	//		X:          node.X,
-	//		Y:          node.Y,
-	//		Shape:      node.Shape,
-	//		Color:      node.Color,
-	//		Image:      node.Image,
-	//		StateImage: node.StateImage,
-	//		OffsetX:    node.OffsetX,
-	//		OffsetY:    node.OffsetY,
-	//		InPoints:   string(nodeInPoints),
-	//		OutPoints:  string(nodeOutPoints),
-	//	}); dt.Error != nil {
-	//		dt.Rollback()
-	//		h.JSONR(c, h.ExpecStatus, dt.Error)
-	//		return
-	//	}
-	//}
-	//
-	//// template group
-	//var deletedTemplateGroups []*app.TemplateGroup
-	//dt = db.Model(app.TemplateGroup{})
-	//dt = dt.Where("template = ?", inputs.ID)
-	//if dt = dt.Delete(&deletedTemplateGroups); dt.Error != nil {
-	//	dt.Rollback()
-	//	h.JSONR(c, h.ExpecStatus, dt.Error)
-	//	return
-	//}
-	//for _, grp := range inputs.Groups {
-	//	if dt = db.Model(app.TemplateGroup{}).Create(grp); dt.Error != nil {
-	//		dt.Rollback()
-	//		h.JSONR(c, h.ExpecStatus, dt.Error)
-	//		return
-	//	}
-	//}
-
+	// 更新graph
+	service.TemplateService.BuildTemplateGraph(template)
 	h.JSONR(c, h.OKStatus, template)
 	return
 }
 
 type APIGetV3TreeInputs struct {
-	TagIDs []int64 `json:"tagIDs[]" form:"tagIDs[]"`
+	TemplateID int64   `json:"templateID" form:"templateID"`
+	TagIDs     []int64 `json:"tagIDs[]" form:"tagIDs[]"`
 }
 
 // @Summary V3版根据tags路径获取tag信息
@@ -327,22 +282,35 @@ func V3TreeNode(c *gin.Context) {
 		return
 	}
 
-	globalTemplateGraphNode := service.TemplateService.GlobalTagGraphNodeV3()
-	if globalTemplateGraphNode == nil {
-		template, _ := service.TemplateService.ValidTemplate()
-		g6Graph, _ := service.TemplateService.UnSerialize(template.Content)
-		globalTemplateGraphNode = service.TemplateService.BuildGraphV3(g6Graph)
+	// get graph node
+	var template *app.Template
+	var graphNode *service.TagGraphNode
+	if inputs.TemplateID == 0 {
+		template, _ = service.TemplateService.ValidTemplate()
+	} else {
+		template, _ = service.TemplateService.Get(inputs.TemplateID)
+	}
+
+	templateGraphNodeMap := service.TemplateService.GlobalTemplateGraphMap()
+	if templateGraphNodeMap == nil {
+		graphNode = service.TemplateService.BuildTemplateGraph(template)
+	} else {
+		if _, ok := templateGraphNodeMap[inputs.TemplateID]; !ok {
+			graphNode = service.TemplateService.BuildTemplateGraph(template)
+		} else {
+			graphNode = templateGraphNodeMap[inputs.TemplateID]
+		}
 	}
 
 	// 根节点
 	if len(inputs.TagIDs) == 0 {
-		h.JSONR(c, http.StatusOK, globalTemplateGraphNode)
+		h.JSONR(c, http.StatusOK, graphNode)
 		return
 	}
 
 	// 其他节点
 	// 找到inputs的末级节点
-	graphNode := globalTemplateGraphNode
+	//graphNode := templateGraphNodeMap[inputs.TemplateID]
 	for _, id := range inputs.TagIDs {
 		graphNode = graphNode.Next[id]
 	}
@@ -366,47 +334,45 @@ func V3TreeChildren(c *gin.Context) {
 		return
 	}
 
-	globalTemplateGraphNode := service.TemplateService.GlobalTagGraphNodeV3()
-	if globalTemplateGraphNode == nil {
-		template, _ := service.TemplateService.ValidTemplate()
-		g6Graph, _ := service.TemplateService.UnSerialize(template.Content)
-		globalTemplateGraphNode = service.TemplateService.BuildGraphV3(g6Graph)
+	// get graph node
+	var template *app.Template
+	var graphNode *service.TagGraphNode
+	if inputs.TemplateID == 0 {
+		template, _ = service.TemplateService.ValidTemplate()
+	} else {
+		template, _ = service.TemplateService.Get(inputs.TemplateID)
 	}
+
+	templateGraphNodeMap := service.TemplateService.GlobalTemplateGraphMap()
+	if templateGraphNodeMap == nil {
+		graphNode = service.TemplateService.BuildTemplateGraph(template)
+	} else {
+		if _, ok := templateGraphNodeMap[inputs.TemplateID]; !ok {
+			graphNode = service.TemplateService.BuildTemplateGraph(template)
+		} else {
+			graphNode = templateGraphNodeMap[inputs.TemplateID]
+		}
+	}
+
+	//globalTemplateGraphNode := service.TemplateService.GlobalTemplateGraphMap()
+	//if globalTemplateGraphNode == nil {
+	//	template, _ := service.TemplateService.ValidTemplate()
+	//	globalTemplateGraphNode = service.TemplateService.BuildTemplateGraph(template)
+	//}
 
 	// 根节点
 	if len(inputs.TagIDs) == 0 {
-		var resp []*service.TagGraphNode
-		for _, n := range globalTemplateGraphNode.Nexts() {
-			resp = append(resp, n)
-		}
-		h.JSONR(c, http.StatusOK, resp)
+		h.JSONR(c, http.StatusOK, graphNode.Children)
 		return
 	}
 
 	// 其他节点
 	// 找到inputs的末级节点
-	graphNode := globalTemplateGraphNode
+	//graphNode := globalTemplateGraphNode
 	for _, id := range inputs.TagIDs {
 		graphNode = graphNode.Next[id]
 	}
 
-	// 末级节点的子节点
-	var resp []interface{}
-	// 子节点
-	for _, x := range graphNode.Nexts() {
-		resp = append(resp, x)
-	}
-
-	// 未打到子标签的host
-	for _, x := range graphNode.UnTaggedHosts {
-		resp = append(resp, x)
-	}
-
-	// 未打到子标签的pod
-	for _, x := range graphNode.UnTaggedPods {
-		resp = append(resp, x)
-	}
-
-	h.JSONR(c, h.OKStatus, resp)
+	h.JSONR(c, h.OKStatus, graphNode.Children)
 	return
 }

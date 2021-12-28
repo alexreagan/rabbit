@@ -22,7 +22,7 @@ import (
 )
 
 // @title rabbit
-// @description 一个简单的机器管理系统
+// @description 一个简单的运维系统
 func main() {
 
 	g.BinaryName = BinaryName
@@ -118,15 +118,15 @@ func main() {
 		syscall.SIGQUIT)
 	select {
 	case n := <-quit:
-		log.Printf("receive signal %v, closing", n)
+		log.Infof("receive signal %v, closing", n)
 	case <-kunyuanSyncer.Ctx().Done():
-		log.Println("kunyuanSyncer ctx done, closing")
+		log.Infoln("kunyuanSyncer ctx done, closing")
 	case <-caasSyncer.Ctx().Done():
-		log.Println("caasSyncer ctx done, closing")
+		log.Infoln("caasSyncer ctx done, closing")
 	case <-caasCleaner.Ctx().Done():
-		log.Println("caasCleaner ctx done, closing")
+		log.Infoln("caasCleaner ctx done, closing")
 	case <-treeReBuilder.Ctx().Done():
-		log.Println("treeReBuilder ctx done, closing")
+		log.Infoln("treeReBuilder ctx done, closing")
 	}
 	kunyuanSyncer.Close()
 	caasSyncer.Close()

@@ -5,7 +5,6 @@ import (
 	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"path"
 	"time"
 )
 
@@ -15,8 +14,7 @@ func InitLog() {
 	}
 
 	// set rotate log
-	logPath := viper.GetString("log.path")
-	logFile := path.Join(logPath, "stdout.log")
+	logFile:= viper.GetString("log.path")
 	rotateLog, _ := rotatelogs.New(
 		logFile+".%Y%m%d",
 		rotatelogs.WithLinkName(logFile),
@@ -30,7 +28,7 @@ func InitLog() {
 	log.SetFormatter(&nested.Formatter{
 		CallerFirst:     true,
 		HideKeys:        true,
-		TimestampFormat: "2006-01-02 15:03:04",
+		TimestampFormat: "2006-01-02 15:04:05",
 	})
 
 	// set log level

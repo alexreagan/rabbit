@@ -15,8 +15,8 @@
 package g
 
 import (
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"log"
 	"strings"
 	"time"
 
@@ -65,7 +65,7 @@ func formatRedisAddr(addrConfig string) (string, string) {
 func PingRedis(c redis.Conn, t time.Time) error {
 	_, err := c.Do("ping")
 	if err != nil {
-		log.Println("[ERROR] ping redis fail", err)
+		log.Infoln("[ERROR] ping redis fail", err)
 	}
 	return err
 }

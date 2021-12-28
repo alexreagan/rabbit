@@ -32,8 +32,11 @@ func (input APIGetTagListInputs) checkInputsContain() error {
 }
 
 type APIGetTagAllInputs struct {
-	OrderBy string `json:"orderBy" form:"orderBy"`
-	Order   string `json:"order" form:"order"`
+	Name         string `json:"name" form:"name"`
+	Remark       string `json:"remark" form:"remark"`
+	CategoryName string `json:"categoryName" form:"categoryName"`
+	OrderBy      string `json:"orderBy" form:"orderBy"`
+	Order        string `json:"order" form:"order"`
 }
 
 // @Summary 全部tag数据
@@ -54,12 +57,20 @@ func TagAll(c *gin.Context) {
 	var tags []*app.Tag
 	var totalCount int64
 	db := g.Con().Portal.Model(app.Tag{})
-	//db = db.Select("`tag`.*, `tag_category`.`name` as category_name")
-	//db = db.Joins("left join `tag_category` on `tag`.`category_id` = `tag_category`.`id`")
-	db = db.Order("`tag`.`name`")
+	if inputs.Name != "" {
+		db = db.Where("`tag`.`name` regexp ?", inputs.Name)
+	}
+	if inputs.CategoryName != "" {
+		db = db.Where("`tag`.`category_name` = ?", inputs.CategoryName)
+	}
+	if inputs.Remark != "" {
+		db = db.Where("`tag`.`remark` regexp ?", inputs.Remark)
+	}
 	db.Count(&totalCount)
 	if inputs.OrderBy != "" {
 		db = db.Order(utils.Camel2Case(inputs.OrderBy) + " " + inputs.Order)
+	} else {
+		db = db.Order("`tag`.`name`")
 	}
 	db.Find(&tags)
 
@@ -99,8 +110,6 @@ func TagList(c *gin.Context) {
 	var tags []*app.Tag
 	var totalCount int64
 	db := g.Con().Portal.Model(app.Tag{})
-	db = db.Select("`tag`.*, `tag_category`.`name` as category_name")
-	db = db.Joins("left join `tag_category` on `tag`.`category_id` = `tag_category`.`id`")
 	if inputs.Name != "" {
 		db = db.Where("`tag`.`name` regexp ?", inputs.Name)
 	}
@@ -108,7 +117,7 @@ func TagList(c *gin.Context) {
 		db = db.Where("`tag`.`category_id` = ?", inputs.CategoryID)
 	}
 	if inputs.CategoryName != "" {
-		db = db.Where("`tag_category`.`name` = ?", inputs.CategoryName)
+		db = db.Where("`tag`.`category_name` = ?", inputs.CategoryName)
 	}
 	if inputs.Remark != "" {
 		db = db.Where("`tag`.`remark` regexp ?", inputs.Remark)
@@ -117,6 +126,8 @@ func TagList(c *gin.Context) {
 	db.Count(&totalCount)
 	if inputs.OrderBy != "" {
 		db = db.Order(utils.Camel2Case(inputs.OrderBy) + " " + inputs.Order)
+	} else {
+		db = db.Order("`tag`.`name`")
 	}
 	db = db.Offset(offset).Limit(limit)
 	db.Find(&tags)

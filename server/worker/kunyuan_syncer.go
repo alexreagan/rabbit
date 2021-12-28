@@ -80,9 +80,10 @@ func (s *KunYuanSyncer) Ctx() context.Context {
 }
 
 func (s *KunYuanSyncer) Close() {
-	log.Infof("closing...")
+	log.Infoln("[KunYuanSyncer] closing...")
 	s.cancel()
 	s.wg.Wait()
+	log.Infoln("[KunYuanSyncer] closed...")
 }
 
 func (s *KunYuanSyncer) Start() {
@@ -136,7 +137,7 @@ func (s *KunYuanSyncer) Start() {
 }
 
 func (s *KunYuanSyncer) StartBaseSyncer() {
-	log.Println("StartBaseSyncer")
+	log.Infoln("StartBaseSyncer")
 	s.SyncBase()
 	//dur := viper.GetDuration("kunyuan.syncer.base.duration") * time.Second
 	dur := time.Duration(kunyuanConfig.Base.Duration) * time.Second
@@ -144,7 +145,7 @@ func (s *KunYuanSyncer) StartBaseSyncer() {
 	for {
 		select {
 		case <-s.ctx.Done():
-			log.Println("ctx done")
+			log.Infoln("[KunYuanSyncer] [BaseSyncer] ctx done")
 			return
 		case <-ticker.C:
 			s.SyncBase()
@@ -153,7 +154,7 @@ func (s *KunYuanSyncer) StartBaseSyncer() {
 }
 
 func (s *KunYuanSyncer) StartMonitorSyncer() {
-	log.Println("StartMonitorSyncer")
+	log.Infoln("StartMonitorSyncer")
 	s.SyncMonitor()
 	//dur := viper.GetDuration("kunyuan.syncer.monitor.duration") * time.Second
 	dur := time.Duration(kunyuanConfig.Monitor.Duration) * time.Second
@@ -161,7 +162,7 @@ func (s *KunYuanSyncer) StartMonitorSyncer() {
 	for {
 		select {
 		case <-s.ctx.Done():
-			log.Println("ctx done")
+			log.Infoln("[KunYuanSyncer] [MonitorSyncer] ctx done")
 			return
 		case <-ticker.C:
 			s.SyncMonitor()
@@ -170,7 +171,7 @@ func (s *KunYuanSyncer) StartMonitorSyncer() {
 }
 
 func (s *KunYuanSyncer) StartAlarmSyncer() {
-	log.Println("StartAlarmSyncer")
+	log.Infoln("StartAlarmSyncer")
 	s.SyncAlarm()
 	//dur := viper.GetDuration("kunyuan.syncer.alarm.duration") * time.Second
 	dur := time.Duration(kunyuanConfig.Alarm.Duration) * time.Second
@@ -178,7 +179,7 @@ func (s *KunYuanSyncer) StartAlarmSyncer() {
 	for {
 		select {
 		case <-s.ctx.Done():
-			log.Println("ctx done")
+			log.Infoln("[KunYuanSyncer] [AlarmSyncer] ctx done")
 			return
 		case <-ticker.C:
 			s.SyncAlarm()
@@ -285,7 +286,7 @@ type KunYuanLoginResult struct {
 }
 
 func (s *KunYuanSyncer) Login() (*KunYuanLoginResult, error) {
-	log.Println("Login...")
+	log.Infoln("Login...")
 	lr := &KunYuanLoginResult{}
 	//loginUrl := viper.GetString("kunyuan.syncer.login.url")
 	loginUrl := kunyuanConfig.Login.URL
@@ -345,7 +346,7 @@ func (s *KunYuanSyncer) GetKunyuanBaseResult(abbr string, page int, lr *KunYuanL
 }
 
 func (s *KunYuanSyncer) SyncBase() {
-	log.Println("SyncBase...")
+	log.Infoln("SyncBase...")
 	lr, err := s.Login()
 	if err != nil || lr.AccessToken == "" || lr.ExpiresIn <= 0 {
 		log.Errorln(err)
@@ -362,11 +363,8 @@ func (s *KunYuanSyncer) SyncBase() {
 				log.Errorln(err)
 				break
 			}
-			if syncerResult.Data.Current > syncerResult.Data.Pages {
-				break
-			}
-			page = syncerResult.Data.Current + 1
 
+			// 保存数据
 			db := g.Con().Portal
 			for _, record := range syncerResult.Data.Records {
 				vt, _ := time.ParseInLocation(tTimeFormat, record.DeployDate, time.Local)
@@ -410,6 +408,12 @@ func (s *KunYuanSyncer) SyncBase() {
 					}
 				}
 			}
+
+			// 跳出循环
+			if syncerResult.Data.Current >= syncerResult.Data.Pages {
+				break
+			}
+			page = syncerResult.Data.Current + 1
 
 			// sleep 1s
 			time.Sleep(time.Second)
@@ -529,7 +533,7 @@ func (s *KunYuanSyncer) GetKunyuanAlertResult(page int, lr *KunYuanLoginResult) 
 }
 
 func (s *KunYuanSyncer) SyncAlarm() {
-	log.Println("SyncAlarm...")
+	log.Infoln("SyncAlarm...")
 	lr, err := s.Login()
 	if err != nil || lr.AccessToken == "" || lr.ExpiresIn <= 0 {
 		log.Errorln(err)
@@ -543,10 +547,6 @@ func (s *KunYuanSyncer) SyncAlarm() {
 			log.Errorln(err)
 			break
 		}
-		if syncerResult.Data.Current > syncerResult.Data.Pages {
-			break
-		}
-		page = syncerResult.Data.Current + 1
 
 		db := g.Con().Portal
 		for _, record := range syncerResult.Data.Alerts {
@@ -582,13 +582,19 @@ func (s *KunYuanSyncer) SyncAlarm() {
 			}
 		}
 
+		// 跳出
+		if syncerResult.Data.Current >= syncerResult.Data.Pages {
+			break
+		}
+		page = syncerResult.Data.Current + 1
+
 		// sleep 1s
 		time.Sleep(time.Second)
 	}
 }
 
 func (s *KunYuanSyncer) SyncMonitor() {
-	log.Println("SyncMonitor...")
+	log.Infoln("SyncMonitor...")
 	lr, err := s.Login()
 	if err != nil || lr.AccessToken == "" || lr.ExpiresIn <= 0 {
 		log.Errorln(err)
@@ -605,10 +611,6 @@ func (s *KunYuanSyncer) SyncMonitor() {
 				log.Errorln(err)
 				break
 			}
-			if syncerResult.Data.Current > syncerResult.Data.Pages {
-				break
-			}
-			page = syncerResult.Data.Current + 1
 
 			db := g.Con().Portal
 			for _, record := range syncerResult.Data.Servers {
@@ -673,6 +675,12 @@ func (s *KunYuanSyncer) SyncMonitor() {
 					}
 				}
 			}
+
+			// 跳出
+			if syncerResult.Data.Current >= syncerResult.Data.Pages {
+				break
+			}
+			page = syncerResult.Data.Current + 1
 
 			// sleep 1s
 			time.Sleep(time.Second)

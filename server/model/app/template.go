@@ -10,7 +10,7 @@ type Template struct {
 	Type     string      `json:"type" gorm:"column:type;type:enum('tree');default:'tree';comment:模板类型"`
 	Remark   string      `json:"remark" gorm:"column:remark;type:text;comment:模板描述"`
 	State    string      `json:"state" gorm:"column:state;type:enum('enable','disable');default:disable;comment:模板状态，同一时刻最多只有一个template处于启用状态"`
-	Content  string      `json:"content" gorm:"column:content;type:text;comment:模板配置"`
+	Content  string      `json:"content" gorm:"column:content;type:longText;comment:模板配置"`
 	Creator  string      `json:"creator" gorm:"column:creator;type:string;size:64;comment:创建人"`
 	CreateAt gtime.GTime `json:"createAt" gorm:"column:create_at;comment:创建时间"`
 	UpdateAt gtime.GTime `json:"updateAt" gorm:"column:update_at;comment:更新时间"`

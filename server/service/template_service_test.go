@@ -16,8 +16,7 @@ func init() {
 
 func TestBuildTree(t *testing.T) {
 	template, _ := TemplateService.Get(1)
-	g6Graph, _ := TemplateService.UnSerialize(template.Content)
-	graph := TemplateService.BuildGraphV3(g6Graph)
+	graph := TemplateService.BuildTemplateGraph(template)
 	for _, node := range graph.Next {
 		log.Printf("%#v", node)
 	}

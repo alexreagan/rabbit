@@ -4,9 +4,12 @@ import (
 	"encoding/json"
 	"github.com/alexreagan/rabbit/g"
 	"github.com/alexreagan/rabbit/server/model/app"
+	"sync"
 )
 
-type templateService struct{}
+type templateService struct {
+	mu sync.Mutex
+}
 
 // 反序列化content为对象
 func (t *templateService) UnSerialize(c string) (*app.G6Graph, error) {
@@ -30,6 +33,31 @@ func (t *templateService) Get(id int64) (*app.Template, error) {
 	return &template, nil
 }
 
+func (t *templateService) All() ([]*app.Template, error) {
+	//var templates []*app.Template
+	//var totalCount int64
+	//db := g.Con().Portal.Debug().Model(app.Template{})
+	//if inputs.Name != "" {
+	//	db = db.Where("`template`.`name` = ?", inputs.Name)
+	//}
+	//if inputs.Remark != "" {
+	//	db = db.Where("`template`.`remark` regexp ?", inputs.Remark)
+	//}
+	//
+	//db.Count(&totalCount)
+	//if inputs.OrderBy != "" {
+	//	db = db.Order(utils.Camel2Case(inputs.OrderBy) + " " + inputs.Order)
+	//}
+	//db.Find(&templates)
+
+	tx := g.Con().Portal
+	var templates []*app.Template
+	if dt := tx.Model(app.Template{}).Find(&templates); dt.Error != nil {
+		return templates, dt.Error
+	}
+	return templates, nil
+}
+
 // 处于有效状态的template，有且只有一个
 func (t *templateService) ValidTemplate() (*app.Template, error) {
 	tx := g.Con().Portal
@@ -49,19 +77,39 @@ func (t *templateService) Updates(template *app.Template) error {
 	return nil
 }
 
-var globalTagGraphNodeV3 *TagGraphNode
+var globalTemplateGraphMap map[int64]*TagGraphNode
 
-func (s *templateService) GlobalTagGraphNodeV3() *TagGraphNode {
-	return globalTagGraphNodeV3
+func (s *templateService) GlobalTemplateGraphMap() map[int64]*TagGraphNode {
+	return globalTemplateGraphMap
 }
 
-// 创建树
-func (t *templateService) BuildGraphV3(g6Graph *app.G6Graph) *TagGraphNode {
+// 组建树
+func (t *templateService) BuildGraphs() map[int64]*TagGraphNode {
+	if globalTemplateGraphMap == nil {
+		globalTemplateGraphMap = make(map[int64]*TagGraphNode)
+	}
+
+	templates, _ := t.All()
+	for _, template := range templates {
+		globalTemplateGraphMap[template.ID] = t.BuildTemplateGraph(template)
+	}
+	return globalTemplateGraphMap
+}
+
+// 组建树结构
+func (t *templateService) BuildTemplateGraph(template *app.Template) *TagGraphNode {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+
+	// UnSerialize template content
+	g6Graph, _ := TemplateService.UnSerialize(template.Content)
+
+	// build graph
 	headMap := make(map[int64]*TagGraphNode)
 	nodeMap := make(map[int64]*TagGraphNode)
 
 	// tag路由图
-	globalTagGraphNodeV3 = newTagGraphNode(&app.Tag{})
+	tagGraphNode := newTagGraphNode(&app.Tag{})
 
 	// 初始化
 	for _, n := range g6Graph.Nodes {
@@ -83,19 +131,25 @@ func (t *templateService) BuildGraphV3(g6Graph *app.G6Graph) *TagGraphNode {
 	}
 	// globalTagGraphNode初始节点赋值
 	for k, _ := range headMap {
-		globalTagGraphNodeV3.Next[k] = nodeMap[k]
+		tagGraphNode.Next[k] = nodeMap[k]
 	}
 
 	// buildTaggedInformationV3
-	buildTaggedInformationV3(globalTagGraphNodeV3.Path, globalTagGraphNodeV3)
+	buildTaggedInformationV3(tagGraphNode.Path, tagGraphNode)
 
 	// 补充额外信息
-	buildUnTaggedInformation(globalTagGraphNodeV3)
+	buildUnTaggedInformation(tagGraphNode)
 
 	// 补充children信息
-	buildChildrenInformation(globalTagGraphNodeV3)
+	buildChildrenInformation(tagGraphNode)
 
-	return globalTagGraphNodeV3
+	// 保存到全局变量
+	if globalTemplateGraphMap == nil {
+		globalTemplateGraphMap = make(map[int64]*TagGraphNode)
+	}
+	globalTemplateGraphMap[template.ID] = tagGraphNode
+
+	return tagGraphNode
 }
 
 func buildTaggedInformationV3(nodePath []int64, node *TagGraphNode) {

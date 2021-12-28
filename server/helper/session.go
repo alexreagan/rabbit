@@ -73,15 +73,6 @@ func SessionChecking(c *gin.Context) (auth bool, err error) {
 		return
 	}
 
-	// 白名单
-	dt := g.Con().Portal
-	var userWhiteList uic.UserWhiteList
-	dt.Where("username = ?", websessio.Name).Find(&userWhiteList)
-	if userWhiteList.ID == 0 {
-		err = errors.New("not found this user")
-		return
-	}
-
 	var session uic.Session
 	db.Table(session.TableName()).Where("sig = ? and uid = ?", websessio.Sig, user.ID).Scan(&session)
 	if session.ID == 0 {

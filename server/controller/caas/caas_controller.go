@@ -413,7 +413,7 @@ func ServiceUpdate(c *gin.Context) {
 	tx.Commit()
 
 	// 重建tag图
-	service.TagService.ReBuildGraph()
+	service.TagService.ReBuildGraphV2()
 
 	h.JSONR(c, h.OKStatus, inputs)
 	return

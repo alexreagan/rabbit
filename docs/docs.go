@@ -2185,12 +2185,27 @@ var doc = `{
                 "parameters": [
                     {
                         "type": "string",
+                        "name": "categoryName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
                         "name": "order",
                         "in": "query"
                     },
                     {
                         "type": "string",
                         "name": "orderBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "remark",
                         "in": "query"
                     }
                 ],
@@ -3013,6 +3028,11 @@ var doc = `{
                         },
                         "name": "tagIDs[]",
                         "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "templateID",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -3047,6 +3067,11 @@ var doc = `{
                             "type": "integer"
                         },
                         "name": "tagIDs[]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "templateID",
                         "in": "query"
                     }
                 ],
@@ -3181,10 +3206,19 @@ var doc = `{
         "app.APIGetTagAllInputs": {
             "type": "object",
             "properties": {
+                "categoryName": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
                 "order": {
                     "type": "string"
                 },
                 "orderBy": {
+                    "type": "string"
+                },
+                "remark": {
                     "type": "string"
                 }
             }
@@ -3336,6 +3370,9 @@ var doc = `{
                     "items": {
                         "type": "integer"
                     }
+                },
+                "templateID": {
+                    "type": "integer"
                 }
             }
         },
@@ -5097,6 +5134,9 @@ var doc = `{
                 }
             }
         },
+        "service.TagGraphChildNode": {
+            "type": "object"
+        },
         "service.TagGraphNode": {
             "type": "object",
             "properties": {
@@ -5115,7 +5155,7 @@ var doc = `{
                 "children": {
                     "type": "array",
                     "items": {
-                        "type": "object"
+                        "$ref": "#/definitions/service.TagGraphChildNode"
                     }
                 },
                 "cnName": {
@@ -5287,18 +5327,15 @@ var doc = `{
                     "type": "string"
                 },
                 "list": {
-                    "description": "Open     string ` + "`" + `json:\"open\" gorm:\"column:open;type:string;size:128;comment:\"` + "`" + `",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/sys.Menu"
                     }
                 },
                 "menuId": {
-                    "description": "gorm.Model",
                     "type": "integer"
                 },
                 "name": {
-                    "description": "Type     int64  ` + "`" + `json:\"type\" gorm:\"column:type;comment:\"` + "`" + `",
                     "type": "string"
                 },
                 "orderNum": {
@@ -5654,7 +5691,7 @@ var SwaggerInfo = swaggerInfo{
 	BasePath:    "",
 	Schemes:     []string{},
 	Title:       "rabbit",
-	Description: "一个简单的机器管理系统",
+	Description: "一个简单的运维系统",
 }
 
 type s struct{}

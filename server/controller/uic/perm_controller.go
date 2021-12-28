@@ -7,7 +7,6 @@ import (
 	"github.com/alexreagan/rabbit/server/model/uic"
 	"github.com/alexreagan/rabbit/server/utils"
 	"github.com/gin-gonic/gin"
-	log "github.com/sirupsen/logrus"
 	"net/http"
 )
 
@@ -95,10 +94,6 @@ func PermCreate(c *gin.Context) {
 		h.JSONR(c, h.BadStatus, err)
 		return
 	}
-
-	log.Println("+++++++++")
-	log.Println(gtime.Now())
-	log.Println("+++++++++")
 
 	db := g.Con().Portal.Model(uic.Perm{})
 	perm := &uic.Perm{

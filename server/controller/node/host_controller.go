@@ -10,7 +10,6 @@ import (
 	"github.com/alexreagan/rabbit/server/service"
 	"github.com/alexreagan/rabbit/server/utils"
 	"github.com/gin-gonic/gin"
-	log "github.com/sirupsen/logrus"
 	"net/http"
 	"sort"
 	"strconv"
@@ -352,7 +351,7 @@ func HostUpdate(c *gin.Context) {
 	tx.Commit()
 
 	// 重建tag图
-	service.TagService.ReBuildGraph()
+	service.TagService.ReBuildGraphV2()
 
 	h.JSONR(c, h.OKStatus, inputs)
 	return
@@ -396,7 +395,6 @@ func HostBatchUpdate(c *gin.Context) {
 
 		for _, tagID := range inputs.TagIDs {
 			if dt = dt.Create(&node.HostTagRel{Host: id, Tag: tagID}); dt.Error != nil {
-				log.Printf("%+v", dt.Error)
 				h.JSONR(c, h.ExpecStatus, dt.Error)
 				dt.Rollback()
 				return

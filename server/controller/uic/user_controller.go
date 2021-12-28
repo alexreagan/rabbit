@@ -7,7 +7,6 @@ import (
 	"github.com/alexreagan/rabbit/server/model/uic"
 	"github.com/alexreagan/rabbit/server/utils"
 	"github.com/gin-gonic/gin"
-	log "github.com/sirupsen/logrus"
 	"net/http"
 	"time"
 )
@@ -128,7 +127,6 @@ func UserCreate(c *gin.Context) {
 		session.Uid = int64(user.ID)
 		db.Create(&session)
 	}
-	log.Debugf("%v", session)
 	response["sig"] = session.Sig
 	response["name"] = user.UserName
 	h.JSONR(c, http.StatusOK, response)

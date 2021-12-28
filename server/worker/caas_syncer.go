@@ -89,9 +89,10 @@ func (s *CaasSyncer) Ctx() context.Context {
 }
 
 func (s *CaasSyncer) Close() {
-	log.Infof("closing...")
+	log.Infoln("[CaasSyncer] closing...")
 	s.cancel()
 	s.wg.Wait()
+	log.Infoln("[CaasSyncer] closed...")
 }
 
 func (s *CaasSyncer) Start() {
@@ -109,7 +110,7 @@ func (s *CaasSyncer) Start() {
 }
 
 func (s *CaasSyncer) StartSyncer() {
-	log.Debugf("[CaasSyncer] StartSyncer...")
+	log.Infoln("[CaasSyncer] StartSyncer...")
 
 	//if viper.GetBool("caas.syncer.enable") == false {
 	//	return
@@ -135,7 +136,7 @@ func (s *CaasSyncer) StartSyncer() {
 	for {
 		select {
 		case <-s.ctx.Done():
-			log.Println("ctx done")
+			log.Infoln("[CaasSyncer] ctx done")
 			return
 		case <-ticker.C:
 			// load config
@@ -175,7 +176,6 @@ func (s *CaasSyncer) Sync() {
 	}
 
 	for _, ws := range wsResult.Data {
-		log.Debugf("%+v", ws)
 		// 更新数据库
 		UpdateWorkspace(&ws)
 

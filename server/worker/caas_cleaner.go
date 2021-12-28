@@ -41,9 +41,10 @@ func (s *CaasCleaner) Ctx() context.Context {
 }
 
 func (s *CaasCleaner) Close() {
-	log.Infof("closing...")
+	log.Infoln("[CaasCleaner] closing...")
 	s.cancel()
 	s.wg.Wait()
+	log.Infoln("[CaasCleaner] closed...")
 }
 
 func (s *CaasCleaner) Start() {
@@ -71,10 +72,10 @@ func (s *CaasCleaner) Clean() {
 }
 
 func (s *CaasCleaner) StartClean() {
-	log.Debugf("[CaasCleaner] StartClean...")
+	log.Infoln("[CaasCleaner] StartClean...")
 
-	// load config
 	var err error
+	// load config
 	caasCleanConfig, err = loadCaasCleanConfigFromDB()
 	if err != nil {
 		log.Error(err)
@@ -89,13 +90,13 @@ func (s *CaasCleaner) StartClean() {
 	// 清理定时器启动
 	//cleanDur := viper.GetDuration("caas.clean.duration") * time.Second
 	cleanDur := time.Duration(caasCleanConfig.Duration) * time.Second
-	cleanTicker := time.NewTicker(cleanDur)
+	ticker := time.NewTicker(cleanDur)
 	for {
 		select {
 		case <-s.ctx.Done():
-			log.Println("ctx done")
+			log.Infoln("[CaasCleaner] ctx done")
 			return
-		case <-cleanTicker.C:
+		case <-ticker.C:
 			// load config
 			caasCleanConfig, err = loadCaasCleanConfigFromDB()
 			if err != nil {

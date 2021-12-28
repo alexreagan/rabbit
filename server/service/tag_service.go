@@ -8,6 +8,8 @@ import (
 	"sort"
 )
 
+type TagGraphChildNode interface{}
+
 type TagGraphNode struct {
 	app.Tag
 	// 当前tag下关联的所有机器
@@ -21,10 +23,10 @@ type TagGraphNode struct {
 	RelatedPods      []*caas.Pod `json:"relatedPods"`
 	RelatedPodsCount int         `json:"relatedPodsCount"`
 	// 当前tag下未关联到子tag的Pod
-	UnTaggedPods      []*caas.Pod `json:"unTaggedPods"`
-	UnTaggedPodsCount int         `json:"UnTaggedPodsCount"`
-	Next              map[int64]*TagGraphNode
-	Children          []interface{} `json:"children"`
+	UnTaggedPods      []*caas.Pod             `json:"unTaggedPods"`
+	UnTaggedPodsCount int                     `json:"UnTaggedPodsCount"`
+	Next              map[int64]*TagGraphNode `json:"next"`
+	Children          []TagGraphChildNode     `json:"children"`
 }
 
 func (t *TagGraphNode) Nexts() []*TagGraphNode {
@@ -108,7 +110,7 @@ func BucketTags(categoryNames []string, tags []*app.Tag) [][]*app.Tag {
 	return bucketTags
 }
 
-func (s *tagService) ReBuildGraph() *TagGraphNode {
+func (s *tagService) ReBuildGraphV2() *TagGraphNode {
 	globalTagGraphNodeV2 = nil
 	return s.BuildGraphV2()
 }
@@ -184,8 +186,8 @@ func buildUnTaggedInformation(n *TagGraphNode) {
 }
 
 func buildChildrenInformation(n *TagGraphNode) {
-	children := make([]interface{}, 0, 0)
-	for _, nd := range n.Next {
+	children := make([]TagGraphChildNode, 0, 0)
+	for _, nd := range n.Nexts() {
 		children = append(children, app.Tag{
 			ID:           nd.ID,
 			Type:         "Children",

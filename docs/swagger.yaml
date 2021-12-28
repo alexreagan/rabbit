@@ -72,9 +72,15 @@ definitions:
     type: object
   app.APIGetTagAllInputs:
     properties:
+      categoryName:
+        type: string
+      name:
+        type: string
       order:
         type: string
       orderBy:
+        type: string
+      remark:
         type: string
     type: object
   app.APIGetTagCategoryListInputs:
@@ -173,6 +179,8 @@ definitions:
         items:
           type: integer
         type: array
+      templateID:
+        type: integer
     type: object
   app.APIPostTagCategoryCreateInputs:
     properties:
@@ -1365,6 +1373,8 @@ definitions:
         $ref: '#/definitions/gtime.GTime'
         type: object
     type: object
+  service.TagGraphChildNode:
+    type: object
   service.TagGraphNode:
     properties:
       UnTaggedHostsCount:
@@ -1377,7 +1387,7 @@ definitions:
         type: string
       children:
         items:
-          type: object
+          $ref: '#/definitions/service.TagGraphChildNode'
         type: array
       cnName:
         type: string
@@ -1494,15 +1504,12 @@ definitions:
       icon:
         type: string
       list:
-        description: Open     string `json:"open" gorm:"column:open;type:string;size:128;comment:"`
         items:
           $ref: '#/definitions/sys.Menu'
         type: array
       menuId:
-        description: gorm.Model
         type: integer
       name:
-        description: Type     int64  `json:"type" gorm:"column:type;comment:"`
         type: string
       orderNum:
         type: integer
@@ -1726,7 +1733,7 @@ definitions:
     type: object
 info:
   contact: {}
-  description: 一个简单的机器管理系统
+  description: 一个简单的运维系统
   license: {}
   title: rabbit
 paths:
@@ -3089,10 +3096,19 @@ paths:
     get:
       parameters:
       - in: query
+        name: categoryName
+        type: string
+      - in: query
+        name: name
+        type: string
+      - in: query
         name: order
         type: string
       - in: query
         name: orderBy
+        type: string
+      - in: query
+        name: remark
         type: string
       produces:
       - application/json
@@ -3611,6 +3627,9 @@ paths:
           type: integer
         name: tagIDs[]
         type: array
+      - in: query
+        name: templateID
+        type: integer
       produces:
       - application/json
       responses:
@@ -3633,6 +3652,9 @@ paths:
           type: integer
         name: tagIDs[]
         type: array
+      - in: query
+        name: templateID
+        type: integer
       produces:
       - application/json
       responses:

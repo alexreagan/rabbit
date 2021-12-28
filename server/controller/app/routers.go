@@ -37,6 +37,7 @@ func Routes(r *gin.Engine) {
 
 	templateGroup := r.Group("/api/v1/template")
 	templateGroup.GET("/list", TemplateList)
+	templateGroup.GET("/all", TemplateAll)
 	templateGroup.GET("/info", TemplateInfo)
 	templateGroup.POST("/create", TemplateCreate)
 	templateGroup.PUT("/update", TemplateUpdate)
