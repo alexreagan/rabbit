@@ -34,22 +34,6 @@ func (t *templateService) Get(id int64) (*app.Template, error) {
 }
 
 func (t *templateService) All() ([]*app.Template, error) {
-	//var templates []*app.Template
-	//var totalCount int64
-	//db := g.Con().Portal.Debug().Model(app.Template{})
-	//if inputs.Name != "" {
-	//	db = db.Where("`template`.`name` = ?", inputs.Name)
-	//}
-	//if inputs.Remark != "" {
-	//	db = db.Where("`template`.`remark` regexp ?", inputs.Remark)
-	//}
-	//
-	//db.Count(&totalCount)
-	//if inputs.OrderBy != "" {
-	//	db = db.Order(utils.Camel2Case(inputs.OrderBy) + " " + inputs.Order)
-	//}
-	//db.Find(&templates)
-
 	tx := g.Con().Portal
 	var templates []*app.Template
 	if dt := tx.Model(app.Template{}).Find(&templates); dt.Error != nil {
@@ -113,6 +97,7 @@ func (t *templateService) BuildTemplateGraph(template *app.Template) *TagGraphNo
 
 	// 初始化
 	for _, n := range g6Graph.Nodes {
+		//nid, _ := strconv.ParseInt(n.ID, 10, 64)
 		tag := &app.Tag{
 			ID:     n.ID,
 			Name:   n.Name,
@@ -123,6 +108,8 @@ func (t *templateService) BuildTemplateGraph(template *app.Template) *TagGraphNo
 	}
 	// 组织树状结构
 	for _, edge := range g6Graph.Edges {
+		//edgeSourceID, _ := strconv.ParseInt(edge.SourceID, 10, 64)
+		//edgeTargetID, _ := strconv.ParseInt(edge.TargetID, 10, 64)
 		// 根据指向关系重建树
 		nodeMap[edge.SourceID].Next[edge.TargetID] = nodeMap[edge.TargetID]
 

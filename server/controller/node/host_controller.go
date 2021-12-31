@@ -32,7 +32,7 @@ type APIGetHostListInputs struct {
 	FsUsageLowerLimit     float64 `json:"fsUsageLowerLimit" form:"fsUsageLowerLimit"`
 	MemoryUsageUpperLimit float64 `json:"memoryUsageUpperLimit" form:"memoryUsageUpperLimit"`
 	MemoryUsageLowerLimit float64 `json:"memoryUsageLowerLimit" form:"memoryUsageLowerLimit"`
-	//G6Group                 string  `json:"group" form:"group"`
+	//G6Combos                 string  `json:"group" form:"group"`
 	//BoundGroup            string  `json:"boundGroup" form:"boundGroup"`
 	TagIDs     []int64 `json:"tagIDs[]" form:"tagIDs[]"`
 	RelatedTag string  `json:"relatedTag" form:"relatedTag"`
@@ -419,7 +419,7 @@ func HostInfo(c *gin.Context) {
 	id := c.Query("id")
 	host := node.Host{}
 	g.Con().Portal.Model(host).Where("id = ?", id).First(&host)
-	//host.Groups = host.RelatedGroups()
+	//host.Combos = host.RelatedGroups()
 	host.Tags = host.RelatedTags()
 	h.JSONR(c, host)
 	return

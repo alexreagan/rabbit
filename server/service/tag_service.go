@@ -18,13 +18,13 @@ type TagGraphNode struct {
 	RelatedHostsCount int          `json:"relatedHostsCount"`
 	// 当前tag下未关联到子tag的机器
 	UnTaggedHosts      []*node.Host `json:"unTaggedHosts"`
-	UnTaggedHostsCount int          `json:"UnTaggedHostsCount"`
+	UnTaggedHostsCount int          `json:"unTaggedHostsCount"`
 	// 当前tag下关联的所有Pod
 	RelatedPods      []*caas.Pod `json:"relatedPods"`
 	RelatedPodsCount int         `json:"relatedPodsCount"`
 	// 当前tag下未关联到子tag的Pod
 	UnTaggedPods      []*caas.Pod             `json:"unTaggedPods"`
-	UnTaggedPodsCount int                     `json:"UnTaggedPodsCount"`
+	UnTaggedPodsCount int                     `json:"unTaggedPodsCount"`
 	Next              map[int64]*TagGraphNode `json:"next"`
 	Children          []TagGraphChildNode     `json:"children"`
 }

@@ -42,4 +42,5 @@ func Routes(r *gin.Engine) {
 	templateGroup.POST("/create", TemplateCreate)
 	templateGroup.PUT("/update", TemplateUpdate)
 	templateGroup.POST("/design", TemplateDesign)
+	templateGroup.GET("/tags", TemplateTags)
 }

@@ -21,8 +21,7 @@ func Con() DBPool {
 }
 
 func InitDBPool() (err error) {
-	uicd, err := gorm.Open(gmysql.Open(viper.GetString("db.uic.dsn")), &gorm.Config{
-	})
+	uicd, err := gorm.Open(gmysql.Open(viper.GetString("db.uic.dsn")), &gorm.Config{})
 	if err != nil {
 		panic(err)
 		return

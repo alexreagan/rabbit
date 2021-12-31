@@ -39,12 +39,11 @@ type G6Edge struct {
 	Type       string  `json:"type" form:"type"`
 }
 
-type G6Group struct {
+type G6Combos struct {
 }
 
 type G6Node struct {
-	ID int64 `json:"id" form:"id"`
-	//TagID      int64       `json:"tagID" form:"tagID"`
+	ID         int64       `json:"id" form:"id"`
 	Name       string      `json:"name" form:"name"`
 	Label      string      `json:"label" form:"label"`
 	Size       []string    `json:"size" form:"size"`
@@ -62,9 +61,9 @@ type G6Node struct {
 }
 
 type G6Graph struct {
-	Edges  []*G6Edge  `json:"edges" form:"edges"`
-	Groups []*G6Group `json:"groups" form:"groups"`
-	Nodes  []*G6Node  `json:"nodes" form:"nodes"`
+	Edges  []*G6Edge   `json:"edges" form:"edges"`
+	Combos []*G6Combos `json:"combos" form:"combos"`
+	Nodes  []*G6Node   `json:"nodes" form:"nodes"`
 }
 
 //type TemplatePoint struct {

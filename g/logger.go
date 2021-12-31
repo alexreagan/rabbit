@@ -14,7 +14,7 @@ func InitLog() {
 	}
 
 	// set rotate log
-	logFile:= viper.GetString("log.path")
+	logFile := viper.GetString("log.path")
 	rotateLog, _ := rotatelogs.New(
 		logFile+".%Y%m%d",
 		rotatelogs.WithLinkName(logFile),

@@ -214,10 +214,10 @@ func TemplateUpdate(c *gin.Context) {
 }
 
 type APIPostTemplateDesignInputs struct {
-	ID     int64          `json:"id" form:"id"`
-	Edges  []*app.G6Edge  `json:"edges" form:"edges"`
-	Groups []*app.G6Group `json:"groups" form:"groups"`
-	Nodes  []*app.G6Node  `json:"nodes" form:"nodes"`
+	ID     int64           `json:"id" form:"id"`
+	Edges  []*app.G6Edge   `json:"edges" form:"edges"`
+	Nodes  []*app.G6Node   `json:"nodes" form:"nodes"`
+	Combos []*app.G6Combos `json:"combos" form:"combos"`
 }
 
 // @Summary 模板设计
@@ -240,7 +240,7 @@ func TemplateDesign(c *gin.Context) {
 	g6Graph := app.G6Graph{
 		Nodes:  inputs.Nodes,
 		Edges:  inputs.Edges,
-		Groups: inputs.Groups,
+		Combos: inputs.Combos,
 	}
 	byt, _ := service.TemplateService.Serialize(g6Graph)
 
