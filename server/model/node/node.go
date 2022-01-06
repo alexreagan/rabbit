@@ -7,12 +7,16 @@ import (
 	"time"
 )
 
-const HostStatusServicing = "servicing"
-const HostStatusOffLine = "offline"
+const NodeStatusServicing = "servicing"
+const NodeStatusOffLine = "offline"
 
-type Host struct {
+type Node struct {
 	ID                   int64        `json:"id" gorm:"primary_key;column:id"`
 	Name                 string       `json:"name" gorm:"column:name;type:string;size:128;comment:"`
+	Machine              string       `json:"machine" gorm:"column:machine;type:string;size:128;comment:"`
+	Release              string       `json:"release" gorm:"column:release;type:string;size:128;comment:"`
+	SysName              string       `json:"sysName" gorm:"column:sys_name;type:string;size:128;comment:"`
+	Version              string       `json:"version" gorm:"column:version;type:string;size:128;comment:"`
 	IP                   string       `json:"ip" gorm:"column:ip;type:string;size:128;comment:IP"`
 	PhysicalSystem       string       `json:"physicalSystem" gorm:"column:physical_system;type:string;size:128;comment:所属物理子系统"`
 	PhysicalSystemArea   string       `json:"physicalSystemArea" gorm:"column:physical_system_area;type:string;size:128;comment:所属物理子系统"`
@@ -58,18 +62,18 @@ type Host struct {
 	UpdateTime           time.Time    `json:"updateTime" gorm:"column:update_time;default:null;comment:"`
 	State                string       `json:"state" gorm:"column:state;type:enum('servicing','offline');default:servicing;comment:机器状态"`
 	Tags                 []*app.Tag   `json:"tags" gorm:"-"`
-	Groups               []*HostGroup `json:"groups" gorm:"-"`
+	Groups               []*NodeGroup `json:"groups" gorm:"-"`
 	IsWarning            bool         `json:"isWarning" gorm:"-"`
 	Type                 string       `json:"type" gorm:"-"`
 }
 
-func (this Host) TableName() string {
-	return "host"
+func (this Node) TableName() string {
+	return "node"
 }
 
-func (this Host) Existing() (int64, bool) {
-	db := g.Con().Portal
-	db.Table(this.TableName()).Where("name = ?", this.Name).Scan(&this)
+func (this Node) Existing() (int64, bool) {
+	tx := g.Con().Portal.Model(this)
+	tx.Where("name = ?", this.Name).Scan(&this)
 	if this.ID != 0 {
 		return this.ID, true
 	} else {
@@ -77,41 +81,41 @@ func (this Host) Existing() (int64, bool) {
 	}
 }
 
-func (this Host) RelatedGroups() []*HostGroup {
-	var hostGroupRels []*HostGroupRel
-	g.Con().Portal.Table(HostGroupRel{}.TableName()).Where("`host_id` = ?", this.ID).Find(&hostGroupRels)
+func (this Node) RelatedGroups() []*NodeGroup {
+	var nodeGroupRels []*NodeGroupRel
+	g.Con().Portal.Table(NodeGroupRel{}.TableName()).Where("`node_id` = ?", this.ID).Find(&nodeGroupRels)
 	var groupIDs []int64
-	for _, t := range hostGroupRels {
+	for _, t := range nodeGroupRels {
 		groupIDs = append(groupIDs, t.GroupID)
 	}
-	var hostGroups []*HostGroup
-	g.Con().Portal.Table(HostGroup{}.TableName()).Where("id in (?)", groupIDs).Find(&hostGroups)
-	return hostGroups
+	var nodeGroups []*NodeGroup
+	g.Con().Portal.Table(NodeGroup{}.TableName()).Where("id in (?)", groupIDs).Find(&nodeGroups)
+	return nodeGroups
 }
 
-func (this Host) RelatedTags() []*app.Tag {
+func (this Node) RelatedTags() []*app.Tag {
 	var tags []*app.Tag
-	db := g.Con().Portal.Model(app.Tag{}).Debug()
-	db = db.Select("`tag`.*, `tag_category`.name as category_name")
-	db = db.Joins("left join `host_tag_rel` on `host_tag_rel`.tag = `tag`.id")
-	db = db.Joins("left join `tag_category` on `tag_category`.id = `tag`.category_id")
-	db = db.Where("`host_tag_rel`.host = ?", this.ID)
-	db.Find(&tags)
+	tx := g.Con().Portal.Model(app.Tag{}).Debug()
+	tx = tx.Select("`tag`.*, `tag_category`.name as category_name")
+	tx = tx.Joins("left join `node_tag_rel` on `node_tag_rel`.tag = `tag`.id")
+	tx = tx.Joins("left join `tag_category` on `tag_category`.id = `tag`.category_id")
+	tx = tx.Where("`node_tag_rel`.node = ?", this.ID)
+	tx.Find(&tags)
 	return tags
 }
 
-type Hosts []*Host
+type Nodes []*Node
 
-func (t Hosts) Len() int { return len(t) }
+func (t Nodes) Len() int { return len(t) }
 
-func (t Hosts) Less(i, j int) bool {
+func (t Nodes) Less(i, j int) bool {
 	return t[i].Name < t[j].Name
 }
 
-func (t Hosts) Swap(i, j int) {
+func (t Nodes) Swap(i, j int) {
 	t[i], t[j] = t[j], t[i]
 }
 
-func (t Hosts) Sort() {
+func (t Nodes) Sort() {
 	sort.Sort(t)
 }

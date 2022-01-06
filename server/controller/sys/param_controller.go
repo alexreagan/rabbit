@@ -47,15 +47,15 @@ func ParamList(c *gin.Context) {
 
 	var params []*sys.Param
 	var totalCount int64
-	db := g.Con().Portal.Debug().Model(sys.Param{})
-	db = db.Where("deleted = ?", false)
+	tx := g.Con().Portal.Debug().Model(sys.Param{})
+	tx = tx.Where("deleted = ?", false)
 
-	db.Count(&totalCount)
+	tx.Count(&totalCount)
 	if inputs.OrderBy != "" {
-		db = db.Order(utils.Camel2Case(inputs.OrderBy) + " " + inputs.Order)
+		tx = tx.Order(utils.Camel2Case(inputs.OrderBy) + " " + inputs.Order)
 	}
-	db = db.Offset(offset).Limit(limit)
-	db.Find(&params)
+	tx = tx.Offset(offset).Limit(limit)
+	tx.Find(&params)
 
 	resp := &APIGetParamListOutputs{
 		List:       params,
@@ -81,8 +81,8 @@ func ParamInfo(c *gin.Context) {
 	}
 
 	var param *sys.Param
-	db := g.Con().Portal.Debug().Model(sys.Param{})
-	db.Where("id = ?", id).Find(&param)
+	tx := g.Con().Portal.Debug().Model(sys.Param{})
+	tx.Where("id = ?", id).Find(&param)
 
 	h.JSONR(c, http.StatusOK, param)
 	return
@@ -117,8 +117,8 @@ func ParamCreate(c *gin.Context) {
 		CreateAt: gtime.Now(),
 	}
 	tx := g.Con().Portal
-	if dt := tx.Model(sys.Param{}).Create(&param); dt.Error != nil {
-		h.JSONR(c, h.ExpecStatus, dt.Error)
+	if tx = tx.Model(sys.Param{}).Create(&param); tx.Error != nil {
+		h.JSONR(c, h.ExpecStatus, tx.Error)
 	}
 
 	h.JSONR(c, h.OKStatus, param)

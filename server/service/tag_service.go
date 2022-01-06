@@ -14,11 +14,11 @@ type TagGraphNode struct {
 	app.Tag
 	// 当前tag下关联的所有机器
 	Path              []int64      `json:"path"`
-	RelatedHosts      []*node.Host `json:"relatedHosts"`
-	RelatedHostsCount int          `json:"relatedHostsCount"`
+	RelatedNodes      []*node.Node `json:"relatedNodes"`
+	RelatedNodesCount int          `json:"relatedNodesCount"`
 	// 当前tag下未关联到子tag的机器
-	UnTaggedHosts      []*node.Host `json:"unTaggedHosts"`
-	UnTaggedHostsCount int          `json:"unTaggedHostsCount"`
+	UnTaggedNodes      []*node.Node `json:"unTaggedNodes"`
+	UnTaggedNodesCount int          `json:"unTaggedNodesCount"`
 	// 当前tag下关联的所有Pod
 	RelatedPods      []*caas.Pod `json:"relatedPods"`
 	RelatedPodsCount int         `json:"relatedPodsCount"`
@@ -26,7 +26,7 @@ type TagGraphNode struct {
 	UnTaggedPods      []*caas.Pod             `json:"unTaggedPods"`
 	UnTaggedPodsCount int                     `json:"unTaggedPodsCount"`
 	Next              map[int64]*TagGraphNode `json:"next"`
-	Children          []TagGraphChildNode     `json:"children"`
+	//Children          []TagGraphChildNode     `json:"children"`
 }
 
 func (t *TagGraphNode) Nexts() []*TagGraphNode {
@@ -72,20 +72,20 @@ func (s *tagService) GlobalTagGraphNodeV2() *TagGraphNode {
 
 func (s *tagService) Get(id int64) *app.Tag {
 	var tag app.Tag
-	db := g.Con().Portal.Model(tag)
-	db = db.Select("`tag`.*, `tag_category`.name as category_name")
-	db = db.Joins("left join `tag_category` on `tag_category`.id = `tag`.`category_id`")
-	db = db.Where("`tag`.id = ?", id)
-	db.Find(&tag)
+	tx := g.Con().Portal.Model(tag)
+	tx = tx.Select("`tag`.*, `tag_category`.name as category_name")
+	tx = tx.Joins("left join `tag_category` on `tag_category`.id = `tag`.`category_id`")
+	tx = tx.Where("`tag`.id = ?", id)
+	tx.Find(&tag)
 	return &tag
 }
 
 func (s *tagService) GetAll() []*app.Tag {
 	var tags []*app.Tag
-	db := g.Con().Portal.Model(app.Tag{})
-	db = db.Select("`tag`.*, `tag_category`.name as category_name")
-	db = db.Joins("left join `tag_category` on `tag_category`.id = `tag`.`category_id`")
-	db.Find(&tags)
+	tx := g.Con().Portal.Model(app.Tag{})
+	tx = tx.Select("`tag`.*, `tag_category`.name as category_name")
+	tx = tx.Joins("left join `tag_category` on `tag_category`.id = `tag`.`category_id`")
+	tx.Find(&tags)
 	return tags
 }
 
@@ -124,8 +124,8 @@ func buildTaggedInformationV2(bucketTags [][]*app.Tag, idx int, nodePath []int64
 		if _, ok := node.Next[tag.ID]; !ok {
 			node.Next[tag.ID] = newTagGraphNode(tag)
 			node.Next[tag.ID].Path = append(nodePath, tag.ID)
-			node.Next[tag.ID].RelatedHosts = HostService.HostsHavingTagIDs(node.Next[tag.ID].Path)
-			node.Next[tag.ID].RelatedHostsCount = len(node.Next[tag.ID].RelatedHosts)
+			node.Next[tag.ID].RelatedNodes = NodeService.NodesHavingTagIDs(node.Next[tag.ID].Path)
+			node.Next[tag.ID].RelatedNodesCount = len(node.Next[tag.ID].RelatedNodes)
 			node.Next[tag.ID].RelatedPods = CaasService.PodsHavingTagIDs(node.Next[tag.ID].Path)
 			node.Next[tag.ID].RelatedPodsCount = len(node.Next[tag.ID].RelatedPods)
 		}
@@ -135,29 +135,29 @@ func buildTaggedInformationV2(bucketTags [][]*app.Tag, idx int, nodePath []int64
 
 // 计算未打到子标签的机器信息
 func buildUnTaggedInformation(n *TagGraphNode) {
-	// 如果不存在next节点，说明不存在unTaggedHosts和unTaggedPods
+	// 如果不存在next节点，说明不存在unTaggedNodes和unTaggedPods
 	if n.Next == nil {
 		return
 	}
 
-	var unTaggedHosts node.Hosts
-	hostMap := make(map[int64]*node.Host)
+	var unTaggedNodes node.Nodes
+	nodeMap := make(map[int64]*node.Node)
 	for _, nd := range n.Next {
-		for _, host := range nd.RelatedHosts {
-			if _, ok := hostMap[host.ID]; !ok {
-				hostMap[host.ID] = host
+		for _, nod := range nd.RelatedNodes {
+			if _, ok := nodeMap[nod.ID]; !ok {
+				nodeMap[nod.ID] = nod
 			}
 		}
 	}
 
-	for _, host := range n.RelatedHosts {
-		if _, ok := hostMap[host.ID]; !ok {
-			unTaggedHosts = append(unTaggedHosts, host)
+	for _, n := range n.RelatedNodes {
+		if _, ok := nodeMap[n.ID]; !ok {
+			unTaggedNodes = append(unTaggedNodes, n)
 		}
 	}
-	unTaggedHosts.Sort()
-	n.UnTaggedHosts = unTaggedHosts
-	n.UnTaggedHostsCount = len(n.UnTaggedHosts)
+	unTaggedNodes.Sort()
+	n.UnTaggedNodes = unTaggedNodes
+	n.UnTaggedNodesCount = len(n.UnTaggedNodes)
 
 	// 子节点上所有的Pod
 	var unTaggedPods caas.Pods
@@ -185,7 +185,35 @@ func buildUnTaggedInformation(n *TagGraphNode) {
 	}
 }
 
-func buildChildrenInformation(n *TagGraphNode) {
+//func buildChildrenInformation(n *TagGraphNode) {
+//	children := make([]TagGraphChildNode, 0, 0)
+//	for _, nd := range n.Nexts() {
+//		children = append(children, app.Tag{
+//			ID:           nd.ID,
+//			Type:         "Children",
+//			Name:         nd.Name,
+//			CnName:       nd.CnName,
+//			CategoryID:   nd.CategoryID,
+//			CategoryName: nd.CategoryName,
+//			Remark:       nd.Remark,
+//		})
+//	}
+//	for _, nod := range n.UnTaggedNodes {
+//		nod.Type = "UnTaggedNode"
+//		children = append(children, nod)
+//	}
+//	for _, pod := range n.UnTaggedPods {
+//		pod.Type = "UnTaggedPod"
+//		children = append(children, pod)
+//	}
+//	n.Children = children
+//
+//	for _, nd := range n.Next {
+//		buildChildrenInformation(nd)
+//	}
+//}
+
+func BuildChildrenInformation(n *TagGraphNode) []TagGraphChildNode {
 	children := make([]TagGraphChildNode, 0, 0)
 	for _, nd := range n.Nexts() {
 		children = append(children, app.Tag{
@@ -198,32 +226,42 @@ func buildChildrenInformation(n *TagGraphNode) {
 			Remark:       nd.Remark,
 		})
 	}
-	for _, host := range n.UnTaggedHosts {
-		host.Type = "UnTaggedHost"
-		children = append(children, host)
+	if len(n.Nexts()) == 0 {
+		// 没有子节点
+		for _, n := range n.RelatedNodes {
+			n.Type = "RelatedNode"
+			children = append(children, n)
+		}
+		for _, pod := range n.RelatedPods {
+			pod.Type = "RelatedPod"
+			children = append(children, pod)
+		}
+	} else {
+		// 有子节点
+		for _, n := range n.UnTaggedNodes {
+			n.Type = "UnTaggedNode"
+			children = append(children, n)
+		}
+		for _, pod := range n.UnTaggedPods {
+			pod.Type = "UnTaggedPod"
+			children = append(children, pod)
+		}
 	}
-	for _, pod := range n.UnTaggedPods {
-		pod.Type = "UnTaggedPod"
-		children = append(children, pod)
-	}
-	n.Children = children
 
-	for _, nd := range n.Next {
-		buildChildrenInformation(nd)
-	}
+	return children
 }
 
-func (s *tagService) RelatedHosts(tag *app.Tag) []*node.Host {
-	var hosts []*node.Host
-	db := g.Con().Portal.Model(node.Host{}).Debug()
-	db = db.Select("distinct `host`.*")
-	db = db.Joins("left join `host_tag_rel` on `host_tag_rel`.host = `host`.id")
-	db = db.Where("`host_tag_rel`.tag = ?", tag.ID)
-	db.Find(&hosts)
-	return hosts
+func (s *tagService) RelatedHosts(tag *app.Tag) []*node.Node {
+	var nodes []*node.Node
+	tx := g.Con().Portal.Model(node.Node{})
+	tx = tx.Select("distinct `node`.*")
+	tx = tx.Joins("left join `node_tag_rel` on `node_tag_rel`.node = `node`.id")
+	tx = tx.Where("`node_tag_rel`.tag = ?", tag.ID)
+	tx.Find(&nodes)
+	return nodes
 }
 
-// 根据host上打的tag信息创建树
+// 根据node上打的tag信息创建树
 func (s *tagService) BuildGraphV2() *TagGraphNode {
 	if globalTagGraphNodeV2 != nil {
 		return globalTagGraphNodeV2
@@ -238,9 +276,9 @@ func (s *tagService) BuildGraphV2() *TagGraphNode {
 	// tag路由图
 	globalTagGraphNodeV2 = newTagGraphNode(&app.Tag{})
 
-	// 组织host tag路由图
-	for _, host := range HostService.GetAll() {
-		tags := host.RelatedTags()
+	// 组织node tag路由图
+	for _, n := range NodeService.GetAll() {
+		tags := n.RelatedTags()
 		bucketTags := BucketTags(categoryNames, tags)
 
 		buildTaggedInformationV2(bucketTags, 0, globalTagGraphNodeV2.Path, globalTagGraphNodeV2)
@@ -258,7 +296,7 @@ func (s *tagService) BuildGraphV2() *TagGraphNode {
 	buildUnTaggedInformation(globalTagGraphNodeV2)
 
 	// 补充children信息
-	buildChildrenInformation(globalTagGraphNodeV2)
+	//buildChildrenInformation(globalTagGraphNodeV2)
 
 	return globalTagGraphNodeV2
 }

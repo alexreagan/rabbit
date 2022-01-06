@@ -44,19 +44,19 @@ func TemplateAll(c *gin.Context) {
 
 	var templates []*app.Template
 	var totalCount int64
-	db := g.Con().Portal.Debug().Model(app.Template{})
+	tx := g.Con().Portal.Debug().Model(app.Template{})
 	if inputs.Name != "" {
-		db = db.Where("`template`.`name` = ?", inputs.Name)
+		tx = tx.Where("`template`.`name` = ?", inputs.Name)
 	}
 	if inputs.Remark != "" {
-		db = db.Where("`template`.`remark` regexp ?", inputs.Remark)
+		tx = tx.Where("`template`.`remark` regexp ?", inputs.Remark)
 	}
 
-	db.Count(&totalCount)
+	tx.Count(&totalCount)
 	if inputs.OrderBy != "" {
-		db = db.Order(utils.Camel2Case(inputs.OrderBy) + " " + inputs.Order)
+		tx = tx.Order(utils.Camel2Case(inputs.OrderBy) + " " + inputs.Order)
 	}
-	db.Find(&templates)
+	tx.Find(&templates)
 
 	resp := &APIGetTemplateListOutputs{
 		List:       templates,
@@ -89,20 +89,20 @@ func TemplateList(c *gin.Context) {
 
 	var templates []*app.Template
 	var totalCount int64
-	db := g.Con().Portal.Debug().Model(app.Template{})
+	tx := g.Con().Portal.Debug().Model(app.Template{})
 	if inputs.Name != "" {
-		db = db.Where("`template`.`name` = ?", inputs.Name)
+		tx = tx.Where("`template`.`name` = ?", inputs.Name)
 	}
 	if inputs.Remark != "" {
-		db = db.Where("`template`.`remark` regexp ?", inputs.Remark)
+		tx = tx.Where("`template`.`remark` regexp ?", inputs.Remark)
 	}
 
-	db.Count(&totalCount)
+	tx.Count(&totalCount)
 	if inputs.OrderBy != "" {
-		db = db.Order(utils.Camel2Case(inputs.OrderBy) + " " + inputs.Order)
+		tx = tx.Order(utils.Camel2Case(inputs.OrderBy) + " " + inputs.Order)
 	}
-	db = db.Offset(offset).Limit(limit)
-	db.Find(&templates)
+	tx = tx.Offset(offset).Limit(limit)
+	tx.Find(&templates)
 
 	resp := &APIGetTemplateListOutputs{
 		List:       templates,
@@ -164,8 +164,8 @@ func TemplateCreate(c *gin.Context) {
 		CreateAt: gtime.Now(),
 		UpdateAt: gtime.Now(),
 	}
-	if dt := tx.Model(app.Template{}).Create(&template); dt.Error != nil {
-		h.JSONR(c, h.ExpecStatus, dt.Error)
+	if tx = tx.Model(app.Template{}).Create(&template); tx.Error != nil {
+		h.JSONR(c, h.ExpecStatus, tx.Error)
 		return
 	}
 
@@ -354,25 +354,18 @@ func V3TreeChildren(c *gin.Context) {
 		}
 	}
 
-	//globalTemplateGraphNode := service.TemplateService.GlobalTemplateGraphMap()
-	//if globalTemplateGraphNode == nil {
-	//	template, _ := service.TemplateService.ValidTemplate()
-	//	globalTemplateGraphNode = service.TemplateService.BuildTemplateGraph(template)
-	//}
-
 	// 根节点
 	if len(inputs.TagIDs) == 0 {
-		h.JSONR(c, http.StatusOK, graphNode.Children)
+		h.JSONR(c, http.StatusOK, service.BuildChildrenInformation(graphNode))
 		return
 	}
 
 	// 其他节点
 	// 找到inputs的末级节点
-	//graphNode := globalTemplateGraphNode
 	for _, id := range inputs.TagIDs {
 		graphNode = graphNode.Next[id]
 	}
 
-	h.JSONR(c, h.OKStatus, graphNode.Children)
+	h.JSONR(c, h.OKStatus, service.BuildChildrenInformation(graphNode))
 	return
 }

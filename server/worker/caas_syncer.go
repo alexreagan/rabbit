@@ -313,13 +313,13 @@ func UpdateApp(app *App) {
 		UpdateTime:  gtime.Now(),
 	}
 
-	db := g.Con().Portal.Debug()
+	tx := g.Con().Portal
 	tapp := caas.App{}
-	db.Model(napp).Debug().Where(caas.App{ID: napp.ID}).First(&tapp)
+	tx.Model(napp).Where(caas.App{ID: napp.ID}).First(&tapp)
 	if tapp.ID == 0 {
-		db.Model(napp).Create(&napp)
+		tx.Model(napp).Create(&napp)
 	} else {
-		db.Model(napp).Updates(&napp)
+		tx.Model(napp).Updates(&napp)
 	}
 }
 
@@ -490,80 +490,80 @@ type CaasPodResult struct {
 func UpdateWorkspace(ws *caas.WorkSpace) {
 	ws.UpdateTime = gtime.NewGTime(time.Now())
 
-	db := g.Con().Portal.Debug()
+	tx := g.Con().Portal
 	t := caas.WorkSpace{}
-	db.Model(ws).Where(caas.WorkSpace{ID: ws.ID}).First(&t)
+	tx.Model(ws).Where(caas.WorkSpace{ID: ws.ID}).First(&t)
 	if t.ID == 0 {
-		db.Model(ws).Create(&ws)
+		tx.Model(ws).Create(&ws)
 	} else {
-		db.Model(ws).Where(caas.WorkSpace{ID: ws.ID}).Updates(&ws)
+		tx.Model(ws).Where(caas.WorkSpace{ID: ws.ID}).Updates(&ws)
 	}
 }
 
 func UpdateService(ser *caas.Service) {
 	ser.UpdateTime = gtime.Now()
 
-	db := g.Con().Portal.Debug()
+	tx := g.Con().Portal
 	tser := caas.Service{}
-	db.Model(ser).Debug().Where(caas.Service{Type: ser.Type, ServiceName: ser.ServiceName, AppID: ser.AppID}).First(&tser)
+	tx.Model(ser).Debug().Where(caas.Service{Type: ser.Type, ServiceName: ser.ServiceName, AppID: ser.AppID}).First(&tser)
 	if tser.ID == 0 {
-		db.Model(ser).Create(&ser)
+		tx.Model(ser).Create(&ser)
 	} else {
 		ser.ID = tser.ID
-		db.Model(ser).Updates(&ser)
+		tx.Model(ser).Updates(&ser)
 	}
 }
 
 func UpdateNamespace(ns *caas.NameSpace) {
 	ns.UpdateTime = gtime.NewGTime(time.Now())
 
-	db := g.Con().Portal.Debug()
+	tx := g.Con().Portal
 	n := caas.NameSpace{}
-	db.Model(ns).Where(caas.NameSpace{ID: ns.ID}).First(&n)
+	tx.Model(ns).Where(caas.NameSpace{ID: ns.ID}).First(&n)
 	if n.ID == 0 {
-		db.Model(ns).Create(&ns)
+		tx.Model(ns).Create(&ns)
 	} else {
-		db.Model(ns).Where(caas.NameSpace{ID: ns.ID}).Updates(&ns)
+		tx.Model(ns).Where(caas.NameSpace{ID: ns.ID}).Updates(&ns)
 	}
 }
 
 func UpdateServicePorts(ser *caas.Service) {
-	db := g.Con().Portal.Debug()
+	tx := g.Con().Portal
 
 	var ports []int64
 	for _, p := range ser.Ports {
 		p.UpdateTime = gtime.NewGTime(time.Now())
 
 		port := caas.Port{}
-		db.Model(port).Where(caas.Port{Host: p.Host}).First(&port)
+		tx.Model(port).Where(caas.Port{Host: p.Host}).First(&port)
 		if port.ID == 0 {
-			db.Model(port).Create(&p)
+			tx.Model(port).Create(&p)
 		} else {
 			p.ID = port.ID
-			db.Model(port).Updates(&p)
+			tx.Model(port).Updates(&p)
 		}
 		ports = append(ports, p.ID)
 	}
 	// service port rel
-	db.Model(caas.ServicePortRel{}).Debug().Where(&caas.ServicePortRel{Service: ser.ID}).Delete(&caas.ServicePortRel{})
+	tx.Model(caas.ServicePortRel{}).Where(&caas.ServicePortRel{Service: ser.ID}).Delete(&caas.ServicePortRel{})
 	for _, p := range RemoveRepeated(ports) {
-		db.Model(caas.ServicePortRel{}).Debug().Create(&caas.ServicePortRel{Service: ser.ID, Port: p})
+		tx.Model(caas.ServicePortRel{}).Create(&caas.ServicePortRel{Service: ser.ID, Port: p})
 	}
 }
 
 func UpdateNamespaceServiceRel(ns *caas.NameSpace, ser *caas.Service) {
-	db := g.Con().Portal.Debug()
+	tx := g.Con().Portal
 	rel := caas.NamespaceServiceRel{
 		NameSpace: ns.ID,
 		Service:   ser.ID,
 	}
 	if !rel.Existing() {
-		db.Model(rel).Create(&rel)
+		tx.Model(rel).Create(&rel)
 	}
 }
 
 func UpdatePods(ser *caas.Service, pods *CaasPodResult) {
-	db := g.Con().Portal.Debug()
+	tx := g.Con().Portal
 
 	// 更新数据库
 	var podIDs []int64
@@ -571,12 +571,12 @@ func UpdatePods(ser *caas.Service, pods *CaasPodResult) {
 		p.UpdateTime = gtime.NewGTime(time.Now())
 
 		pod := caas.Pod{}
-		db.Model(pod).Where(caas.Pod{Name: p.Name}).First(&pod)
+		tx.Model(pod).Where(caas.Pod{Name: p.Name}).First(&pod)
 		if pod.ID == 0 {
-			db.Model(pod).Create(&p)
+			tx.Model(pod).Create(&p)
 		} else {
 			p.ID = pod.ID
-			db.Model(pod).Updates(&p)
+			tx.Model(pod).Updates(&p)
 		}
 
 		podIDs = append(podIDs, p.ID)
@@ -584,9 +584,9 @@ func UpdatePods(ser *caas.Service, pods *CaasPodResult) {
 
 	// service pod rel
 	var rels []caas.ServicePodRel
-	db.Model(caas.ServicePodRel{}).Where(&caas.ServicePodRel{Service: ser.ID}).Delete(&rels)
+	tx.Model(caas.ServicePodRel{}).Where(&caas.ServicePodRel{Service: ser.ID}).Delete(&rels)
 	for _, p := range RemoveRepeated(podIDs) {
-		db.Model(caas.ServicePodRel{}).Create(&caas.ServicePodRel{Service: ser.ID, Pod: p})
+		tx.Model(caas.ServicePodRel{}).Create(&caas.ServicePodRel{Service: ser.ID, Pod: p})
 	}
 }
 

@@ -30,10 +30,10 @@ func (this Alarm) TableName() string {
 
 func (this Alarm) LatestRecords() []*Alarm {
 	var alarms []*Alarm
-	db := g.Con().Portal.Debug()
-	db = db.Model(Alarm{})
-	db = db.Select("`alarm`.*")
-	db = db.Joins("right join (select max(id) as id from alarm group by prod_ip) as tbl on alarm.id = tbl.id")
-	db = db.Find(&alarms)
+	tx := g.Con().Portal.Debug()
+	tx = tx.Model(Alarm{})
+	tx = tx.Select("`alarm`.*")
+	tx = tx.Joins("right join (select max(id) as id from alarm group by prod_ip) as tbl on alarm.id = tbl.id")
+	tx = tx.Find(&alarms)
 	return alarms
 }

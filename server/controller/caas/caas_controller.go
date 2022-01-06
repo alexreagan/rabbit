@@ -39,10 +39,10 @@ type CaasService struct {
 	caas.Service
 }
 
-// @Summary 更新host group信息
+// @Summary 获取caas service列表
 // @Description
 // @Produce json
-// @Param APIGetCaasServiceListInputs query APIGetCaasServiceListInputs true "更新host group信息"
+// @Param APIGetCaasServiceListInputs query APIGetCaasServiceListInputs true "获取caas service列表"
 // @Success 200 {object} APIGetCaasServiceListOutputs
 // @Failure 400 "bad arguments"
 // @Failure 417 "internal error"
@@ -62,15 +62,15 @@ func ServiceList(c *gin.Context) {
 	}
 	var services []*CaasService
 	var totalCount int64
-	db := g.Con().Portal.Model(caas.Service{}).Debug()
-	db = db.Select("`caas_service`.*, `caas_namespace`.`namespace`, `caas_namespace`.`workspace_name`, `caas_namespace`.`cluster_name`, `caas_namespace`.`physical_system_name`")
-	db = db.Joins("left join `caas_namespace_service_rel` on `service` = `caas_service`.`id`")
-	db = db.Joins("left join `caas_namespace` on `caas_namespace`.`id` = `caas_namespace_service_rel`.`namespace`")
+	tx := g.Con().Portal.Model(caas.Service{}).Debug()
+	tx = tx.Select("`caas_service`.*, `caas_namespace`.`namespace`, `caas_namespace`.`workspace_name`, `caas_namespace`.`cluster_name`, `caas_namespace`.`physical_system_name`")
+	tx = tx.Joins("left join `caas_namespace_service_rel` on `service` = `caas_service`.`id`")
+	tx = tx.Joins("left join `caas_namespace` on `caas_namespace`.`id` = `caas_namespace_service_rel`.`namespace`")
 	if inputs.ServiceName != "" {
-		db.Where("`caas_service`.`service_name` regexp ?", inputs.ServiceName)
+		tx.Where("`caas_service`.`service_name` regexp ?", inputs.ServiceName)
 	}
-	db.Count(&totalCount)
-	db.Offset(offset).Limit(limit).Find(&services)
+	tx.Count(&totalCount)
+	tx.Offset(offset).Limit(limit).Find(&services)
 
 	resp := &APIGetCaasServiceListOutputs{
 		List:       services,
@@ -100,20 +100,20 @@ func ServiceRefreshPods(c *gin.Context) {
 		return
 	}
 
-	db := g.Con().Portal.Debug()
+	tx := g.Con().Portal.Debug()
 
 	var ser caas.Service
-	db.Model(caas.Service{}).Where("id = ?", inputs.ServiceID).Find(&ser)
+	tx.Model(caas.Service{}).Where("id = ?", inputs.ServiceID).Find(&ser)
 
 	var rel caas.NamespaceServiceRel
-	db.Model(caas.NamespaceServiceRel{}).Where("service = ?", inputs.ServiceID).Find(&rel)
+	tx.Model(caas.NamespaceServiceRel{}).Where("service = ?", inputs.ServiceID).Find(&rel)
 	if rel.Service == 0 {
 		h.JSONR(c, h.BadStatus, "no service id")
 		return
 	}
 
 	var namespace caas.NameSpace
-	db.Model(caas.NameSpace{}).Where("id = ?", rel.NameSpace).Find(&namespace)
+	tx.Model(caas.NameSpace{}).Where("id = ?", rel.NameSpace).Find(&namespace)
 
 	pods, err := worker.GetPod(&namespace, &ser)
 	if err != nil {
@@ -164,21 +164,21 @@ func NamespaceList(c *gin.Context) {
 	}
 	var namespaces []*caas.NameSpace
 	var totalCount int64
-	db := g.Con().Portal.Model(caas.NameSpace{}).Debug()
+	tx := g.Con().Portal.Model(caas.NameSpace{}).Debug()
 	if inputs.Namespace != "" {
-		db = db.Where("`namespace` regexp ?", inputs.Namespace)
+		tx = tx.Where("`namespace` regexp ?", inputs.Namespace)
 	}
 	if inputs.WorkspaceName != "" {
-		db = db.Where("`workspace_name` regexp ?", inputs.WorkspaceName)
+		tx = tx.Where("`workspace_name` regexp ?", inputs.WorkspaceName)
 	}
 	if inputs.ClusterName != "" {
-		db = db.Where("cluster_name regexp ?", inputs.ClusterName)
+		tx = tx.Where("cluster_name regexp ?", inputs.ClusterName)
 	}
 	if inputs.PhysicalSystemName != "" {
-		db = db.Where("physical_system_name regexp ?", inputs.PhysicalSystemName)
+		tx = tx.Where("physical_system_name regexp ?", inputs.PhysicalSystemName)
 	}
-	db.Count(&totalCount)
-	db.Offset(offset).Limit(limit).Find(&namespaces)
+	tx.Count(&totalCount)
+	tx.Offset(offset).Limit(limit).Find(&namespaces)
 
 	resp := &APIGetCaasNamespaceListOutputs{
 		List:       namespaces,
@@ -226,23 +226,23 @@ func PodList(c *gin.Context) {
 
 	var pods []*caas.Pod
 	var totalCount int64
-	db := g.Con().Portal.Debug().Model(caas.Pod{})
-	db = db.Select("distinct `caas_pod`.*")
+	tx := g.Con().Portal.Debug().Model(caas.Pod{})
+	tx = tx.Select("distinct `caas_pod`.*")
 	if inputs.Name != "" {
-		db = db.Where("name regexp ?", inputs.Name)
+		tx = tx.Where("name regexp ?", inputs.Name)
 	}
 	if inputs.Namespace != "" {
-		db = db.Where("namespace = ?", inputs.Namespace)
+		tx = tx.Where("namespace = ?", inputs.Namespace)
 	}
 	if inputs.ServiceName != "" {
-		db = db.Where("service_name = ?", inputs.ServiceName)
+		tx = tx.Where("service_name = ?", inputs.ServiceName)
 	}
 	if inputs.OrderBy != "" {
-		db = db.Order(utils.Camel2Case(inputs.OrderBy) + " " + inputs.Order)
+		tx = tx.Order(utils.Camel2Case(inputs.OrderBy) + " " + inputs.Order)
 	}
-	db.Count(&totalCount)
-	db = db.Offset(offset).Limit(limit)
-	db.Find(&pods)
+	tx.Count(&totalCount)
+	tx = tx.Offset(offset).Limit(limit)
+	tx.Find(&pods)
 
 	resp := &APIGetPodListOutputs{
 		List:       pods,
@@ -286,12 +286,12 @@ func WorkspaceList(c *gin.Context) {
 	}
 	var workspaces []*caas.WorkSpace
 	var totalCount int64
-	db := g.Con().Portal.Model(caas.WorkSpace{}).Debug()
+	tx := g.Con().Portal.Model(caas.WorkSpace{}).Debug()
 	if inputs.Name != "" {
-		db = db.Where("`name` regexp ?", inputs.Name)
+		tx = tx.Where("`name` regexp ?", inputs.Name)
 	}
-	db.Count(&totalCount)
-	db.Offset(offset).Limit(limit).Find(&workspaces)
+	tx.Count(&totalCount)
+	tx.Offset(offset).Limit(limit).Find(&workspaces)
 
 	resp := &APIGetCaasWorkspaceListOutputs{
 		List:       workspaces,
@@ -316,9 +316,9 @@ type APIGetPodGetInputs struct {
 func PodInfo(c *gin.Context) {
 	id := c.Query("id")
 
-	db := g.Con().Portal
+	tx := g.Con().Portal
 	f := caas.Pod{}
-	db.Model(f).Where("id = ?", id).First(&f)
+	tx.Model(f).Where("id = ?", id).First(&f)
 	f.AdditionalAttrs()
 	h.JSONR(c, f)
 	return
@@ -336,17 +336,17 @@ func ServiceInfo(c *gin.Context) {
 	id := c.Query("id")
 
 	var srv caas.Service
-	db := g.Con().Portal.Model(caas.Service{})
-	db = db.Where("`caas_service`.`id` = ?", id)
-	db = db.Find(&srv)
+	tx := g.Con().Portal.Model(caas.Service{})
+	tx = tx.Where("`caas_service`.`id` = ?", id)
+	tx = tx.Find(&srv)
 
 	var srvInfo CaasService
-	db = g.Con().Portal.Model(caas.Service{})
-	db = db.Select("`caas_namespace`.`namespace`, `caas_namespace`.`workspace_name`, `caas_namespace`.`cluster_name`, `caas_namespace`.`physical_system_name`")
-	db = db.Joins("left join `caas_namespace_service_rel` on `service` = `caas_service`.`id`")
-	db = db.Joins("left join `caas_namespace` on `caas_namespace`.`id` = `caas_namespace_service_rel`.`namespace`")
-	db = db.Where("`caas_service`.`id` = ?", id)
-	db = db.Find(&srvInfo)
+	tx = g.Con().Portal.Model(caas.Service{})
+	tx = tx.Select("`caas_namespace`.`namespace`, `caas_namespace`.`workspace_name`, `caas_namespace`.`cluster_name`, `caas_namespace`.`physical_system_name`")
+	tx = tx.Joins("left join `caas_namespace_service_rel` on `service` = `caas_service`.`id`")
+	tx = tx.Joins("left join `caas_namespace` on `caas_namespace`.`id` = `caas_namespace_service_rel`.`namespace`")
+	tx = tx.Where("`caas_service`.`id` = ?", id)
+	tx = tx.Find(&srvInfo)
 
 	resp := CaasService{
 		Namespace:          srvInfo.Namespace,
@@ -384,29 +384,30 @@ func ServiceUpdate(c *gin.Context) {
 	tx := g.Con().Portal.Begin()
 
 	ser := caas.Service{}
-	if dt := tx.Model(caas.Service{}).Where("id = ?", inputs.ID).Find(&ser); dt.Error != nil {
-		h.JSONR(c, h.ExpecStatus, dt.Error)
+	if err := tx.Model(caas.Service{}).Where("id = ?", inputs.ID).Find(&ser).Error; err != nil {
+		tx.Rollback()
+		h.JSONR(c, h.ExpecStatus, err)
 		return
 	}
 
-	if dt := tx.Model(caas.Service{}).Where("id = ?", inputs.ID).Updates(caas.Service{
+	if err := tx.Model(caas.Service{}).Where("id = ?", inputs.ID).Updates(&caas.Service{
 		Owner: inputs.Owner,
-	}); dt.Error != nil {
-		h.JSONR(c, h.ExpecStatus, dt.Error)
+	}).Error; err != nil {
+		tx.Rollback()
+		h.JSONR(c, h.ExpecStatus, err)
 		return
 	}
 
-	dt := tx.Debug().Model(caas.ServiceTagRel{})
-	if dt = dt.Where(&caas.ServiceTagRel{Service: inputs.ID}).Delete(&caas.ServiceTagRel{}); dt.Error != nil {
-		h.JSONR(c, h.ExpecStatus, dt.Error)
-		dt.Rollback()
+	if err := tx.Model(caas.ServiceTagRel{}).Where(&caas.ServiceTagRel{Service: inputs.ID}).Delete(&caas.ServiceTagRel{}).Error; err != nil {
+		tx.Rollback()
+		h.JSONR(c, h.ExpecStatus, err)
 		return
 	}
 
 	for _, tagID := range inputs.TagIDs {
-		if dt = dt.Create(&caas.ServiceTagRel{Service: inputs.ID, Tag: tagID}); dt.Error != nil {
-			h.JSONR(c, h.ExpecStatus, dt.Error)
-			dt.Rollback()
+		if err := tx.Create(&caas.ServiceTagRel{Service: inputs.ID, Tag: tagID}).Error; err != nil {
+			tx.Rollback()
+			h.JSONR(c, h.ExpecStatus, err)
 			return
 		}
 	}
@@ -458,14 +459,14 @@ func AppList(c *gin.Context) {
 	}
 	var apps []*App
 	var totalCount int64
-	db := g.Con().Portal.Model(caas.App{}).Debug()
-	db = db.Select("`caas_app`.`id`, `caas_app`.`app_name`, `caas_app`.`description`, `caas_app`.`create_time`, `caas_app`.`update_time`, `caas_namespace`.`namespace` as namespace_name")
-	db = db.Joins("left join `caas_namespace` on `caas_app`.`namespace_id` = `caas_namespace`.`id`")
+	tx := g.Con().Portal.Model(caas.App{}).Debug()
+	tx = tx.Select("`caas_app`.`id`, `caas_app`.`app_name`, `caas_app`.`description`, `caas_app`.`create_time`, `caas_app`.`update_time`, `caas_namespace`.`namespace` as namespace_name")
+	tx = tx.Joins("left join `caas_namespace` on `caas_app`.`namespace_id` = `caas_namespace`.`id`")
 	if inputs.AppName != "" {
-		db = db.Where("`caas_app`.`app_name` regexp ?", inputs.AppName)
+		tx = tx.Where("`caas_app`.`app_name` regexp ?", inputs.AppName)
 	}
-	db.Count(&totalCount)
-	db.Offset(offset).Limit(limit).Find(&apps)
+	tx.Count(&totalCount)
+	tx.Offset(offset).Limit(limit).Find(&apps)
 
 	resp := &APIGetCaasAppListOutputs{
 		List:       apps,
@@ -486,11 +487,11 @@ func AppList(c *gin.Context) {
 func AppInfo(c *gin.Context) {
 	id := c.Query("id")
 
-	var app *caas.App
-	db := g.Con().Portal.Model(caas.App{})
-	db = db.Where("id = ?", id)
-	db = db.Find(&app)
+	var caasApp *caas.App
+	tx := g.Con().Portal.Model(caas.App{})
+	tx = tx.Where("id = ?", id)
+	tx = tx.Find(&caasApp)
 
-	h.JSONR(c, http.StatusOK, app)
+	h.JSONR(c, http.StatusOK, caasApp)
 	return
 }

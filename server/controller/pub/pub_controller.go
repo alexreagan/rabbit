@@ -46,13 +46,13 @@ func List(c *gin.Context) {
 
 	var pubs []*pub.Pub
 	var totalCount int64
-	db := g.Con().Portal.Debug().Model(pub.Pub{})
-	db.Count(&totalCount)
+	tx := g.Con().Portal.Debug().Model(pub.Pub{})
+	tx.Count(&totalCount)
 	if inputs.OrderBy != "" {
-		db = db.Order(utils.Camel2Case(inputs.OrderBy) + " " + inputs.Order)
+		tx = tx.Order(utils.Camel2Case(inputs.OrderBy) + " " + inputs.Order)
 	}
-	db = db.Offset(offset).Limit(limit)
-	db.Find(&pubs)
+	tx = tx.Offset(offset).Limit(limit)
+	tx.Find(&pubs)
 
 	resp := &APIGetPubListOutputs{
 		List:       pubs,
@@ -126,8 +126,8 @@ func Create(c *gin.Context) {
 		CreateAt:              gtime.Now(),
 	}
 	tx := g.Con().Portal
-	if dt := tx.Model(pub.Pub{}).Create(&p); dt.Error != nil {
-		h.JSONR(c, h.ExpecStatus, dt.Error)
+	if tx = tx.Model(pub.Pub{}).Create(&p); tx.Error != nil {
+		h.JSONR(c, h.ExpecStatus, tx.Error)
 	}
 
 	h.JSONR(c, h.OKStatus, inputs)
@@ -174,7 +174,7 @@ func Update(c *gin.Context) {
 		TrialOperationCase:    inputs.TrialOperationCase,
 	}
 	tx := g.Con().Portal.Model(pub.Pub{}).Debug()
-	if dt := tx.Where("id = ?", inputs.ID).Updates(p); dt.Error != nil {
+	if dt := tx.Where("id = ?", inputs.ID).Updates(&p); dt.Error != nil {
 		h.JSONR(c, h.ExpecStatus, dt.Error)
 		return
 	}

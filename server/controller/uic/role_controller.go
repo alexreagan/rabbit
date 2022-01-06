@@ -45,17 +45,17 @@ func RoleList(c *gin.Context) {
 
 	var roles []*uic.Role
 	var totalCount int64
-	db := g.Con().Portal.Model(uic.Role{})
+	tx := g.Con().Portal.Model(uic.Role{})
 	if inputs.Name != "" {
-		db = db.Where("name regexp ?", inputs.Name)
+		tx = tx.Where("name regexp ?", inputs.Name)
 	}
-	db.Count(&totalCount)
+	tx.Count(&totalCount)
 
 	if inputs.OrderBy != "" {
-		db = db.Order(utils.Camel2Case(inputs.OrderBy) + " " + inputs.Order)
+		tx = tx.Order(utils.Camel2Case(inputs.OrderBy) + " " + inputs.Order)
 	}
-	db = db.Offset(offset).Limit(limit)
-	db.Find(&roles)
+	tx = tx.Offset(offset).Limit(limit)
+	tx.Find(&roles)
 
 	resp := &APIGetRoleListOutputs{
 		List:       roles,
@@ -80,9 +80,9 @@ func RoleSelect(c *gin.Context) {
 		return
 	}
 
-	db := g.Con().Portal
+	tx := g.Con().Portal
 	var roles []*uic.Role
-	db.Model(uic.Role{}).Where("name regexp ?", inputs.Name).Find(&roles)
+	tx.Model(uic.Role{}).Where("name regexp ?", inputs.Name).Find(&roles)
 
 	resp := &APIGetRoleSearchOutputs{
 		List: roles,
@@ -118,26 +118,27 @@ func RoleCreate(c *gin.Context) {
 		return
 	}
 
-	db := g.Con().Portal.Model(uic.Role{}).Begin()
+	tx := g.Con().Portal.Begin()
+	tx = tx.Model(uic.Role{})
 	role := &uic.Role{
 		Name:      inputs.Name,
 		CnName:    inputs.CnName,
 		Remark:    inputs.Remark,
 		CreatedAt: gtime.Now(),
 	}
-	db = db.Create(role)
+	tx.Create(role)
 
 	var rels []*uic.RolePermRel
-	dt := g.Con().Portal.Model(uic.RolePermRel{})
-	dt.Where("id = ?", role.ID).Delete(&rels)
+	tx = tx.Model(uic.RolePermRel{})
+	tx.Where("id = ?", role.ID).Delete(&rels)
 
 	for _, v := range inputs.PermList {
-		dt.Create(&uic.RolePermRel{
+		tx.Create(&uic.RolePermRel{
 			Role: role.ID,
 			Perm: v,
 		})
 	}
-	db.Commit()
+	tx.Commit()
 
 	resp := &APIGetRoleCreateOutputs{
 		Role: role,
@@ -167,23 +168,22 @@ func RoleUpdate(c *gin.Context) {
 		CnName: inputs.CnName,
 		Remark: inputs.Remark,
 	}
-	db := g.Con().Portal.Model(uic.Role{})
-	db = db.Where("id = ?", inputs.ID).Updates(role)
-	if db.Error != nil {
-		h.JSONR(c, http.StatusExpectationFailed, db.Error)
+	db := g.Con().Portal
+	tx := db.Model(uic.Role{})
+	if err := tx.Where("id = ?", inputs.ID).Updates(role).Error; err != nil {
+		h.JSONR(c, http.StatusExpectationFailed, err)
 		return
 	}
 
 	var rels []*uic.RolePermRel
-	dt := g.Con().Portal.Model(uic.RolePermRel{})
-	dt = dt.Where("role = ?", role.ID).Delete(&rels)
-	if dt.Error != nil {
-		h.JSONR(c, http.StatusExpectationFailed, dt.Error)
+	tx = db.Model(uic.RolePermRel{})
+	if err := tx.Where("role = ?", role.ID).Delete(&rels).Error; err != nil {
+		h.JSONR(c, http.StatusExpectationFailed, err)
 		return
 	}
 
 	for _, v := range inputs.PermList {
-		dt.Create(&uic.RolePermRel{
+		tx.Create(&uic.RolePermRel{
 			Role: role.ID,
 			Perm: v,
 		})
@@ -213,19 +213,18 @@ func RoleInfo(c *gin.Context) {
 	id := c.Query("id")
 
 	var role *uic.Role
-	db := g.Con().Portal.Model(uic.Role{})
-	db = db.Where("id = ?", id).Find(&role)
-	if db.Error != nil {
-		h.JSONR(c, http.StatusExpectationFailed, db.Error)
+	db := g.Con().Portal
+	if err := db.Model(uic.Role{}).Where("id = ?", id).Find(&role).Error; err != nil {
+		h.JSONR(c, http.StatusExpectationFailed, err)
 		return
 	}
 
 	var perms []*uic.Perm
-	dt := g.Con().Portal.Model(uic.Perm{}).Debug()
-	dt = dt.Select("`perm`.*")
-	dt = dt.Joins("left join `role_perm_rel` on `role_perm_rel`.`perm` = `perm`.`id`")
-	dt = dt.Where("`role_perm_rel`.`role` = ?", id)
-	dt = dt.Find(&perms)
+	tx := db.Model(uic.Perm{})
+	tx = tx.Select("`perm`.*")
+	tx = tx.Joins("left join `role_perm_rel` on `role_perm_rel`.`perm` = `perm`.`id`")
+	tx = tx.Where("`role_perm_rel`.`role` = ?", id)
+	tx = tx.Find(&perms)
 
 	resp := &APIGetRoleInfoOutputs{
 		Role:  role,

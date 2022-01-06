@@ -59,12 +59,12 @@ func main() {
 		g.Con().Portal.AutoMigrate(&sys.MenuPermission{})
 
 		// node
-		g.Con().Portal.AutoMigrate(&node.Host{})
-		//g.Con().Portal.AutoMigrate(&node.HostGroup{})
-		//g.Con().Portal.AutoMigrate(&node.HostGroupRel{})
-		g.Con().Portal.AutoMigrate(&node.HostTagRel{})
-		// host apply request
-		g.Con().Portal.AutoMigrate(&node.HostApplyRequest{})
+		g.Con().Portal.AutoMigrate(&node.Node{})
+		//g.Con().Portal.AutoMigrate(&node.NodeGroup{})
+		//g.Con().Portal.AutoMigrate(&node.NodeGroupRel{})
+		g.Con().Portal.AutoMigrate(&node.NodeTagRel{})
+		// node apply request
+		g.Con().Portal.AutoMigrate(&node.NodeApplyRequest{})
 
 		// app
 		g.Con().Portal.AutoMigrate(&app.Template{})
@@ -91,11 +91,11 @@ func main() {
 	// start gin server
 	go server.Start()
 
-	// sync hosts from kunyuan
+	// sync nodes from kunyuan
 	kunyuanSyncer := worker.InitKunYuanSyncer()
 	kunyuanSyncer.Start()
 
-	// sync hosts from caas
+	// sync nodes from caas
 	caasSyncer := worker.InitCaasSyncer()
 	caasSyncer.Start()
 
@@ -106,6 +106,10 @@ func main() {
 	// tree ReBuilder
 	treeReBuilder := worker.InitTreeReBuilder()
 	treeReBuilder.Start()
+
+	// prometheus syncer
+	prometheusSyncer := worker.InitPrometheusSyncer()
+	prometheusSyncer.Start()
 
 	// process signal
 	quit := make(chan os.Signal, 1)
@@ -127,9 +131,12 @@ func main() {
 		log.Infoln("caasCleaner ctx done, closing")
 	case <-treeReBuilder.Ctx().Done():
 		log.Infoln("treeReBuilder ctx done, closing")
+	case <-prometheusSyncer.Ctx().Done():
+		log.Infoln("treeReBuilder ctx done, closing")
 	}
 	kunyuanSyncer.Close()
 	caasSyncer.Close()
 	caasCleaner.Close()
 	treeReBuilder.Close()
+	prometheusSyncer.Close()
 }

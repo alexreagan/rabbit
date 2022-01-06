@@ -71,23 +71,23 @@ type TagCpuChart struct {
 // @Router /api/v1/chart/bar [get]
 func ChartBar(c *gin.Context) {
 	var tnCharts []TagNodeChart
-	db := g.Con().Portal.Debug().Model(node.HostTagRel{})
-	db = db.Select("`host_tag_rel`.`tag` as tag_id, `tag`.`name` as tag_name, count(*) as node_count")
-	db = db.Joins(" left join `tag` on `host_tag_rel`.tag = `tag`.id")
-	db = db.Group("`host_tag_rel`.tag")
-	db = db.Having("count(*)>0")
-	db = db.Order("`host_tag_rel`.`tag`")
-	db = db.Find(&tnCharts)
+	tx := g.Con().Portal.Debug().Model(node.NodeTagRel{})
+	tx = tx.Select("`node_tag_rel`.`tag` as tag_id, `tag`.`name` as tag_name, count(*) as node_count")
+	tx = tx.Joins(" left join `tag` on `node_tag_rel`.tag = `tag`.id")
+	tx = tx.Group("`node_tag_rel`.tag")
+	tx = tx.Having("count(*)>0")
+	tx = tx.Order("`node_tag_rel`.`tag`")
+	tx = tx.Find(&tnCharts)
 
 	var tcCharts []TagCpuChart
-	db = g.Con().Portal.Debug().Model(node.HostTagRel{})
-	db = db.Select("`host_tag_rel`.`tag` as tag_id, `tag`.`name` as tag_name, sum(`host`.`cpu_number`) as cpu_count")
-	db = db.Joins(" left join `tag` on `host_tag_rel`.tag = `tag`.id")
-	db = db.Joins(" left join `host` on `host_tag_rel`.host = `host`.id")
-	db = db.Group("`host_tag_rel`.`tag`")
-	db = db.Having("count(*)>0")
-	db = db.Order("`host_tag_rel`.`tag`")
-	db = db.Find(&tcCharts)
+	tx = g.Con().Portal.Debug().Model(node.NodeTagRel{})
+	tx = tx.Select("`node_tag_rel`.`tag` as tag_id, `tag`.`name` as tag_name, sum(`node`.`cpu_number`) as cpu_count")
+	tx = tx.Joins(" left join `tag` on `node_tag_rel`.tag = `tag`.id")
+	tx = tx.Joins(" left join `node` on `node_tag_rel`.node = `node`.id")
+	tx = tx.Group("`node_tag_rel`.`tag`")
+	tx = tx.Having("count(*)>0")
+	tx = tx.Order("`node_tag_rel`.`tag`")
+	tx = tx.Find(&tcCharts)
 
 	var tagChartDataMap map[string]int64
 	tagChartDataMap = make(map[string]int64)
@@ -150,13 +150,13 @@ func ChartBar(c *gin.Context) {
 // @Router /api/v1/chart/pie [get]
 func ChartPie(c *gin.Context) {
 	var tnCharts []TagNodeChart
-	db := g.Con().Portal.Debug().Model(node.HostTagRel{})
-	db = db.Select("`host_tag_rel`.`tag` as tag_id, `tag`.`name` as tag_name, count(*) as node_count")
-	db = db.Joins(" left join `tag` on `host_tag_rel`.tag = `tag`.id")
-	db = db.Group("`host_tag_rel`.tag")
-	db = db.Having("count(*)>0")
-	db = db.Order("`host_tag_rel`.`tag`")
-	db = db.Find(&tnCharts)
+	tx := g.Con().Portal.Debug().Model(node.NodeTagRel{})
+	tx = tx.Select("`node_tag_rel`.`tag` as tag_id, `tag`.`name` as tag_name, count(*) as node_count")
+	tx = tx.Joins(" left join `tag` on `node_tag_rel`.tag = `tag`.id")
+	tx = tx.Group("`node_tag_rel`.tag")
+	tx = tx.Having("count(*)>0")
+	tx = tx.Order("`node_tag_rel`.`tag`")
+	tx = tx.Find(&tnCharts)
 
 	var seriesData []APIGetChartPieSeriesItem
 	for _, tnChart := range tnCharts {
@@ -180,9 +180,9 @@ func ChartPie(c *gin.Context) {
 
 type APIGetChartStat struct {
 	Name            string `json:"name"`
-	TotalHostCount  int64  `json:"totalHostCount"`
-	UsedHostCount   int64  `json:"usedHostCount"`
-	UnUsedHostCount int64  `json:"unUsedHostCount"`
+	TotalNodeCount  int64  `json:"totalNodeCount"`
+	UsedNodeCount   int64  `json:"usedNodeCount"`
+	UnUsedNodeCount int64  `json:"unUsedNodeCount"`
 	TotalCpuCount   int64  `json:"totalCpuCount"`
 	UsedCpuCount    int64  `json:"usedCpuCount"`
 	UnUsedCpuCount  int64  `json:"unUsedCpuCount"`
@@ -203,45 +203,45 @@ type APIGetChartStatOutputs struct {
 func ChartVMStat(c *gin.Context) {
 	// 按照物理子系统统计所有机器使用情况
 	var totalStat []APIGetChartStat
-	db := g.Con().Portal.Debug().Model(node.Host{})
-	db = db.Select("`host`.`physical_system` as name, count(*) as total_host_count, sum(`host`.`cpu_number`) as total_cpu_count")
-	db = db.Group("`host`.`physical_system`")
-	db = db.Order("`host`.`physical_system`")
-	db = db.Find(&totalStat)
+	tx := g.Con().Portal.Debug().Model(node.Node{})
+	tx = tx.Select("`node`.`physical_system` as name, count(*) as total_node_count, sum(`node`.`cpu_number`) as total_cpu_count")
+	tx = tx.Group("`node`.`physical_system`")
+	tx = tx.Order("`node`.`physical_system`")
+	tx = tx.Find(&totalStat)
 
 	var totalCpuCount int64
-	var totalHostCount int64
+	var totalNodeCount int64
 	var totalChartStat map[string]APIGetChartStat
 	totalChartStat = make(map[string]APIGetChartStat)
 	for _, s := range totalStat {
 		totalCpuCount += s.TotalCpuCount
-		totalHostCount += s.TotalHostCount
+		totalNodeCount += s.TotalNodeCount
 		totalChartStat[s.Name] = s
 	}
 
 	var usedStat []APIGetChartStat
 	var ids []int64
-	db = g.Con().Portal.Debug().Model(node.Host{})
-	db = db.Select("distinct(`host`.`id`)")
-	db = db.Joins("left join `host_tag_rel` on `host`.id=`host_tag_rel`.host")
-	db = db.Where("`host_tag_rel`.tag is not null;")
-	db = db.Find(&ids)
+	tx = g.Con().Portal.Debug().Model(node.Node{})
+	tx = tx.Select("distinct(`node`.`id`)")
+	tx = tx.Joins("left join `node_tag_rel` on `node`.id=`node_tag_rel`.node")
+	tx = tx.Where("`node_tag_rel`.tag is not null;")
+	tx = tx.Find(&ids)
 
 	// 查询所有机器
-	db = g.Con().Portal.Debug().Model(node.Host{})
-	db = db.Select("`host`.`physical_system` as `name`, count(*) as total_host_count, sum(`host`.`cpu_number`) as total_cpu_count")
-	db = db.Where("id in (?)", ids)
-	db = db.Group("`host`.`physical_system`")
-	db = db.Order("`host`.`physical_system`")
-	db = db.Find(&usedStat)
+	tx = g.Con().Portal.Debug().Model(node.Node{})
+	tx = tx.Select("`node`.`physical_system` as `name`, count(*) as total_node_count, sum(`node`.`cpu_number`) as total_cpu_count")
+	tx = tx.Where("id in (?)", ids)
+	tx = tx.Group("`node`.`physical_system`")
+	tx = tx.Order("`node`.`physical_system`")
+	tx = tx.Find(&usedStat)
 
 	var usedCpuCount int64
-	var usedHostCount int64
+	var usedNodeCount int64
 	var usedChartStat map[string]APIGetChartStat
 	usedChartStat = make(map[string]APIGetChartStat)
 	for _, s := range usedStat {
 		usedCpuCount += s.TotalCpuCount
-		usedHostCount += s.TotalHostCount
+		usedNodeCount += s.TotalNodeCount
 		usedChartStat[s.Name] = s
 	}
 
@@ -249,22 +249,22 @@ func ChartVMStat(c *gin.Context) {
 	for k, v := range totalChartStat {
 		t := APIGetChartStat{}
 		t.Name = v.Name
-		t.TotalHostCount = v.TotalHostCount
+		t.TotalNodeCount = v.TotalNodeCount
 		t.TotalCpuCount = v.TotalCpuCount
-		t.UsedHostCount = usedChartStat[k].TotalHostCount
+		t.UsedNodeCount = usedChartStat[k].TotalNodeCount
 		t.UsedCpuCount = usedChartStat[k].TotalCpuCount
-		t.UnUsedHostCount = v.TotalHostCount - usedChartStat[k].TotalHostCount
+		t.UnUsedNodeCount = v.TotalNodeCount - usedChartStat[k].TotalNodeCount
 		t.UnUsedCpuCount = v.TotalCpuCount - usedChartStat[k].TotalCpuCount
 		subStat = append(subStat, t)
 	}
 
 	var s APIGetChartStatOutputs
 	s.Name = ""
-	s.TotalHostCount = totalHostCount
+	s.TotalNodeCount = totalNodeCount
 	s.TotalCpuCount = totalCpuCount
-	s.UsedHostCount = usedHostCount
+	s.UsedNodeCount = usedNodeCount
 	s.UsedCpuCount = usedCpuCount
-	s.UnUsedHostCount = totalHostCount - usedHostCount
+	s.UnUsedNodeCount = totalNodeCount - usedNodeCount
 	s.UnUsedCpuCount = totalCpuCount - usedCpuCount
 	s.SubStat = subStat
 
@@ -291,12 +291,12 @@ type APIGetChartContainerStatOutputs struct {
 func ChartContainerStat(c *gin.Context) {
 	// 按照物理子系统统计所有机器使用情况
 	var totalStat APIGetChartContainerStatOutputs
-	db := g.Con().Portal.Debug()
-	db = db.Model(&caas.NameSpace{})
-	db = db.Select("sum(`cpu`) as total_cpu_count, sum(`memory`) as total_memory_count, sum(`shared_volume`) as total_shared_volume, sum(`local_volume`) as total_local_volume")
-	db.Find(&totalStat)
-
 	tx := g.Con().Portal.Debug()
+	tx = tx.Model(&caas.NameSpace{})
+	tx = tx.Select("sum(`cpu`) as total_cpu_count, sum(`memory`) as total_memory_count, sum(`shared_volume`) as total_shared_volume, sum(`local_volume`) as total_local_volume")
+	tx.Find(&totalStat)
+
+	tx = g.Con().Portal.Debug()
 	tx = tx.Model(&caas.Service{})
 	tx = tx.Select("sum(`cpu` * now_replicas) / 1000 as used_cpu_count, sum(`memory` * now_replicas) / 1024 as used_memory_count")
 	tx.Find(&totalStat)

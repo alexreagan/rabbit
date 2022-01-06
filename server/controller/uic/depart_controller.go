@@ -10,7 +10,7 @@ import (
 )
 
 type APIGetDepartListsInputs struct {
-	Name     string `json:"host" form:"name"`
+	Name     string `json:"name" form:"name"`
 	Priority int    `json:"priority" form:"priority"`
 	Status   string `json:"status" form:"status"`
 	//id
@@ -52,12 +52,12 @@ func DepartmentLists(c *gin.Context) {
 	}
 	//for get correct table name
 	f := uic.Depart{}
-	db := inputs.collectDBFilters(g.Con().Uic, f.TableName(), nil)
+	tx := inputs.collectDBFilters(g.Con().Uic, f.TableName(), nil)
 	var data []uic.Depart
 	//if no specific, will give return first 2000 records
 	if inputs.Page == -1 && inputs.Limit == -1 {
 		inputs.Limit = 2000
-		db = db.Order("id DESC").Limit(inputs.Limit)
+		tx = tx.Order("id DESC").Limit(inputs.Limit)
 	} else if inputs.Limit == -1 {
 		// set page but not set limit
 		h.JSONR(c, h.BadStatus, errors.New("You set page but skip limit params, please check your input"))
@@ -85,8 +85,8 @@ func DepartmentLists(c *gin.Context) {
 			inputs.Limit = 50
 		}
 		step := (inputs.Page - 1) * inputs.Limit
-		db = db.Order("id DESC").Offset(step).Limit(inputs.Limit)
+		tx = tx.Order("id DESC").Offset(step).Limit(inputs.Limit)
 	}
-	db.Find(&data)
+	tx.Find(&data)
 	h.JSONR(c, data)
 }

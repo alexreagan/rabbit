@@ -25,38 +25,38 @@ func (t *templateService) Serialize(g6Graph app.G6Graph) ([]byte, error) {
 
 // 查找
 func (t *templateService) Get(id int64) (*app.Template, error) {
-	tx := g.Con().Portal
+	tx := g.Con().Portal.Model(app.Template{})
 	template := app.Template{}
-	if dt := tx.Model(app.Template{}).Where("id = ?", id).Find(&template); dt.Error != nil {
-		return &template, dt.Error
+	if err := tx.Where("id = ?", id).Find(&template).Error; err != nil {
+		return &template, err
 	}
 	return &template, nil
 }
 
 func (t *templateService) All() ([]*app.Template, error) {
-	tx := g.Con().Portal
+	tx := g.Con().Portal.Model(app.Template{})
 	var templates []*app.Template
-	if dt := tx.Model(app.Template{}).Find(&templates); dt.Error != nil {
-		return templates, dt.Error
+	if err := tx.Find(&templates).Error; err != nil {
+		return templates, err
 	}
 	return templates, nil
 }
 
 // 处于有效状态的template，有且只有一个
 func (t *templateService) ValidTemplate() (*app.Template, error) {
-	tx := g.Con().Portal
+	tx := g.Con().Portal.Model(app.Template{})
 	template := app.Template{}
-	if dt := tx.Model(app.Template{}).Where("state = 'enable'").First(&template); dt.Error != nil {
-		return &template, dt.Error
+	if err := tx.Where("state = 'enable'").First(&template).Error; err != nil {
+		return &template, err
 	}
 	return &template, nil
 }
 
 // 更新
 func (t *templateService) Updates(template *app.Template) error {
-	db := g.Con().Portal
-	if db = db.Model(app.Template{}).Where("id = ?", template.ID).Updates(template); db.Error != nil {
-		return db.Error
+	tx := g.Con().Portal.Model(app.Template{})
+	if err := tx.Where("id = ?", template.ID).Updates(template).Error; err != nil {
+		return err
 	}
 	return nil
 }
@@ -97,7 +97,6 @@ func (t *templateService) BuildTemplateGraph(template *app.Template) *TagGraphNo
 
 	// 初始化
 	for _, n := range g6Graph.Nodes {
-		//nid, _ := strconv.ParseInt(n.ID, 10, 64)
 		tag := &app.Tag{
 			ID:     n.ID,
 			Name:   n.Name,
@@ -108,8 +107,6 @@ func (t *templateService) BuildTemplateGraph(template *app.Template) *TagGraphNo
 	}
 	// 组织树状结构
 	for _, edge := range g6Graph.Edges {
-		//edgeSourceID, _ := strconv.ParseInt(edge.SourceID, 10, 64)
-		//edgeTargetID, _ := strconv.ParseInt(edge.TargetID, 10, 64)
 		// 根据指向关系重建树
 		nodeMap[edge.SourceID].Next[edge.TargetID] = nodeMap[edge.TargetID]
 
@@ -128,7 +125,7 @@ func (t *templateService) BuildTemplateGraph(template *app.Template) *TagGraphNo
 	buildUnTaggedInformation(tagGraphNode)
 
 	// 补充children信息
-	buildChildrenInformation(tagGraphNode)
+	//buildChildrenInformation(tagGraphNode)
 
 	// 保存到全局变量
 	if globalTemplateGraphMap == nil {
@@ -142,8 +139,8 @@ func (t *templateService) BuildTemplateGraph(template *app.Template) *TagGraphNo
 func buildTaggedInformationV3(nodePath []int64, node *TagGraphNode) {
 	for _, tag := range node.Next {
 		node.Next[tag.ID].Path = append(nodePath, tag.ID)
-		node.Next[tag.ID].RelatedHosts = HostService.HostsHavingTagIDs(node.Next[tag.ID].Path)
-		node.Next[tag.ID].RelatedHostsCount = len(node.Next[tag.ID].RelatedHosts)
+		node.Next[tag.ID].RelatedNodes = NodeService.NodesHavingTagIDs(node.Next[tag.ID].Path)
+		node.Next[tag.ID].RelatedNodesCount = len(node.Next[tag.ID].RelatedNodes)
 		node.Next[tag.ID].RelatedPods = CaasService.PodsHavingTagIDs(node.Next[tag.ID].Path)
 		node.Next[tag.ID].RelatedPodsCount = len(node.Next[tag.ID].RelatedPods)
 		buildTaggedInformationV3(node.Next[tag.ID].Path, tag)

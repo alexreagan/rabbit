@@ -48,27 +48,27 @@ func List(c *gin.Context) {
 
 	var alarms []*alarm.Alarm
 	var totalCount int64
-	db := g.Con().Portal.Debug().Model(alarm.Alarm{})
-	db = db.Select("distinct `alarm`.*")
+	tx := g.Con().Portal.Debug().Model(alarm.Alarm{})
+	tx = tx.Select("distinct `alarm`.*")
 	if inputs.IP != "" {
-		db = db.Where("`alarm`.`prod_ip` regexp ?", inputs.IP)
+		tx = tx.Where("`alarm`.`prod_ip` regexp ?", inputs.IP)
 	}
 	if inputs.PhysicalSystem != "" {
-		db = db.Where("`alarm`.`sub_sys_en_name` = ?", inputs.PhysicalSystem)
+		tx = tx.Where("`alarm`.`sub_sys_en_name` = ?", inputs.PhysicalSystem)
 	}
 	if inputs.Resolved != "" {
 		if inputs.Resolved == "true" {
-			db = db.Where("`alarm`.`resolved` = 1")
+			tx = tx.Where("`alarm`.`resolved` = 1")
 		} else {
-			db = db.Where("`alarm`.`resolved` = 0")
+			tx = tx.Where("`alarm`.`resolved` = 0")
 		}
 	}
 	if inputs.OrderBy != "" {
-		db = db.Order(utils.Camel2Case(inputs.OrderBy) + " " + inputs.Order)
+		tx = tx.Order(utils.Camel2Case(inputs.OrderBy) + " " + inputs.Order)
 	}
-	db.Count(&totalCount)
-	db = db.Offset(offset).Limit(limit)
-	db.Find(&alarms)
+	tx.Count(&totalCount)
+	tx = tx.Offset(offset).Limit(limit)
+	tx.Find(&alarms)
 
 	resp := &APIGetAlarmListOutputs{
 		List:       alarms,
@@ -87,10 +87,10 @@ func List(c *gin.Context) {
 // @Router /api/v1/alarm/physical_system_choices [get]
 func PhysicalSystemChoices(c *gin.Context) {
 	var data []*model.APIGetVariableItem
-	db := g.Con().Portal.Model(alarm.Alarm{}).Debug()
-	db = db.Select("distinct `sub_sys_name` as `label`, `sub_sys_en_name` as `value`")
-	db = db.Order("`sub_sys_en_name`")
-	db = db.Find(&data)
+	tx := g.Con().Portal.Model(alarm.Alarm{}).Debug()
+	tx = tx.Select("distinct `sub_sys_name` as `label`, `sub_sys_en_name` as `value`")
+	tx = tx.Order("`sub_sys_en_name`")
+	tx = tx.Find(&data)
 	resp := model.APIGetVariableOutputs{
 		List:       data,
 		TotalCount: int64(len(data)),

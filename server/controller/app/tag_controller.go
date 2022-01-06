@@ -56,23 +56,23 @@ func TagAll(c *gin.Context) {
 
 	var tags []*app.Tag
 	var totalCount int64
-	db := g.Con().Portal.Model(app.Tag{})
+	tx := g.Con().Portal.Model(app.Tag{})
 	if inputs.Name != "" {
-		db = db.Where("`tag`.`name` regexp ?", inputs.Name)
+		tx = tx.Where("`tag`.`name` regexp ?", inputs.Name)
 	}
 	if inputs.CategoryName != "" {
-		db = db.Where("`tag`.`category_name` = ?", inputs.CategoryName)
+		tx = tx.Where("`tag`.`category_name` = ?", inputs.CategoryName)
 	}
 	if inputs.Remark != "" {
-		db = db.Where("`tag`.`remark` regexp ?", inputs.Remark)
+		tx = tx.Where("`tag`.`remark` regexp ?", inputs.Remark)
 	}
-	db.Count(&totalCount)
+	tx.Count(&totalCount)
 	if inputs.OrderBy != "" {
-		db = db.Order(utils.Camel2Case(inputs.OrderBy) + " " + inputs.Order)
+		tx = tx.Order(utils.Camel2Case(inputs.OrderBy) + " " + inputs.Order)
 	} else {
-		db = db.Order("`tag`.`name`")
+		tx = tx.Order("`tag`.`name`")
 	}
-	db.Find(&tags)
+	tx.Find(&tags)
 
 	resp := &APIGetTagListOutputs{
 		List:       tags,
@@ -109,28 +109,28 @@ func TagList(c *gin.Context) {
 
 	var tags []*app.Tag
 	var totalCount int64
-	db := g.Con().Portal.Model(app.Tag{})
+	tx := g.Con().Portal.Model(app.Tag{})
 	if inputs.Name != "" {
-		db = db.Where("`tag`.`name` regexp ?", inputs.Name)
+		tx = tx.Where("`tag`.`name` regexp ?", inputs.Name)
 	}
 	if inputs.CategoryID != "" {
-		db = db.Where("`tag`.`category_id` = ?", inputs.CategoryID)
+		tx = tx.Where("`tag`.`category_id` = ?", inputs.CategoryID)
 	}
 	if inputs.CategoryName != "" {
-		db = db.Where("`tag`.`category_name` = ?", inputs.CategoryName)
+		tx = tx.Where("`tag`.`category_name` = ?", inputs.CategoryName)
 	}
 	if inputs.Remark != "" {
-		db = db.Where("`tag`.`remark` regexp ?", inputs.Remark)
+		tx = tx.Where("`tag`.`remark` regexp ?", inputs.Remark)
 	}
 
-	db.Count(&totalCount)
+	tx.Count(&totalCount)
 	if inputs.OrderBy != "" {
-		db = db.Order(utils.Camel2Case(inputs.OrderBy) + " " + inputs.Order)
+		tx = tx.Order(utils.Camel2Case(inputs.OrderBy) + " " + inputs.Order)
 	} else {
-		db = db.Order("`tag`.`name`")
+		tx = tx.Order("`tag`.`name`")
 	}
-	db = db.Offset(offset).Limit(limit)
-	db.Find(&tags)
+	tx = tx.Offset(offset).Limit(limit)
+	tx.Find(&tags)
 
 	resp := &APIGetTagListOutputs{
 		List:       tags,
@@ -155,8 +155,8 @@ func TagInfo(c *gin.Context) {
 	}
 
 	var tag *app.Tag
-	db := g.Con().Portal.Debug().Model(app.Tag{})
-	db.Where("id = ?", id).Find(&tag)
+	tx := g.Con().Portal.Debug().Model(app.Tag{})
+	tx.Where("id = ?", id).Find(&tag)
 
 	h.JSONR(c, http.StatusOK, tag)
 	return
@@ -197,8 +197,8 @@ func TagCreate(c *gin.Context) {
 		CreateAt:     gtime.Now(),
 	}
 	tx := g.Con().Portal
-	if dt := tx.Model(app.Tag{}).Create(&tag); dt.Error != nil {
-		h.JSONR(c, h.ExpecStatus, dt.Error)
+	if tx = tx.Model(app.Tag{}).Create(&tag); tx.Error != nil {
+		h.JSONR(c, h.ExpecStatus, tx.Error)
 	}
 
 	h.JSONR(c, h.OKStatus, tag)
@@ -233,8 +233,8 @@ func TagUpdate(c *gin.Context) {
 		CreateAt:     gtime.Now(),
 	}
 	tx := g.Con().Portal
-	if dt := tx.Model(app.Tag{}).Where("id = ?", inputs.ID).Updates(&tag); dt.Error != nil {
-		h.JSONR(c, h.ExpecStatus, dt.Error)
+	if tx = tx.Model(app.Tag{}).Where("id = ?", inputs.ID).Updates(&tag); tx.Error != nil {
+		h.JSONR(c, h.ExpecStatus, tx.Error)
 	}
 
 	h.JSONR(c, h.OKStatus, tag)
@@ -272,16 +272,16 @@ func TagCategoryAll(c *gin.Context) {
 
 	var categorys []*app.TagCategory
 	var totalCount int64
-	db := g.Con().Portal.Debug().Model(app.TagCategory{})
+	tx := g.Con().Portal.Debug().Model(app.TagCategory{})
 	if inputs.Name != "" {
-		db = db.Where("`name` regexp ?", inputs.Name)
+		tx = tx.Where("`name` regexp ?", inputs.Name)
 	}
 
-	db.Count(&totalCount)
+	tx.Count(&totalCount)
 	if inputs.OrderBy != "" {
-		db = db.Order(utils.Camel2Case(inputs.OrderBy) + " " + inputs.Order)
+		tx = tx.Order(utils.Camel2Case(inputs.OrderBy) + " " + inputs.Order)
 	}
-	db.Find(&categorys)
+	tx.Find(&categorys)
 
 	resp := &APIGetTagCategoryListOutputs{
 		List:       categorys,
@@ -314,17 +314,17 @@ func TagCategoryList(c *gin.Context) {
 
 	var categorys []*app.TagCategory
 	var totalCount int64
-	db := g.Con().Portal.Debug().Model(app.TagCategory{})
+	tx := g.Con().Portal.Debug().Model(app.TagCategory{})
 	if inputs.Name != "" {
-		db = db.Where("`name` regexp ?", inputs.Name)
+		tx = tx.Where("`name` regexp ?", inputs.Name)
 	}
 
-	db.Count(&totalCount)
+	tx.Count(&totalCount)
 	if inputs.OrderBy != "" {
-		db = db.Order(utils.Camel2Case(inputs.OrderBy) + " " + inputs.Order)
+		tx = tx.Order(utils.Camel2Case(inputs.OrderBy) + " " + inputs.Order)
 	}
-	db = db.Offset(offset).Limit(limit)
-	db.Find(&categorys)
+	tx = tx.Offset(offset).Limit(limit)
+	tx.Find(&categorys)
 
 	resp := &APIGetTagCategoryListOutputs{
 		List:       categorys,
@@ -350,8 +350,8 @@ func TagCategoryInfo(c *gin.Context) {
 	}
 
 	var tc *app.TagCategory
-	db := g.Con().Portal.Debug().Model(app.TagCategory{})
-	db.Where("id = ?", id).Find(&tc)
+	tx := g.Con().Portal.Debug().Model(app.TagCategory{})
+	tx.Where("id = ?", id).Find(&tc)
 
 	h.JSONR(c, http.StatusOK, tc)
 	return
@@ -388,8 +388,8 @@ func TagCategoryCreate(c *gin.Context) {
 		CreateAt: gtime.Now(),
 	}
 	tx := g.Con().Portal
-	if dt := tx.Model(app.TagCategory{}).Create(&tagCategory); dt.Error != nil {
-		h.JSONR(c, h.ExpecStatus, dt.Error)
+	if tx = tx.Model(app.TagCategory{}).Create(&tagCategory); tx.Error != nil {
+		h.JSONR(c, h.ExpecStatus, tx.Error)
 	}
 
 	h.JSONR(c, h.OKStatus, tagCategory)
@@ -419,8 +419,8 @@ func TagCategoryUpdate(c *gin.Context) {
 		CreateAt: gtime.Now(),
 	}
 	tx := g.Con().Portal
-	if dt := tx.Model(app.TagCategory{}).Where("id = ?", inputs.ID).Updates(&tagCategory); dt.Error != nil {
-		h.JSONR(c, h.ExpecStatus, dt.Error)
+	if tx = tx.Model(app.TagCategory{}).Where("id = ?", inputs.ID).Updates(&tagCategory); tx.Error != nil {
+		h.JSONR(c, h.ExpecStatus, tx.Error)
 	}
 
 	h.JSONR(c, h.OKStatus, tagCategory)
@@ -455,17 +455,17 @@ func TagCategoryTags(c *gin.Context) {
 
 	var tags []*app.Tag
 	var totalCount int64
-	db := g.Con().Portal.Model(app.Tag{})
-	db = db.Select("`tag`.*, `tag_category`.name as category_name")
-	db = db.Joins("left join `tag_category` on `tag`.`category_id` = `tag_category`.`id`")
+	tx := g.Con().Portal.Model(app.Tag{})
+	tx = tx.Select("`tag`.*, `tag_category`.name as category_name")
+	tx = tx.Joins("left join `tag_category` on `tag`.`category_id` = `tag_category`.`id`")
 	if inputs.CategoryID != "" {
-		db = db.Where("`tag`.category_id = ?", inputs.CategoryID)
+		tx = tx.Where("`tag`.category_id = ?", inputs.CategoryID)
 	}
 	if inputs.CategoryName != "" {
-		db = db.Where("`tag_category`.name = ?", inputs.CategoryName)
+		tx = tx.Where("`tag_category`.name = ?", inputs.CategoryName)
 	}
-	db.Count(&totalCount)
-	db.Find(&tags)
+	tx.Count(&totalCount)
+	tx.Find(&tags)
 
 	resp := &APIGetTagCategoryTagsOutputs{
 		List:       tags,

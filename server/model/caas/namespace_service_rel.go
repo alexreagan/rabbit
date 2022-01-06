@@ -13,8 +13,8 @@ func (this NamespaceServiceRel) TableName() string {
 
 func (this NamespaceServiceRel) Existing() bool {
 	var nsr NamespaceServiceRel
-	db := g.Con().Portal
-	db.Model(this).Where("namespace = ? and service = ?", this.NameSpace, this.Service).Scan(&nsr)
+	tx := g.Con().Portal.Model(this)
+	tx.Where("namespace = ? and service = ?", this.NameSpace, this.Service).Scan(&nsr)
 	if nsr.NameSpace != 0 {
 		return true
 	} else {

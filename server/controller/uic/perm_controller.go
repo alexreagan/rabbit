@@ -46,20 +46,20 @@ func PermList(c *gin.Context) {
 
 	var perms []*uic.Perm
 	var totalCount int64
-	db := g.Con().Portal.Model(uic.Perm{})
+	tx := g.Con().Portal.Model(uic.Perm{})
 	if inputs.Name != "" {
-		db = db.Where("name regexp ?", inputs.Name)
+		tx = tx.Where("name regexp ?", inputs.Name)
 	}
 	if inputs.CnName != "" {
-		db = db.Where("cn_name regexp ?", inputs.CnName)
+		tx = tx.Where("cn_name regexp ?", inputs.CnName)
 	}
-	db.Count(&totalCount)
+	tx.Count(&totalCount)
 
 	if inputs.OrderBy != "" {
-		db = db.Order(utils.Camel2Case(inputs.OrderBy) + " " + inputs.Order)
+		tx = tx.Order(utils.Camel2Case(inputs.OrderBy) + " " + inputs.Order)
 	}
-	db = db.Offset(offset).Limit(limit)
-	db.Find(&perms)
+	tx = tx.Offset(offset).Limit(limit)
+	tx.Find(&perms)
 
 	resp := &APIGetPermListOutputs{
 		List:       perms,
@@ -95,14 +95,14 @@ func PermCreate(c *gin.Context) {
 		return
 	}
 
-	db := g.Con().Portal.Model(uic.Perm{})
+	tx := g.Con().Portal.Model(uic.Perm{})
 	perm := &uic.Perm{
 		Name:     inputs.Name,
 		CnName:   inputs.CnName,
 		Remark:   inputs.Remark,
 		CreateAt: gtime.Now(),
 	}
-	db = db.Create(perm)
+	tx = tx.Create(perm)
 
 	resp := &APIGetPermCreateOutputs{
 		Perm: perm,
@@ -133,10 +133,10 @@ func PermUpdate(c *gin.Context) {
 		Remark:   inputs.Remark,
 		CreateAt: gtime.Now(),
 	}
-	db := g.Con().Portal.Model(uic.Perm{})
-	db = db.Where("id = ?", inputs.ID).Updates(perm)
-	if db.Error != nil {
-		h.JSONR(c, http.StatusExpectationFailed, db.Error)
+	tx := g.Con().Portal.Model(uic.Perm{})
+	tx = tx.Where("id = ?", inputs.ID).Updates(perm)
+	if tx.Error != nil {
+		h.JSONR(c, http.StatusExpectationFailed, tx.Error)
 		return
 	}
 
@@ -163,10 +163,10 @@ func PermInfo(c *gin.Context) {
 	id := c.Query("id")
 
 	var perm *uic.Perm
-	db := g.Con().Portal.Model(uic.Perm{})
-	db = db.Where("id = ?", id).Find(&perm)
-	if db.Error != nil {
-		h.JSONR(c, http.StatusExpectationFailed, db.Error)
+	tx := g.Con().Portal.Model(uic.Perm{})
+	tx = tx.Where("id = ?", id).Find(&perm)
+	if tx.Error != nil {
+		h.JSONR(c, http.StatusExpectationFailed, tx.Error)
 		return
 	}
 
@@ -192,14 +192,14 @@ func PermMyself(c *gin.Context) {
 	user, _ := h.GetUser(c)
 
 	var perms []*uic.Perm
-	db := g.Con().Portal.Model(uic.Perm{}).Debug()
-	db = db.Select("`perm`.*")
-	db = db.Joins("left join `role_perm_rel` on `perm`.`id` = `role_perm_rel`.`perm`")
-	db = db.Joins("left join `user_role_rel` on `role_perm_rel`.`role` = `user_role_rel`.`role`")
-	db = db.Where("`user_role_rel`.`user` = ?", user.ID)
-	db = db.Find(&perms)
-	if db.Error != nil {
-		h.JSONR(c, http.StatusExpectationFailed, db.Error)
+	tx := g.Con().Portal.Model(uic.Perm{}).Debug()
+	tx = tx.Select("`perm`.*")
+	tx = tx.Joins("left join `role_perm_rel` on `perm`.`id` = `role_perm_rel`.`perm`")
+	tx = tx.Joins("left join `user_role_rel` on `role_perm_rel`.`role` = `user_role_rel`.`role`")
+	tx = tx.Where("`user_role_rel`.`user` = ?", user.ID)
+	tx = tx.Find(&perms)
+	if tx.Error != nil {
+		h.JSONR(c, http.StatusExpectationFailed, tx.Error)
 		return
 	}
 

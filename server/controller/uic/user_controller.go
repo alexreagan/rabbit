@@ -53,16 +53,16 @@ func UserList(c *gin.Context) {
 	}
 
 	//for get correct table name
-	db := g.Con().Uic.Table(uic.User{}.TableName())
-	db = db.Where("username like ? ", inputs.UserName+"%")
-	db = db.Or("ad_username like ?", inputs.UserName+"%")
-	db = db.Or("nickname like ?", inputs.UserName+"%")
+	tx := g.Con().Uic.Table(uic.User{}.TableName())
+	tx = tx.Where("username like ? ", inputs.UserName+"%")
+	tx = tx.Or("ad_username like ?", inputs.UserName+"%")
+	tx = tx.Or("nickname like ?", inputs.UserName+"%")
 
 	var totalCount int64
-	db.Count(&totalCount)
+	tx.Count(&totalCount)
 	var users []*uic.User
-	db = db.Order("id DESC").Offset(offset).Limit(limit)
-	db.Find(&users)
+	tx = tx.Order("id DESC").Offset(offset).Limit(limit)
+	tx.Find(&users)
 
 	resp := &APIGetUserListOutputs{
 		List:       users,

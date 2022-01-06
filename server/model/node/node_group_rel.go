@@ -22,23 +22,23 @@ import (
 // | Field   | Type             | Null | Key | Default | Extra |
 // +---------+------------------+------+-----+---------+-------+
 // | group_id  | int(11) unsigned | NO   | PRI | NULL    |       |
-// | host_od   | int(11)          | NO   | PRI | NULL    |       |
+// | node_id   | int(11)          | NO   | PRI | NULL    |       |
 // +---------+------------------+------+-----+---------+-------+
 
-type HostGroupRel struct {
+type NodeGroupRel struct {
 	GroupID int64 `gorm:"column:group_id"`
-	HostID  int64 `gorm:"column:host_id"`
+	NodeID  int64 `gorm:"column:node_id"`
 }
 
-func (this HostGroupRel) TableName() string {
-	return "host_group_rel"
+func (this NodeGroupRel) TableName() string {
+	return "node_group_rel"
 }
 
-func (this HostGroupRel) Existing() bool {
-	var tGrpHost HostGroupRel
-	db := g.Con()
-	db.Portal.Table(this.TableName()).Where("group_id = ? AND host_id = ?", this.GroupID, this.HostID).Scan(&tGrpHost)
-	if tGrpHost.GroupID != 0 {
+func (this NodeGroupRel) Existing() bool {
+	var tGrpNode NodeGroupRel
+	tx := g.Con().Portal.Model(this)
+	tx.Where("group_id = ? AND node_id = ?", this.GroupID, this.NodeID).Scan(&tGrpNode)
+	if tGrpNode.GroupID != 0 {
 		return true
 	} else {
 		return false

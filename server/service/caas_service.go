@@ -16,19 +16,20 @@ type caasService struct {
 
 func (s *caasService) GetNameSpaceLatestTime() time.Time {
 	var latest time.Time
-	db := g.Con().Portal.Model(caas.NameSpace{})
-	db = db.Select("max(update_time)")
-	db = db.Find(&latest)
+	tx := g.Con().Portal.Model(caas.NameSpace{})
+	tx = tx.Select("max(update_time)")
+	tx = tx.Find(&latest)
 	return latest
 }
 
 func (s *caasService) DeleteNameSpaceBeforeTime(timestamp time.Time) {
 	var namespaces []*caas.NameSpace
-	db := g.Con().Portal.Begin()
-	dt := db.Model(caas.NameSpace{}).Debug()
-	dt = dt.Where("update_time < ?", timestamp)
-	dt = dt.Find(&namespaces)
+	tx := g.Con().Portal.Begin()
+	tx = tx.Model(caas.NameSpace{})
+	tx = tx.Where("update_time < ?", timestamp)
+	tx = tx.Find(&namespaces)
 	if len(namespaces) == 0 {
+		tx.Rollback()
 		return
 	}
 
@@ -38,41 +39,42 @@ func (s *caasService) DeleteNameSpaceBeforeTime(timestamp time.Time) {
 	}
 
 	var rels []*caas.NamespaceServiceRel
-	dt = db.Model(caas.NamespaceServiceRel{}).Debug()
-	dt = dt.Where("namespace_id in (?)", ids)
-	if dt = dt.Delete(&rels); dt.Error != nil {
-		db.Rollback()
-		log.Error(dt.Error)
+	tx = tx.Model(caas.NamespaceServiceRel{})
+	tx = tx.Where("namespace_id in (?)", ids)
+	if err := tx.Delete(&rels).Error; err != nil {
+		tx.Rollback()
+		log.Error(err)
 		return
 	}
 
-	dt = db.Model(caas.NameSpace{})
-	dt = dt.Where("id in (?)", ids)
-	if dt = dt.Delete(&namespaces); dt.Error != nil {
-		db.Rollback()
-		log.Error(dt.Error)
+	tx = tx.Model(caas.NameSpace{})
+	tx = tx.Where("id in (?)", ids)
+	if err := tx.Delete(&namespaces).Error; err != nil {
+		tx.Rollback()
+		log.Error(err)
 		return
 	}
 
-	db.Commit()
+	tx.Commit()
 }
 
 func (s *caasService) GetServiceLatestTime() time.Time {
 	var latest time.Time
-	db := g.Con().Portal.Model(caas.Service{})
-	db = db.Select("max(update_time)")
-	db = db.Find(&latest)
+	tx := g.Con().Portal.Model(caas.Service{})
+	tx = tx.Select("max(update_time)")
+	tx = tx.Find(&latest)
 	return latest
 }
 
 func (s *caasService) DeleteServiceBeforeTime(timestamp time.Time) {
-	db := g.Con().Portal.Begin()
+	tx := g.Con().Portal.Begin()
 
 	var services []*caas.Service
-	dt := g.Con().Portal.Model(caas.Service{})
-	dt = dt.Where("update_time < ?", timestamp)
-	dt = dt.Find(&services)
+	tx = tx.Model(caas.Service{})
+	tx = tx.Where("update_time < ?", timestamp)
+	tx = tx.Find(&services)
 	if len(services) == 0 {
+		tx.Rollback()
 		return
 	}
 
@@ -81,83 +83,83 @@ func (s *caasService) DeleteServiceBeforeTime(timestamp time.Time) {
 		ids = append(ids, service.ID)
 	}
 	var rels []*caas.NamespaceServiceRel
-	dt = db.Model(caas.NamespaceServiceRel{})
-	dt = dt.Where("service in (?)", ids)
-	if dt = dt.Delete(&rels); dt.Error != nil {
-		db.Rollback()
-		log.Error(dt.Error)
+	tx = tx.Model(caas.NamespaceServiceRel{})
+	tx = tx.Where("service in (?)", ids)
+	if err := tx.Delete(&rels).Error; err != nil {
+		tx.Rollback()
+		log.Error(err)
 		return
 	}
 
 	var servicePodRels []*caas.ServicePodRel
-	dt = db.Model(caas.ServicePodRel{})
-	dt = dt.Where("service in (?)", ids)
-	if dt = dt.Delete(&servicePodRels); dt.Error != nil {
-		db.Rollback()
-		log.Error(dt.Error)
+	tx = tx.Model(caas.ServicePodRel{})
+	tx = tx.Where("service in (?)", ids)
+	if err := tx.Delete(&servicePodRels).Error; err != nil {
+		tx.Rollback()
+		log.Error(err)
 		return
 	}
 
 	var servicePortRels []*caas.ServicePortRel
-	dt = db.Model(caas.ServicePortRel{})
-	dt = dt.Where("service in (?)", ids)
-	if dt = dt.Delete(&servicePortRels); dt.Error != nil {
-		db.Rollback()
-		log.Error(dt.Error)
+	tx = tx.Model(caas.ServicePortRel{})
+	tx = tx.Where("service in (?)", ids)
+	if err := tx.Delete(&servicePortRels).Error; err != nil {
+		tx.Rollback()
+		log.Error(err)
 		return
 	}
 
-	dt = db.Model(caas.Service{})
-	dt = dt.Where("id in (?)", ids)
-	if dt = dt.Delete(&services); dt.Error != nil {
-		db.Rollback()
-		log.Error(dt.Error)
+	tx = tx.Model(caas.Service{})
+	tx = tx.Where("id in (?)", ids)
+	if err := tx.Delete(&services).Error; err != nil {
+		tx.Rollback()
+		log.Error(err)
 		return
 	}
 
-	db.Commit()
+	tx.Commit()
 }
 
 func (s *caasService) GetPodLatestTime() time.Time {
 	var latest time.Time
-	db := g.Con().Portal.Model(caas.Pod{})
-	db = db.Select("max(update_time)")
-	db = db.Find(&latest)
+	tx := g.Con().Portal.Model(caas.Pod{})
+	tx = tx.Select("max(update_time)")
+	tx = tx.Find(&latest)
 	return latest
 }
 
 func (s *caasService) DeletePodBeforeTime(timestamp time.Time) {
 	var pods []*caas.Pod
-	db := g.Con().Portal.Begin()
-	dt := db.Model(caas.Pod{})
-	dt = dt.Where("update_time < ?", timestamp)
-	if dt = dt.Delete(&pods); dt.Error != nil {
-		db.Rollback()
-		log.Error(dt.Error)
+	tx := g.Con().Portal.Begin()
+	tx = tx.Model(caas.Pod{})
+	tx = tx.Where("update_time < ?", timestamp)
+	if err := tx.Delete(&pods).Error; err != nil {
+		tx.Rollback()
+		log.Error(err)
 		return
 	}
-	db.Commit()
+	tx.Commit()
 }
 
 func (s *caasService) GetPortLatestTime() time.Time {
 	var latest time.Time
-	db := g.Con().Portal.Model(caas.Port{})
-	db = db.Select("max(update_time)")
-	db = db.Find(&latest)
+	tx := g.Con().Portal.Model(caas.Port{})
+	tx = tx.Select("max(update_time)")
+	tx = tx.Find(&latest)
 	return latest
 }
 
 func (s *caasService) DeletePortBeforeTime(timestamp time.Time) {
 	var ports []*caas.Port
-	db := g.Con().Portal.Begin()
-	dt := db.Model(caas.Port{})
-	dt = dt.Where("update_time < ?", timestamp)
-	if dt = dt.Delete(&ports); dt.Error != nil {
-		db.Rollback()
-		log.Error(dt.Error)
+	tx := g.Con().Portal.Begin()
+	tx = tx.Model(caas.Port{})
+	tx = tx.Where("update_time < ?", timestamp)
+	if err := tx.Delete(&ports).Error; err != nil {
+		tx.Rollback()
+		log.Error(err)
 		return
 	}
-	db.Commit()
+	tx.Commit()
 }
 
 // 含有tagIDs的Pods
@@ -174,13 +176,13 @@ func (s *caasService) PodsHavingTagIDs(tagIDs []int64) []*caas.Pod {
 	}
 
 	var pods caas.Pods
-	db := g.Con().Portal.Model(caas.Pod{}).Debug()
-	db = db.Joins("left join `caas_service_pod_rel` on `caas_service_pod_rel`.`pod`=`caas_pod`.`id`")
-	db = db.Joins("left join `caas_service_tag_rel` on `caas_service_tag_rel`.`service`=`caas_service_pod_rel`.`service`")
-	db = db.Where("`caas_service_tag_rel`.`tag` in (?)", tagIDs)
-	db = db.Group("`caas_service_pod_rel`.`pod`")
-	db = db.Having("group_concat(`caas_service_tag_rel`.`tag` order by `caas_service_tag_rel`.`tag`) = ?", strings.Join(tmp, ","))
-	db.Find(&pods)
+	tx := g.Con().Portal.Model(caas.Pod{}).Debug()
+	tx = tx.Joins("left join `caas_service_pod_rel` on `caas_service_pod_rel`.`pod`=`caas_pod`.`id`")
+	tx = tx.Joins("left join `caas_service_tag_rel` on `caas_service_tag_rel`.`service`=`caas_service_pod_rel`.`service`")
+	tx = tx.Where("`caas_service_tag_rel`.`tag` in (?)", tagIDs)
+	tx = tx.Group("`caas_service_pod_rel`.`pod`")
+	tx = tx.Having("group_concat(`caas_service_tag_rel`.`tag` order by `caas_service_tag_rel`.`tag`) = ?", strings.Join(tmp, ","))
+	tx.Find(&pods)
 
 	pods.Sort()
 	return pods
@@ -188,19 +190,19 @@ func (s *caasService) PodsHavingTagIDs(tagIDs []int64) []*caas.Pod {
 
 func (s *caasService) GetAllService() []*caas.Service {
 	var services []*caas.Service
-	db := g.Con().Portal.Model(caas.Service{})
-	db.Find(&services)
+	tx := g.Con().Portal.Model(caas.Service{})
+	tx.Find(&services)
 	return services
 }
 
 func (this caasService) GetServiceRelatedTags(service *caas.Service) []*app.Tag {
 	var tags []*app.Tag
-	db := g.Con().Portal.Model(app.Tag{}).Debug()
-	db = db.Select("`tag`.*, `tag_category`.name as category_name")
-	db = db.Joins("left join `caas_service_tag_rel` on `caas_service_tag_rel`.`tag` = `tag`.id")
-	db = db.Joins("left join `tag_category` on `tag_category`.id = `tag`.category_id")
-	db = db.Where("`caas_service_tag_rel`.`service` = ?", service.ID)
-	db.Find(&tags)
+	tx := g.Con().Portal.Model(app.Tag{}).Debug()
+	tx = tx.Select("`tag`.*, `tag_category`.name as category_name")
+	tx = tx.Joins("left join `caas_service_tag_rel` on `caas_service_tag_rel`.`tag` = `tag`.id")
+	tx = tx.Joins("left join `tag_category` on `tag_category`.id = `tag`.category_id")
+	tx = tx.Where("`caas_service_tag_rel`.`service` = ?", service.ID)
+	tx.Find(&tags)
 	return tags
 }
 

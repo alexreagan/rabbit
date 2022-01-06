@@ -8,11 +8,11 @@ import (
 	"strings"
 )
 
-var globalTree []*HostGroup
-var globalNodeMap map[int64]*HostGroup
+var globalTree []*NodeGroup
+var globalNodeMap map[int64]*NodeGroup
 var GroupPathSeperator = "/"
 
-type HostGroup struct {
+type NodeGroup struct {
 	ID                int64        `json:"id" gorm:"primary_key;column:id"`
 	Type              string       `json:"type" gorm:"column:type;type:enum('vmGroup','containerGroup');default:'vmGroup';comment:"`
 	Name              string       `json:"name" gorm:"column:name;type:string;size:128;comment:"`
@@ -23,31 +23,31 @@ type HostGroup struct {
 	CaasServiceID     int64        `json:"caasServiceId" gorm:"column:caas_service_id;comment:"`
 	Desc              string       `json:"desc" gorm:"column:desc;type:string;size:256;comment:"`
 	CreateUser        string       `json:"createUser" gorm:"column:create_user;type:string;size:32;comment:"`
-	Children          []*HostGroup `json:"children" gorm:"-"`
+	Children          []*NodeGroup `json:"children" gorm:"-"`
 	SubGroupCount     int          `json:"subGroupCount" gorm:"-"`
-	RelatedHostCount  int          `json:"relatedHostCount" gorm:"-"`
+	RelatedNodeCount  int          `json:"relatedNodeCount" gorm:"-"`
 	RelatedPodCount   int          `json:"relatedPodCount" gorm:"-"`
-	ChildrenHostCount int          `json:"childrenHostCount" gorm:"-"`
+	ChildrenNodeCount int          `json:"childrenNodeCount" gorm:"-"`
 	ChildrenPodCount  int          `json:"childrenPodCount" gorm:"-"`
 	IsWarning         bool         `json:"isWarning" gorm:"-"`
 }
 
-func (this HostGroup) TableName() string {
-	return "host_group"
+func (this NodeGroup) TableName() string {
+	return "node_group"
 }
 
-//type HostGroupPro struct {
-//	HostGroup
-//	Children          []*HostGroupPro `json:"children"`
+//type nodeGroupPro struct {
+//	NodeGroup
+//	Children          []*nodeGroupPro `json:"children"`
 //	SubGroupCount     int             `json:"subGroupCount"`
-//	RelatedHostsCount  int             `json:"relatedHostCount"`
+//	RelatedNodesCount  int             `json:"relatedNodeCount"`
 //	RelatedPodCount   int             `json:"relatedPodCount"`
-//	ChildrenHostCount int             `json:"childrenHostCount"`
+//	ChildrenNodeCount int             `json:"childrenNodeCount"`
 //	ChildrenPodCount  int             `json:"childrenPodCount"`
 //	IsWarning         bool            `json:"isWarning"`
 //}
 
-func (this *HostGroup) UpdateChildrenPath() {
+func (this *NodeGroup) UpdateChildrenPath() {
 	groupPathArray := this.GetPath()
 	children := this.GetRTChildren()
 	for _, child := range children {
@@ -55,9 +55,9 @@ func (this *HostGroup) UpdateChildrenPath() {
 		tGroupPath = append(tGroupPath, child.Name)
 		groupPathArrayBytes, _ := json.Marshal(tGroupPath)
 
-		db := g.Con().Portal.Model(HostGroup{})
-		db = db.Where("id = ?", child.ID).Updates(
-			HostGroup{
+		tx := g.Con().Portal.Model(NodeGroup{})
+		tx = tx.Where("id = ?", child.ID).Updates(
+			&NodeGroup{
 				Path:      strings.Join(tGroupPath, GroupPathSeperator),
 				PathArray: string(groupPathArrayBytes),
 			})
@@ -66,35 +66,35 @@ func (this *HostGroup) UpdateChildrenPath() {
 	return
 }
 
-func (this HostGroup) GetParentName() string {
-	var hostGroup HostGroup
-	db := g.Con().Portal.Model(HostGroup{})
-	db = db.Where("id = ?", this.ParentID)
-	db.Find(&hostGroup)
-	return hostGroup.Name
+func (this NodeGroup) GetParentName() string {
+	var nodeGroup NodeGroup
+	tx := g.Con().Portal.Model(NodeGroup{})
+	tx = tx.Where("id = ?", this.ParentID)
+	tx.Find(&nodeGroup)
+	return nodeGroup.Name
 }
 
-func (this HostGroup) BuildTree(id int64) ([]*HostGroup, map[int64]*HostGroup) {
+func (this NodeGroup) BuildTree(id int64) ([]*NodeGroup, map[int64]*NodeGroup) {
 	if globalTree != nil {
 		return globalTree, globalNodeMap
 	}
-	var hostGroups []*HostGroup
-	globalNodeMap = make(map[int64]*HostGroup)
+	var nodeGroups []*NodeGroup
+	globalNodeMap = make(map[int64]*NodeGroup)
 
-	db := g.Con().Portal.Debug().Model(HostGroup{})
+	tx := g.Con().Portal.Model(NodeGroup{})
 	if id != 0 {
-		db = db.Where("id = ? or parent_id = ?", id, id)
+		tx = tx.Where("id = ? or parent_id = ?", id, id)
 	}
-	db = db.Order("name")
-	db.Find(&hostGroups)
+	tx = tx.Order("name")
+	tx.Find(&nodeGroups)
 
 	// 组建树状结构
-	for _, grp := range hostGroups {
+	for _, grp := range nodeGroups {
 		// 群组默认为叶子节点，没达到报警条件
 		grp.IsWarning = false
 		globalNodeMap[grp.ID] = grp
 	}
-	for _, grp := range hostGroups {
+	for _, grp := range nodeGroups {
 		if grp.ParentID == 0 {
 			globalTree = append(globalTree, grp)
 		} else if _, ok := globalNodeMap[grp.ParentID]; ok {
@@ -120,12 +120,12 @@ func (this HostGroup) BuildTree(id int64) ([]*HostGroup, map[int64]*HostGroup) {
 
 	for _, grp := range globalNodeMap {
 		grp.SubGroupCount = len(grp.Children)
-		grp.RelatedHostCount = len(HostGroup{ID: grp.ID}.RelatedHosts())
-		grp.RelatedPodCount = len(HostGroup{ID: grp.ID, CaasServiceID: grp.CaasServiceID}.RelatedPods())
+		grp.RelatedNodeCount = len(NodeGroup{ID: grp.ID}.RelatedNodes())
+		grp.RelatedPodCount = len(NodeGroup{ID: grp.ID, CaasServiceID: grp.CaasServiceID}.RelatedPods())
 
 		// 叶子节点加权
 		if len(grp.Children) == 0 {
-			grp.ChildrenHostCount = grp.RelatedHostCount
+			grp.ChildrenNodeCount = grp.RelatedNodeCount
 			grp.ChildrenPodCount = grp.RelatedPodCount
 
 			t := grp
@@ -133,7 +133,7 @@ func (this HostGroup) BuildTree(id int64) ([]*HostGroup, map[int64]*HostGroup) {
 				if t.ParentID == 0 {
 					break
 				}
-				globalNodeMap[t.ParentID].ChildrenHostCount += grp.ChildrenHostCount
+				globalNodeMap[t.ParentID].ChildrenNodeCount += grp.ChildrenNodeCount
 				globalNodeMap[t.ParentID].ChildrenPodCount += grp.ChildrenPodCount
 
 				t = globalNodeMap[t.ParentID]
@@ -143,25 +143,25 @@ func (this HostGroup) BuildTree(id int64) ([]*HostGroup, map[int64]*HostGroup) {
 	return globalTree, globalNodeMap
 }
 
-func (this HostGroup) ReBuildTree() ([]*HostGroup, map[int64]*HostGroup) {
+func (this NodeGroup) ReBuildTree() ([]*NodeGroup, map[int64]*NodeGroup) {
 	globalTree = nil
 	globalNodeMap = nil
 	return this.BuildTree(0)
 }
 
-func (this HostGroup) GetPath() []string {
+func (this NodeGroup) GetPath() []string {
 	var pathArray []string
 	id := this.ID
 	for {
-		hostGroup := &HostGroup{}
-		db := g.Con().Portal.Model(HostGroup{})
-		db.Where("id = ?", id).Find(&hostGroup)
-		pathArray = append(pathArray, hostGroup.Name)
+		nodeGroup := &NodeGroup{}
+		tx := g.Con().Portal.Model(NodeGroup{})
+		tx.Where("id = ?", id).Find(&nodeGroup)
+		pathArray = append(pathArray, nodeGroup.Name)
 
-		if hostGroup.ParentID == 0 {
+		if nodeGroup.ParentID == 0 {
 			break
 		}
-		id = hostGroup.ParentID
+		id = nodeGroup.ParentID
 	}
 	var reversePathArray []string
 	for i := len(pathArray) - 1; i >= 0; i-- {
@@ -170,41 +170,27 @@ func (this HostGroup) GetPath() []string {
 	return reversePathArray
 }
 
-func (this HostGroup) GetJsonPath() string {
+func (this NodeGroup) GetJsonPath() string {
 	reversePath := this.GetPath()
 	path, _ := json.Marshal(reversePath)
 	return string(path)
 }
 
-func (this HostGroup) GetRTChildren() []*HostGroup {
-	var hostGroups []*HostGroup
-	dt := g.Con().Portal.Model(HostGroup{})
-	dt = dt.Where("parent_id = ?", this.ID).Find(&hostGroups)
-	return hostGroups
+func (this NodeGroup) GetRTChildren() []*NodeGroup {
+	var nodeGroups []*NodeGroup
+	tx := g.Con().Portal.Model(NodeGroup{})
+	tx = tx.Where("parent_id = ?", this.ID).Find(&nodeGroups)
+	return nodeGroups
 }
 
-func (this HostGroup) GetChildren() []*HostGroup {
+func (this NodeGroup) GetChildren() []*NodeGroup {
 	if globalNodeMap == nil {
 		this.BuildTree(0)
 	}
 	return globalNodeMap[this.ID].Children
 }
 
-func (this HostGroup) RelatedHosts() []*Host {
-	//var hostGroupRels []*HostGroupRel
-	//g.Con().Portal.Model(HostGroupRel{}).Where("`group_id` = ?", this.Tag).Find(&hostGroupRels)
-	//var hostIds []int64
-	//for _, t := range hostGroupRels {
-	//	hostIds = append(hostIds, t.HostID)
-	//}
-	//var hosts []*Host
-	//g.Con().Portal.Model(Host{}).Where("id in (?)", hostIds).Find(&hosts)
-
-	//// 添加报警标识
-	//for _, host := range hosts {
-	//	host.AdditionalAttrs()
-	//}
-
+func (this NodeGroup) RelatedNodes() []*Node {
 	// 报警信息
 	alarms := alarm.Alarm{}.LatestRecords()
 	alarmMap := make(map[string]*alarm.Alarm)
@@ -213,40 +199,39 @@ func (this HostGroup) RelatedHosts() []*Host {
 	}
 
 	// 当前组关联的机器
-	var hosts []*Host
-	db := g.Con().Portal.Debug()
-	db = db.Model(Host{})
-	db = db.Select("`host`.*")
-	db = db.Joins("left join `host_group_rel` on `host_group_rel`.`host_id` = `host`.`id`")
-	db = db.Where("`host_group_rel`.`group_id` = ?", this.ID)
-	db = db.Find(&hosts)
+	var nodes []*Node
+	tx := g.Con().Portal.Model(Node{})
+	tx = tx.Select("`node`.*")
+	tx = tx.Joins("left join `node_group_rel` on `node_group_rel`.`node_id` = `node`.`id`")
+	tx = tx.Where("`node_group_rel`.`group_id` = ?", this.ID)
+	tx = tx.Find(&nodes)
 
 	// 报警信息
-	for _, h := range hosts {
-		h.Type = "host"
+	for _, n := range nodes {
+		n.Type = "node"
 
-		alt, ok := alarmMap[h.IP]
+		alt, ok := alarmMap[n.IP]
 		if ok {
-			h.IsWarning = alt.Resolved == false
+			n.IsWarning = alt.Resolved == false
 		} else {
-			h.IsWarning = false
+			n.IsWarning = false
 		}
 	}
-	return hosts
+	return nodes
 }
 
 // 判断群组是否满足报警条件
-func (this HostGroup) MeetWarningCondition() bool {
-	hosts := this.RelatedHosts()
-	for _, host := range hosts {
-		if host.IsWarning == true {
+func (this NodeGroup) MeetWarningCondition() bool {
+	nodes := this.RelatedNodes()
+	for _, n := range nodes {
+		if n.IsWarning == true {
 			return true
 		}
 	}
 	return false
 }
 
-func (this HostGroup) RelatedPods() []*caas.Pod {
+func (this NodeGroup) RelatedPods() []*caas.Pod {
 	var pods []*caas.Pod
 	tx := g.Con().Portal.Model(caas.Pod{}).Debug()
 	tx = tx.Select("`caas_pod`.*")

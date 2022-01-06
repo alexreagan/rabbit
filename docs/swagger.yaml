@@ -63,11 +63,11 @@ definitions:
         $ref: '#/definitions/gtime.GTime'
         type: object
     type: object
-  app.APIGetHostGroupTreeOutputs:
+  app.APIGetNodeGroupTreeOutputs:
     properties:
-      hostGroups:
+      nodeGroups:
         items:
-          $ref: '#/definitions/node.HostGroup'
+          $ref: '#/definitions/node.NodeGroup'
         type: array
     type: object
   app.APIGetTagAllInputs:
@@ -210,13 +210,13 @@ definitions:
     type: object
   app.APIPostTemplateDesignInputs:
     properties:
+      combos:
+        items:
+          $ref: '#/definitions/app.G6Combos'
+        type: array
       edges:
         items:
           $ref: '#/definitions/app.G6Edge'
-        type: array
-      groups:
-        items:
-          $ref: '#/definitions/app.G6Group'
         type: array
       id:
         type: integer
@@ -235,6 +235,8 @@ definitions:
         type: string
       state:
         type: string
+    type: object
+  app.G6Combos:
     type: object
   app.G6Edge:
     properties:
@@ -266,8 +268,6 @@ definitions:
       type:
         type: string
     type: object
-  app.G6Group:
-    type: object
   app.G6Node:
     properties:
       color:
@@ -285,7 +285,6 @@ definitions:
       label:
         type: string
       name:
-        description: TagID      int64       `json:"tagID" form:"tagID"`
         type: string
       offsetX:
         type: number
@@ -337,9 +336,6 @@ definitions:
       remark:
         type: string
       type:
-        description: |-
-          Label        string      `json:"label" gorm:"column:label;type:string;size:128;comment:画布上的展现文字"`
-          Size         string      `json:"size" gorm:"column:size;type:string;size:64;comment:大小，譬如170*34"`
         type: string
     type: object
   app.TagCategory:
@@ -834,15 +830,15 @@ definitions:
         type: string
       totalCpuCount:
         type: integer
-      totalHostCount:
+      totalNodeCount:
         type: integer
       unUsedCpuCount:
         type: integer
-      unUsedHostCount:
+      unUsedNodeCount:
         type: integer
       usedCpuCount:
         type: integer
-      usedHostCount:
+      usedNodeCount:
         type: integer
     type: object
   chart.APIGetChartStatOutputs:
@@ -855,15 +851,15 @@ definitions:
         type: array
       totalCpuCount:
         type: integer
-      totalHostCount:
+      totalNodeCount:
         type: integer
       unUsedCpuCount:
         type: integer
-      unUsedHostCount:
+      unUsedNodeCount:
         type: integer
       usedCpuCount:
         type: integer
-      usedHostCount:
+      usedNodeCount:
         type: integer
     type: object
   gtime.GTime:
@@ -884,7 +880,7 @@ definitions:
       totalCount:
         type: integer
     type: object
-  node.APIGetHostApplyRequestListData:
+  node.APIGetNodeApplyRequestListData:
     properties:
       applier:
         type: string
@@ -902,18 +898,18 @@ definitions:
         type: object
       creator:
         type: string
-      hostIDs:
-        type: string
-      hosts:
-        items:
-          $ref: '#/definitions/node.Host'
-        type: array
       id:
         type: integer
       memory:
         type: integer
       name:
         type: string
+      nodeIDs:
+        type: string
+      nodes:
+        items:
+          $ref: '#/definitions/node.Node'
+        type: array
       releaseAt:
         $ref: '#/definitions/gtime.GTime'
         type: object
@@ -928,7 +924,7 @@ definitions:
           $ref: '#/definitions/app.Tag'
         type: array
     type: object
-  node.APIGetHostApplyRequestListInputs:
+  node.APIGetNodeApplyRequestListInputs:
     properties:
       applier:
         type: string
@@ -941,16 +937,16 @@ definitions:
       page:
         type: integer
     type: object
-  node.APIGetHostApplyRequestListOutputs:
+  node.APIGetNodeApplyRequestListOutputs:
     properties:
       list:
         items:
-          $ref: '#/definitions/node.APIGetHostApplyRequestListData'
+          $ref: '#/definitions/node.APIGetNodeApplyRequestListData'
         type: array
       totalCount:
         type: integer
     type: object
-  node.APIGetHostGroupListInputs:
+  node.APIGetNodeGroupListInputs:
     properties:
       limit:
         type: integer
@@ -959,16 +955,16 @@ definitions:
       page:
         type: integer
     type: object
-  node.APIGetHostGroupListOutputs:
+  node.APIGetNodeGroupListOutputs:
     properties:
       list:
         items:
-          $ref: '#/definitions/node.HostGroup'
+          $ref: '#/definitions/node.NodeGroup'
         type: array
       totalCount:
         type: integer
     type: object
-  node.APIGetHostListInputs:
+  node.APIGetNodeListInputs:
     properties:
       areaName:
         type: string
@@ -1004,34 +1000,34 @@ definitions:
         type: string
       tagIDs[]:
         description: |-
-          G6Group                 string  `json:"group" form:"group"`
+          G6Combos                 string  `json:"group" form:"group"`
           BoundGroup            string  `json:"boundGroup" form:"boundGroup"`
         items:
           type: integer
         type: array
     type: object
-  node.APIGetHostListOutputs:
+  node.APIGetNodeListOutputs:
     properties:
       list:
         items:
-          $ref: '#/definitions/node.Host'
+          $ref: '#/definitions/node.Node'
         type: array
       totalCount:
         type: integer
     type: object
-  node.APIGetHostSelectInputs:
+  node.APIGetNodeSelectInputs:
     properties:
       query:
         type: string
     type: object
-  node.APIPostHostApplyRequestAssignInputs:
+  node.APIPostNodeApplyRequestAssignInputs:
     properties:
-      hostIDs:
+      id:
+        type: integer
+      nodeIDs:
         items:
           type: integer
         type: array
-      id:
-        type: integer
       state:
         type: string
       tagIDs:
@@ -1039,7 +1035,7 @@ definitions:
           type: integer
         type: array
     type: object
-  node.APIPostHostApplyRequestCreateInputs:
+  node.APIPostNodeApplyRequestCreateInputs:
     properties:
       applier:
         type: string
@@ -1056,7 +1052,7 @@ definitions:
       remark:
         type: string
     type: object
-  node.APIPostHostBatchUpdateInputs:
+  node.APIPostNodeBatchUpdateInputs:
     properties:
       devOwner:
         type: string
@@ -1069,7 +1065,7 @@ definitions:
           type: integer
         type: array
     type: object
-  node.APIPostHostUpdateInputs:
+  node.APIPostNodeUpdateInputs:
     properties:
       devOwner:
         type: string
@@ -1090,7 +1086,7 @@ definitions:
     required:
     - ip
     type: object
-  node.APIPutHostGroupInputs:
+  node.APIPutNodeGroupInputs:
     properties:
       caasServiceId:
         type: integer
@@ -1111,7 +1107,7 @@ definitions:
     - name
     - type
     type: object
-  node.Host:
+  node.Node:
     properties:
       applyUser:
         type: string
@@ -1151,7 +1147,7 @@ definitions:
         type: string
       groups:
         items:
-          $ref: '#/definitions/node.HostGroup'
+          $ref: '#/definitions/node.NodeGroup'
         type: array
       id:
         type: integer
@@ -1164,6 +1160,8 @@ definitions:
       logicSystem:
         type: string
       logicSystemCnName:
+        type: string
+      machine:
         type: string
       manIp:
         type: string
@@ -1193,6 +1191,8 @@ definitions:
         type: string
       physicalSystemEnName:
         type: string
+      release:
+        type: string
       servSpaceCodeList:
         type: string
       servSpaceNameList:
@@ -1205,6 +1205,8 @@ definitions:
         type: string
       status:
         type: string
+      sysName:
+        type: string
       tags:
         items:
           $ref: '#/definitions/app.Tag'
@@ -1213,20 +1215,22 @@ definitions:
         type: string
       updateTime:
         type: string
+      version:
+        type: string
       virtFcNum:
         type: string
       virtNetNum:
         type: string
     type: object
-  node.HostGroup:
+  node.NodeGroup:
     properties:
       caasServiceId:
         type: integer
       children:
         items:
-          $ref: '#/definitions/node.HostGroup'
+          $ref: '#/definitions/node.NodeGroup'
         type: array
-      childrenHostCount:
+      childrenNodeCount:
         type: integer
       childrenPodCount:
         type: integer
@@ -1248,7 +1252,7 @@ definitions:
         type: string
       pathArray:
         type: string
-      relatedHostCount:
+      relatedNodeCount:
         type: integer
       relatedPodCount:
         type: integer
@@ -1257,11 +1261,11 @@ definitions:
       type:
         type: string
     type: object
-  node.HostGroupRel:
+  node.NodeGroupRel:
     properties:
       groupID:
         type: integer
-      hostID:
+      nodeID:
         type: integer
     type: object
   pub.APIGetPubListInputs:
@@ -1373,22 +1377,12 @@ definitions:
         $ref: '#/definitions/gtime.GTime'
         type: object
     type: object
-  service.TagGraphChildNode:
-    type: object
   service.TagGraphNode:
     properties:
-      UnTaggedHostsCount:
-        type: integer
-      UnTaggedPodsCount:
-        type: integer
       categoryID:
         type: integer
       categoryName:
         type: string
-      children:
-        items:
-          $ref: '#/definitions/service.TagGraphChildNode'
-        type: array
       cnName:
         type: string
       createAt:
@@ -1407,11 +1401,11 @@ definitions:
         items:
           type: integer
         type: array
-      relatedHosts:
+      relatedNodes:
         items:
-          $ref: '#/definitions/node.Host'
+          $ref: '#/definitions/node.Node'
         type: array
-      relatedHostsCount:
+      relatedNodesCount:
         type: integer
       relatedPods:
         description: 当前tag下关联的所有Pod
@@ -1423,20 +1417,21 @@ definitions:
       remark:
         type: string
       type:
-        description: |-
-          Label        string      `json:"label" gorm:"column:label;type:string;size:128;comment:画布上的展现文字"`
-          Size         string      `json:"size" gorm:"column:size;type:string;size:64;comment:大小，譬如170*34"`
         type: string
-      unTaggedHosts:
+      unTaggedNodes:
         description: 当前tag下未关联到子tag的机器
         items:
-          $ref: '#/definitions/node.Host'
+          $ref: '#/definitions/node.Node'
         type: array
+      unTaggedNodesCount:
+        type: integer
       unTaggedPods:
         description: 当前tag下未关联到子tag的Pod
         items:
           $ref: '#/definitions/caas.Pod'
         type: array
+      unTaggedPodsCount:
+        type: integer
     type: object
   sys.APIGetMenuNavListOutputs:
     properties:
@@ -1963,7 +1958,7 @@ paths:
           description: bad arguments
         "417":
           description: internal error
-      summary: 更新host group信息
+      summary: 获取caas service列表
   /api/v1/caas/service/refresh_pods:
     get:
       parameters:
@@ -2082,531 +2077,6 @@ paths:
         "417":
           description: internal error
       summary: 统计平台收纳的所有机器数/cpu数/已分配机器数/已分配cpu数
-  /api/v1/host/area_choices:
-    get:
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/model.APIGetVariableOutputs'
-        "400":
-          description: bad arguments
-        "417":
-          description: internal error
-      summary: 区域类别
-  /api/v1/host/batch/update:
-    put:
-      parameters:
-      - description: 更新机器标签和负责人信息
-        in: body
-        name: APIPostHostBatchUpdateInputs
-        schema:
-          $ref: '#/definitions/node.APIPostHostBatchUpdateInputs'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/node.APIPostHostBatchUpdateInputs'
-        "400":
-          description: bad arguments
-        "417":
-          description: internal error
-      summary: 更新机器标签和负责人
-  /api/v1/host/create:
-    post:
-      parameters:
-      - description: 创建新机器IP
-        in: formData
-        name: IP
-        required: true
-        type: string
-      - description: 创建HostName
-        in: formData
-        name: Hostname
-        type: string
-      - description: 创建HostGroup
-        in: formData
-        name: GroupID
-        type: string
-      - description: 创建Tenant
-        in: formData
-        name: Tenant
-        type: string
-      - description: 创建Env
-        in: formData
-        name: Env
-        type: string
-      - description: 创建Project
-        in: formData
-        name: Project
-        type: string
-      - description: 创建Module
-        in: formData
-        name: Module
-        type: string
-      - description: 创建DevOwner
-        in: formData
-        name: DevOwner
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/node.APIPostHostUpdateInputs'
-        "400":
-          description: bad arguments
-        "417":
-          description: internal error
-      summary: 创建新机器
-  /api/v1/host/detail:
-    get:
-      parameters:
-      - description: 根据机器ID获取机器详细信息
-        in: query
-        name: id
-        required: true
-        type: string
-      - description: 根据机器IP获取机器详细信息
-        in: query
-        name: ip
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/node.Host'
-        "400":
-          description: bad arguments
-        "417":
-          description: internal error
-      summary: 根据机器ID或IP获取机器详细信息
-  /api/v1/host/info:
-    get:
-      parameters:
-      - description: 根据机器ID获取机器详细信息
-        in: query
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/node.Host'
-        "400":
-          description: bad arguments
-        "417":
-          description: internal error
-      summary: 根据机器ID获取机器详细信息
-  /api/v1/host/list:
-    get:
-      parameters:
-      - in: query
-        name: areaName
-        type: string
-      - in: query
-        name: cpuNumber
-        type: integer
-      - in: query
-        name: cpuUsageLowerLimit
-        type: number
-      - in: query
-        name: cpuUsageUpperLimit
-        type: number
-      - in: query
-        name: fsUsageLowerLimit
-        type: number
-      - in: query
-        name: fsUsageUpperLimit
-        type: number
-      - in: query
-        name: ip
-        type: string
-      - in: query
-        name: limit
-        type: integer
-      - in: query
-        name: memoryUsageLowerLimit
-        type: number
-      - in: query
-        name: memoryUsageUpperLimit
-        type: number
-      - in: query
-        name: order
-        type: string
-      - in: query
-        name: orderBy
-        type: string
-      - in: query
-        name: page
-        type: integer
-      - in: query
-        name: physicalSystem
-        type: string
-      - in: query
-        name: relatedTag
-        type: string
-      - in: query
-        name: status
-        type: string
-      - description: |-
-          G6Group                 string  `json:"group" form:"group"`
-          BoundGroup            string  `json:"boundGroup" form:"boundGroup"`
-        in: query
-        items:
-          type: integer
-        name: tagIDs[]
-        type: array
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/node.APIGetHostListOutputs'
-        "400":
-          description: bad arguments
-        "417":
-          description: internal error
-      summary: 机器列表接口
-  /api/v1/host/physical_system_choices:
-    get:
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/model.APIGetVariableOutputs'
-        "400":
-          description: bad arguments
-        "417":
-          description: internal error
-      summary: 物理子系统类别
-  /api/v1/host/select:
-    get:
-      parameters:
-      - in: query
-        name: query
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/node.APIGetHostListOutputs'
-        "400":
-          description: bad arguments
-        "417":
-          description: internal error
-      summary: 机器查找
-  /api/v1/host/update:
-    put:
-      parameters:
-      - description: 根据IP更新机器信息
-        in: formData
-        name: IP
-        required: true
-        type: string
-      - description: 更新HostName
-        in: formData
-        name: Hostname
-        type: string
-      - description: 更新HostGroup
-        in: formData
-        name: GroupID
-        type: string
-      - description: 更新DevOwner
-        in: formData
-        name: DevOwner
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/node.APIPostHostUpdateInputs'
-        "400":
-          description: bad arguments
-        "417":
-          description: internal error
-      summary: 更新机器信息
-  /api/v1/host_apply_request/assign:
-    put:
-      parameters:
-      - description: 创建机器申请单处理
-        in: body
-        name: APIPostHostApplyRequestAssignInputs
-        required: true
-        schema:
-          $ref: '#/definitions/node.APIPostHostApplyRequestAssignInputs'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: json
-        "400":
-          description: bad arguments
-        "417":
-          description: internal error
-      summary: 创建机器申请单处理
-  /api/v1/host_apply_request/create:
-    post:
-      parameters:
-      - description: 创建机器申请单
-        in: body
-        name: APIPostHostApplyRequestCreateInputs
-        required: true
-        schema:
-          $ref: '#/definitions/node.APIPostHostApplyRequestCreateInputs'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: json
-        "400":
-          description: bad arguments
-        "417":
-          description: internal error
-      summary: 创建机器申请单
-  /api/v1/host_apply_request/info:
-    get:
-      parameters:
-      - description: 根据请求单ID获取详细信息
-        in: query
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/node.Host'
-        "400":
-          description: bad arguments
-        "417":
-          description: internal error
-      summary: 根据请求单ID获取详细信息
-  /api/v1/host_apply_request/list:
-    get:
-      parameters:
-      - in: query
-        name: applier
-        type: string
-      - in: query
-        name: limit
-        type: integer
-      - in: query
-        name: order
-        type: string
-      - in: query
-        name: orderBy
-        type: string
-      - in: query
-        name: page
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/node.APIGetHostApplyRequestListOutputs'
-        "400":
-          description: bad arguments
-        "417":
-          description: internal error
-      summary: 机器资源申请列表
-  /api/v1/host_group/all:
-    get:
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/node.APIGetHostGroupListOutputs'
-        "400":
-          description: bad arguments
-        "417":
-          description: internal error
-      summary: 获取所有host group信息
-  /api/v1/host_group/bind_host:
-    post:
-      parameters:
-      - description: 根据ID获取host group树状信息
-        in: query
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/node.HostGroupRel'
-        "417":
-          description: internal error
-      summary: 获取host group信息
-  /api/v1/host_group/create:
-    post:
-      parameters:
-      - in: query
-        name: limit
-        type: integer
-      - in: query
-        name: name
-        type: string
-      - in: query
-        name: page
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/node.APIGetHostGroupListOutputs'
-        "400":
-          description: bad arguments
-        "417":
-          description: internal error
-      summary: 创建host group信息
-  /api/v1/host_group/delete:
-    post:
-      parameters:
-      - description: 删除host group信息
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/node.HostGroup'
-        "417":
-          description: internal error
-      summary: 删除host group信息
-  /api/v1/host_group/get:
-    get:
-      parameters:
-      - description: 根据机器群组名称获取机器群组详细信息
-        in: query
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "400":
-          description: bad arguments
-        "417":
-          description: internal error
-      summary: 根据机器群组名称获取机器群组详细信息
-  /api/v1/host_group/list:
-    get:
-      parameters:
-      - in: query
-        name: limit
-        type: integer
-      - in: query
-        name: name
-        type: string
-      - in: query
-        name: page
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/node.APIGetHostGroupListOutputs'
-        "400":
-          description: bad arguments
-        "417":
-          description: internal error
-      summary: 获取host group列表
-  /api/v1/host_group/related_hosts:
-    get:
-      parameters:
-      - description: group路径
-        in: query
-        name: path
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/node.HostGroup'
-        "417":
-          description: internal error
-      summary: 根据group路径获取group下所有的host
-  /api/v1/host_group/update:
-    put:
-      parameters:
-      - in: query
-        name: caasServiceId
-        type: integer
-      - in: query
-        name: desc
-        type: string
-      - in: query
-        name: id
-        required: true
-        type: integer
-      - in: query
-        name: name
-        required: true
-        type: string
-      - in: query
-        name: parentID
-        type: integer
-      - in: query
-        name: parentName
-        type: string
-      - in: query
-        name: type
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/node.HostGroup'
-        "400":
-          description: bad arguments
-        "417":
-          description: internal error
-      summary: 更新host group信息
   /api/v1/menu/info/:id:
     get:
       parameters:
@@ -2677,6 +2147,531 @@ paths:
         "417":
           description: internal error
       summary: 更新机器信息
+  /api/v1/node/area_choices:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.APIGetVariableOutputs'
+        "400":
+          description: bad arguments
+        "417":
+          description: internal error
+      summary: 区域类别
+  /api/v1/node/batch/update:
+    put:
+      parameters:
+      - description: 更新机器标签和负责人信息
+        in: body
+        name: APIPostNodeBatchUpdateInputs
+        schema:
+          $ref: '#/definitions/node.APIPostNodeBatchUpdateInputs'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/node.APIPostNodeBatchUpdateInputs'
+        "400":
+          description: bad arguments
+        "417":
+          description: internal error
+      summary: 更新机器标签和负责人
+  /api/v1/node/create:
+    post:
+      parameters:
+      - description: 创建新机器IP
+        in: formData
+        name: IP
+        required: true
+        type: string
+      - description: 创建NodeName
+        in: formData
+        name: Nodename
+        type: string
+      - description: 创建NodeGroup
+        in: formData
+        name: GroupID
+        type: string
+      - description: 创建Tenant
+        in: formData
+        name: Tenant
+        type: string
+      - description: 创建Env
+        in: formData
+        name: Env
+        type: string
+      - description: 创建Project
+        in: formData
+        name: Project
+        type: string
+      - description: 创建Module
+        in: formData
+        name: Module
+        type: string
+      - description: 创建DevOwner
+        in: formData
+        name: DevOwner
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/node.APIPostNodeUpdateInputs'
+        "400":
+          description: bad arguments
+        "417":
+          description: internal error
+      summary: 创建新机器
+  /api/v1/node/detail:
+    get:
+      parameters:
+      - description: 根据机器ID获取机器详细信息
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: 根据机器IP获取机器详细信息
+        in: query
+        name: ip
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/node.Node'
+        "400":
+          description: bad arguments
+        "417":
+          description: internal error
+      summary: 根据机器ID或IP获取机器详细信息
+  /api/v1/node/info:
+    get:
+      parameters:
+      - description: 根据机器ID获取机器详细信息
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/node.Node'
+        "400":
+          description: bad arguments
+        "417":
+          description: internal error
+      summary: 根据机器ID获取机器详细信息
+  /api/v1/node/list:
+    get:
+      parameters:
+      - in: query
+        name: areaName
+        type: string
+      - in: query
+        name: cpuNumber
+        type: integer
+      - in: query
+        name: cpuUsageLowerLimit
+        type: number
+      - in: query
+        name: cpuUsageUpperLimit
+        type: number
+      - in: query
+        name: fsUsageLowerLimit
+        type: number
+      - in: query
+        name: fsUsageUpperLimit
+        type: number
+      - in: query
+        name: ip
+        type: string
+      - in: query
+        name: limit
+        type: integer
+      - in: query
+        name: memoryUsageLowerLimit
+        type: number
+      - in: query
+        name: memoryUsageUpperLimit
+        type: number
+      - in: query
+        name: order
+        type: string
+      - in: query
+        name: orderBy
+        type: string
+      - in: query
+        name: page
+        type: integer
+      - in: query
+        name: physicalSystem
+        type: string
+      - in: query
+        name: relatedTag
+        type: string
+      - in: query
+        name: status
+        type: string
+      - description: |-
+          G6Combos                 string  `json:"group" form:"group"`
+          BoundGroup            string  `json:"boundGroup" form:"boundGroup"`
+        in: query
+        items:
+          type: integer
+        name: tagIDs[]
+        type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/node.APIGetNodeListOutputs'
+        "400":
+          description: bad arguments
+        "417":
+          description: internal error
+      summary: 机器列表接口
+  /api/v1/node/physical_system_choices:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.APIGetVariableOutputs'
+        "400":
+          description: bad arguments
+        "417":
+          description: internal error
+      summary: 物理子系统类别
+  /api/v1/node/select:
+    get:
+      parameters:
+      - in: query
+        name: query
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/node.APIGetNodeListOutputs'
+        "400":
+          description: bad arguments
+        "417":
+          description: internal error
+      summary: 机器查找
+  /api/v1/node/update:
+    put:
+      parameters:
+      - description: 根据IP更新机器信息
+        in: formData
+        name: IP
+        required: true
+        type: string
+      - description: 更新NodeName
+        in: formData
+        name: Nodename
+        type: string
+      - description: 更新NodeGroup
+        in: formData
+        name: GroupID
+        type: string
+      - description: 更新DevOwner
+        in: formData
+        name: DevOwner
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/node.APIPostNodeUpdateInputs'
+        "400":
+          description: bad arguments
+        "417":
+          description: internal error
+      summary: 更新机器信息
+  /api/v1/node_apply_request/assign:
+    put:
+      parameters:
+      - description: 创建机器申请单处理
+        in: body
+        name: APIPostNodeApplyRequestAssignInputs
+        required: true
+        schema:
+          $ref: '#/definitions/node.APIPostNodeApplyRequestAssignInputs'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: json
+        "400":
+          description: bad arguments
+        "417":
+          description: internal error
+      summary: 创建机器申请单处理
+  /api/v1/node_apply_request/create:
+    post:
+      parameters:
+      - description: 创建机器申请单
+        in: body
+        name: APIPostNodeApplyRequestCreateInputs
+        required: true
+        schema:
+          $ref: '#/definitions/node.APIPostNodeApplyRequestCreateInputs'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: json
+        "400":
+          description: bad arguments
+        "417":
+          description: internal error
+      summary: 创建机器申请单
+  /api/v1/node_apply_request/info:
+    get:
+      parameters:
+      - description: 根据请求单ID获取详细信息
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/node.Node'
+        "400":
+          description: bad arguments
+        "417":
+          description: internal error
+      summary: 根据请求单ID获取详细信息
+  /api/v1/node_apply_request/list:
+    get:
+      parameters:
+      - in: query
+        name: applier
+        type: string
+      - in: query
+        name: limit
+        type: integer
+      - in: query
+        name: order
+        type: string
+      - in: query
+        name: orderBy
+        type: string
+      - in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/node.APIGetNodeApplyRequestListOutputs'
+        "400":
+          description: bad arguments
+        "417":
+          description: internal error
+      summary: 机器资源申请列表
+  /api/v1/node_group/all:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/node.APIGetNodeGroupListOutputs'
+        "400":
+          description: bad arguments
+        "417":
+          description: internal error
+      summary: 获取所有node group信息
+  /api/v1/node_group/bind_node:
+    post:
+      parameters:
+      - description: 绑定node到node group
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/node.NodeGroupRel'
+        "417":
+          description: internal error
+      summary: 绑定node到node group
+  /api/v1/node_group/create:
+    post:
+      parameters:
+      - in: query
+        name: limit
+        type: integer
+      - in: query
+        name: name
+        type: string
+      - in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/node.APIGetNodeGroupListOutputs'
+        "400":
+          description: bad arguments
+        "417":
+          description: internal error
+      summary: 创建node group
+  /api/v1/node_group/delete:
+    post:
+      parameters:
+      - description: 删除node group
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/node.NodeGroup'
+        "417":
+          description: internal error
+      summary: 删除node group
+  /api/v1/node_group/get:
+    get:
+      parameters:
+      - description: 根据机器群组名称获取机器群组详细信息
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "400":
+          description: bad arguments
+        "417":
+          description: internal error
+      summary: 根据机器群组名称获取机器群组详细信息
+  /api/v1/node_group/list:
+    get:
+      parameters:
+      - in: query
+        name: limit
+        type: integer
+      - in: query
+        name: name
+        type: string
+      - in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/node.APIGetNodeGroupListOutputs'
+        "400":
+          description: bad arguments
+        "417":
+          description: internal error
+      summary: 获取node group列表
+  /api/v1/node_group/related_nodes:
+    get:
+      parameters:
+      - description: group路径
+        in: query
+        name: path
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/node.NodeGroup'
+        "417":
+          description: internal error
+      summary: 根据group路径获取group下所有的node
+  /api/v1/node_group/update:
+    put:
+      parameters:
+      - in: query
+        name: caasServiceId
+        type: integer
+      - in: query
+        name: desc
+        type: string
+      - in: query
+        name: id
+        required: true
+        type: integer
+      - in: query
+        name: name
+        required: true
+        type: string
+      - in: query
+        name: parentID
+        type: integer
+      - in: query
+        name: parentName
+        type: string
+      - in: query
+        name: type
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/node.NodeGroup'
+        "400":
+          description: bad arguments
+        "417":
+          description: internal error
+      summary: 更新node group
   /api/v1/param/create:
     post:
       parameters:
@@ -3364,6 +3359,39 @@ paths:
         "417":
           description: internal error
       summary: 更新tag category
+  /api/v1/template/all:
+    get:
+      parameters:
+      - in: query
+        name: limit
+        type: integer
+      - in: query
+        name: name
+        type: string
+      - in: query
+        name: order
+        type: string
+      - in: query
+        name: orderBy
+        type: string
+      - in: query
+        name: page
+        type: integer
+      - in: query
+        name: remark
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.APIGetTemplateListOutputs'
+        "400":
+          description: bad arguments
+        "417":
+          description: internal error
+      summary: 展现模板所有数据
   /api/v1/template/create:
     post:
       parameters:
@@ -3483,7 +3511,7 @@ paths:
   /api/v1/tree/children:
     get:
       parameters:
-      - description: 根据ID获取host group树状信息
+      - description: 根据ID获取node children信息
         in: query
         name: id
         required: true
@@ -3494,12 +3522,12 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app.APIGetHostGroupTreeOutputs'
+            $ref: '#/definitions/app.APIGetNodeGroupTreeOutputs'
         "400":
           description: bad arguments
         "417":
           description: internal error
-      summary: 获取host group信息
+      summary: 获取node children信息
   /api/v1/tree/rebuild:
     get:
       produces:
@@ -3509,7 +3537,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/node.HostGroup'
+              $ref: '#/definitions/node.NodeGroup'
             type: array
         "400":
           description: bad arguments
@@ -3613,7 +3641,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app.APIGetHostGroupTreeOutputs'
+            $ref: '#/definitions/app.APIGetNodeGroupTreeOutputs'
         "400":
           description: bad arguments
         "417":

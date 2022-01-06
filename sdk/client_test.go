@@ -4,13 +4,13 @@ import (
 	"testing"
 )
 
-func TestGetHostsByGroup(t *testing.T) {
+func TestGetNodesByGroup(t *testing.T) {
 	c := &YangtzeClient{
 		Addr: "http://localhost:8080",
 	}
-	hosts, err := c.GetHostsByGroup("ROOT/DMP")
-	for _, host := range hosts {
-		t.Logf("%+v", host)
+	nodes, err := c.GetNodesByGroup("ROOT/DMP")
+	for _, n := range nodes {
+		t.Logf("%+v", n)
 	}
 	t.Logf("%+v", err)
 }

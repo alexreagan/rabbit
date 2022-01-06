@@ -365,10 +365,10 @@ func (s *KunYuanSyncer) SyncBase() {
 			}
 
 			// 保存数据
-			db := g.Con().Portal
+			tx := g.Con().Portal
 			for _, record := range syncerResult.Data.Records {
 				vt, _ := time.ParseInLocation(tTimeFormat, record.DeployDate, time.Local)
-				h := &node.Host{
+				h := &node.Node{
 					Name:                 record.ServPartName,
 					ApplyUser:            record.ApplyUser,
 					AreaName:             record.AreaName,
@@ -388,23 +388,23 @@ func (s *KunYuanSyncer) SyncBase() {
 					PhysicalSystemArea:   record.SubSystemAreaName,
 					LogicSystemCnName:    record.LogicSystemCnName,
 					UpdateTime:           time.Now(),
-					State:                node.HostStatusServicing,
+					State:                node.NodeStatusServicing,
 				}
 
-				var hh node.Host
+				var hh node.Node
 				if record.ProdIp != "" {
-					db.Model(hh).Where(node.Host{IP: record.ProdIp}).First(&hh)
+					tx.Model(hh).Where(node.Node{IP: record.ProdIp}).First(&hh)
 					if hh.ID == 0 {
-						db.Model(hh).Create(h)
+						tx.Model(hh).Create(h)
 					} else {
-						db.Model(hh).Where(node.Host{IP: record.ProdIp}).Updates(h)
+						tx.Model(hh).Where(node.Node{IP: record.ProdIp}).Updates(h)
 					}
 				} else if record.ServPartName != "" {
-					db.Model(hh).Where(node.Host{Name: record.ServPartName}).First(&hh)
+					tx.Model(hh).Where(node.Node{Name: record.ServPartName}).First(&hh)
 					if hh.ID == 0 {
-						db.Model(hh).Create(h)
+						tx.Model(hh).Create(h)
 					} else {
-						db.Model(hh).Where(node.Host{Name: record.ServPartName}).Updates(h)
+						tx.Model(hh).Where(node.Node{Name: record.ServPartName}).Updates(h)
 					}
 				}
 			}
@@ -548,7 +548,7 @@ func (s *KunYuanSyncer) SyncAlarm() {
 			break
 		}
 
-		db := g.Con().Portal
+		tx := g.Con().Portal
 		for _, record := range syncerResult.Data.Alerts {
 			firingTime, _ := time.ParseInLocation(timeFormat, record.FiringTime, time.Local)
 			resolvedTime, _ := time.ParseInLocation(timeFormat, record.ResolvedTime, time.Local)
@@ -573,11 +573,11 @@ func (s *KunYuanSyncer) SyncAlarm() {
 
 			var oalm alarm.Alarm
 			if record.ID != 0 {
-				db.Model(oalm).Where(alarm.Alarm{ID: record.ID}).First(&oalm)
+				tx.Model(oalm).Where(alarm.Alarm{ID: record.ID}).First(&oalm)
 				if oalm.ID == 0 {
-					db.Model(oalm).Create(alm)
+					tx.Model(oalm).Create(alm)
 				} else {
-					db.Model(oalm).Where(alarm.Alarm{ID: record.ID}).Updates(alm)
+					tx.Model(oalm).Where(alarm.Alarm{ID: record.ID}).Updates(alm)
 				}
 			}
 		}
@@ -612,10 +612,10 @@ func (s *KunYuanSyncer) SyncMonitor() {
 				break
 			}
 
-			db := g.Con().Portal
+			tx := g.Con().Portal
 			for _, record := range syncerResult.Data.Servers {
 				coreTotalNum, _ := strconv.Atoi(record.CoreTotalNum)
-				h := &node.Host{
+				h := &node.Node{
 					IP:                   record.ProdIp,
 					Name:                 record.ServPartName,
 					CloudPoolCode:        record.CloudPoolCode,
@@ -646,7 +646,7 @@ func (s *KunYuanSyncer) SyncMonitor() {
 					VirtFcNum:            record.VirtFcNum,
 					VirtNetNum:           record.VirtNetNum,
 					UpdateTime:           time.Now(),
-					State:                node.HostStatusServicing,
+					State:                node.NodeStatusServicing,
 					//ApplyUser:            record.ApplyUser,
 					//AreaName:             record.AreaName,
 					//CpuNumber:            record.CpuNumber,
@@ -658,20 +658,20 @@ func (s *KunYuanSyncer) SyncMonitor() {
 					//OsVersion:            record.OsVersion,
 				}
 
-				var hh node.Host
+				var hh node.Node
 				if record.ProdIp != "" {
-					db.Model(hh).Where(node.Host{IP: record.ProdIp}).First(&hh)
+					tx.Model(hh).Where(node.Node{IP: record.ProdIp}).First(&hh)
 					if hh.ID == 0 {
-						db.Model(hh).Create(h)
+						tx.Model(hh).Create(h)
 					} else {
-						db.Model(hh).Where(node.Host{IP: record.ProdIp}).Updates(h)
+						tx.Model(hh).Where(node.Node{IP: record.ProdIp}).Updates(h)
 					}
 				} else if record.ServPartName != "" {
-					db.Model(hh).Where(node.Host{Name: record.ServPartName}).First(&hh)
+					tx.Model(hh).Where(node.Node{Name: record.ServPartName}).First(&hh)
 					if hh.ID == 0 {
-						db.Model(hh).Create(h)
+						tx.Model(hh).Create(h)
 					} else {
-						db.Model(hh).Where(node.Host{Name: record.ServPartName}).Updates(h)
+						tx.Model(hh).Where(node.Node{Name: record.ServPartName}).Updates(h)
 					}
 				}
 			}

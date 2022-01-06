@@ -12,11 +12,11 @@ type paramService struct{}
 
 func (s *paramService) get(key string) (string, error) {
 	var value string
-	db := g.Con().Portal.Debug().Model(sys.Param{})
-	db = db.Select("value")
-	db = db.Where("`key` = ?", key)
-	db = db.Find(&value)
-	return value, db.Error
+	tx := g.Con().Portal.Model(sys.Param{})
+	tx = tx.Select("value")
+	tx = tx.Where("`key` = ?", key)
+	tx = tx.Find(&value)
+	return value, tx.Error
 }
 
 func (s *paramService) Get(key string) (string, error) {
@@ -34,10 +34,10 @@ func (s *paramService) GetInt(key string) (int, error) {
 
 func (s *paramService) GetTreeOrder() ([]string, error) {
 	var value string
-	db := g.Con().Portal.Debug().Model(sys.Param{})
-	db.Select("value")
-	db.Where("`key` = ?", "tree.order")
-	if db = db.Find(&value); db.Error != nil {
+	tx := g.Con().Portal.Model(sys.Param{})
+	tx.Select("value")
+	tx.Where("`key` = ?", "tree.order")
+	if tx = tx.Find(&value); tx.Error != nil {
 		return []string{}, errors.New("there's no such record")
 	}
 

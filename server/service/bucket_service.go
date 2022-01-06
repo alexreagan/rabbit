@@ -8,13 +8,13 @@ import (
 type bucketService struct {
 }
 
-func (s *bucketService) Sort(hosts []*node.Host, tags []*app.Tag) (map[int64]*app.Tag, []*node.Host) {
-	// host tag map
-	hostTagMap := make(map[int64]*app.Tag)
-	for _, host := range hosts {
-		for _, tag := range host.RelatedTags() {
-			if _, ok := hostTagMap[tag.ID]; !ok {
-				hostTagMap[tag.ID] = tag
+func (s *bucketService) Sort(nodes []*node.Node, tags []*app.Tag) (map[int64]*app.Tag, []*node.Node) {
+	// node tag map
+	nodeTagMap := make(map[int64]*app.Tag)
+	for _, n := range nodes {
+		for _, tag := range n.RelatedTags() {
+			if _, ok := nodeTagMap[tag.ID]; !ok {
+				nodeTagMap[tag.ID] = tag
 			}
 		}
 	}
@@ -27,11 +27,11 @@ func (s *bucketService) Sort(hosts []*node.Host, tags []*app.Tag) (map[int64]*ap
 		}
 	}
 
-	// host tag与tag桶的交集
+	// n tag与tag桶的交集
 	intersectTags := make([]*app.Tag, 0)
-	for _, hostTag := range hostTagMap {
+	for _, nodeTag := range nodeTagMap {
 		for _, tag := range tagMap {
-			if hostTag.ID == tag.ID {
+			if nodeTag.ID == tag.ID {
 				intersectTags = append(intersectTags, tag)
 			}
 		}
@@ -39,23 +39,23 @@ func (s *bucketService) Sort(hosts []*node.Host, tags []*app.Tag) (map[int64]*ap
 
 	// tag 交集
 	intersectTagMap := make(map[int64]*app.Tag)
-	unTaggedHost := make([]*node.Host, 0)
+	unTaggedNode := make([]*node.Node, 0)
 	for _, tag := range intersectTags {
 		intersectTagMap[tag.ID] = tag
 	}
-	for _, host := range hosts {
+	for _, n := range nodes {
 		tagged := false
-		for _, tag := range host.RelatedTags() {
+		for _, tag := range n.RelatedTags() {
 			if _, ok := intersectTagMap[tag.ID]; ok {
-				//intersectTagMap[tag.Tag].RelatedHosts = append(intersectTagMap[tag.Tag].RelatedHosts, host)
+				//intersectTagMap[tag.Tag].RelatedNodes = append(intersectTagMap[tag.Tag].RelatedNodes, n)
 				tagged = true
 			}
 		}
 		if tagged == false {
-			unTaggedHost = append(unTaggedHost, host)
+			unTaggedNode = append(unTaggedNode, n)
 		}
 	}
-	return intersectTagMap, unTaggedHost
+	return intersectTagMap, unTaggedNode
 }
 
 func newBucketService() *bucketService {

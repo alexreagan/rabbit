@@ -13,14 +13,14 @@ type YangtzeClient struct {
 const ConnTimeout = 1 * time.Second
 const ReadWriteTimeout = 5 * time.Second
 
-// 根据group路径获取路径下所有的host
-func (c *YangtzeClient) GetHostsByGroup(path string) ([]*node.Host, error) {
-	uri := "/api/v1/host_group/related_hosts"
+// 根据group路径获取路径下所有的node
+func (c *YangtzeClient) GetNodesByGroup(path string) ([]*node.Node, error) {
+	uri := "/api/v1/node_group/related_nodes"
 	req := httplib.Get(c.Addr + uri)
 	req = req.SetTimeout(ConnTimeout, ReadWriteTimeout)
 	req.Param("path", path)
 
-	var resp []*node.Host
+	var resp []*node.Node
 	err := req.ToJson(&resp)
 	return resp, err
 }

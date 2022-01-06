@@ -356,7 +356,7 @@ var doc = `{
                 "produces": [
                     "application/json"
                 ],
-                "summary": "更新host group信息",
+                "summary": "获取caas service列表",
                 "parameters": [
                     {
                         "type": "integer",
@@ -578,832 +578,6 @@ var doc = `{
                 }
             }
         },
-        "/api/v1/host/area_choices": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "区域类别",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/model.APIGetVariableOutputs"
-                        }
-                    },
-                    "400": {
-                        "description": "bad arguments"
-                    },
-                    "417": {
-                        "description": "internal error"
-                    }
-                }
-            }
-        },
-        "/api/v1/host/batch/update": {
-            "put": {
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "更新机器标签和负责人",
-                "parameters": [
-                    {
-                        "description": "更新机器标签和负责人信息",
-                        "name": "APIPostHostBatchUpdateInputs",
-                        "in": "body",
-                        "schema": {
-                            "$ref": "#/definitions/node.APIPostHostBatchUpdateInputs"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/node.APIPostHostBatchUpdateInputs"
-                        }
-                    },
-                    "400": {
-                        "description": "bad arguments"
-                    },
-                    "417": {
-                        "description": "internal error"
-                    }
-                }
-            }
-        },
-        "/api/v1/host/create": {
-            "post": {
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "创建新机器",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "创建新机器IP",
-                        "name": "IP",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "创建HostName",
-                        "name": "Hostname",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "创建HostGroup",
-                        "name": "GroupID",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "创建Tenant",
-                        "name": "Tenant",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "创建Env",
-                        "name": "Env",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "创建Project",
-                        "name": "Project",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "创建Module",
-                        "name": "Module",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "创建DevOwner",
-                        "name": "DevOwner",
-                        "in": "formData"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/node.APIPostHostUpdateInputs"
-                        }
-                    },
-                    "400": {
-                        "description": "bad arguments"
-                    },
-                    "417": {
-                        "description": "internal error"
-                    }
-                }
-            }
-        },
-        "/api/v1/host/detail": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "根据机器ID或IP获取机器详细信息",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "根据机器ID获取机器详细信息",
-                        "name": "id",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "根据机器IP获取机器详细信息",
-                        "name": "ip",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/node.Host"
-                        }
-                    },
-                    "400": {
-                        "description": "bad arguments"
-                    },
-                    "417": {
-                        "description": "internal error"
-                    }
-                }
-            }
-        },
-        "/api/v1/host/info": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "根据机器ID获取机器详细信息",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "根据机器ID获取机器详细信息",
-                        "name": "id",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/node.Host"
-                        }
-                    },
-                    "400": {
-                        "description": "bad arguments"
-                    },
-                    "417": {
-                        "description": "internal error"
-                    }
-                }
-            }
-        },
-        "/api/v1/host/list": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "机器列表接口",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "name": "areaName",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "name": "cpuNumber",
-                        "in": "query"
-                    },
-                    {
-                        "type": "number",
-                        "name": "cpuUsageLowerLimit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "number",
-                        "name": "cpuUsageUpperLimit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "number",
-                        "name": "fsUsageLowerLimit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "number",
-                        "name": "fsUsageUpperLimit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "name": "ip",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "name": "limit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "number",
-                        "name": "memoryUsageLowerLimit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "number",
-                        "name": "memoryUsageUpperLimit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "name": "order",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "name": "orderBy",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "name": "physicalSystem",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "name": "relatedTag",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "name": "status",
-                        "in": "query"
-                    },
-                    {
-                        "type": "array",
-                        "items": {
-                            "type": "integer"
-                        },
-                        "description": "G6Group                 string  ` + "`" + `json:\"group\" form:\"group\"` + "`" + `\nBoundGroup            string  ` + "`" + `json:\"boundGroup\" form:\"boundGroup\"` + "`" + `",
-                        "name": "tagIDs[]",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/node.APIGetHostListOutputs"
-                        }
-                    },
-                    "400": {
-                        "description": "bad arguments"
-                    },
-                    "417": {
-                        "description": "internal error"
-                    }
-                }
-            }
-        },
-        "/api/v1/host/physical_system_choices": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "物理子系统类别",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/model.APIGetVariableOutputs"
-                        }
-                    },
-                    "400": {
-                        "description": "bad arguments"
-                    },
-                    "417": {
-                        "description": "internal error"
-                    }
-                }
-            }
-        },
-        "/api/v1/host/select": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "机器查找",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "name": "query",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/node.APIGetHostListOutputs"
-                        }
-                    },
-                    "400": {
-                        "description": "bad arguments"
-                    },
-                    "417": {
-                        "description": "internal error"
-                    }
-                }
-            }
-        },
-        "/api/v1/host/update": {
-            "put": {
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "更新机器信息",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "根据IP更新机器信息",
-                        "name": "IP",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "更新HostName",
-                        "name": "Hostname",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "更新HostGroup",
-                        "name": "GroupID",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "更新DevOwner",
-                        "name": "DevOwner",
-                        "in": "formData"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/node.APIPostHostUpdateInputs"
-                        }
-                    },
-                    "400": {
-                        "description": "bad arguments"
-                    },
-                    "417": {
-                        "description": "internal error"
-                    }
-                }
-            }
-        },
-        "/api/v1/host_apply_request/assign": {
-            "put": {
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "创建机器申请单处理",
-                "parameters": [
-                    {
-                        "description": "创建机器申请单处理",
-                        "name": "APIPostHostApplyRequestAssignInputs",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/node.APIPostHostApplyRequestAssignInputs"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "json"
-                        }
-                    },
-                    "400": {
-                        "description": "bad arguments"
-                    },
-                    "417": {
-                        "description": "internal error"
-                    }
-                }
-            }
-        },
-        "/api/v1/host_apply_request/create": {
-            "post": {
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "创建机器申请单",
-                "parameters": [
-                    {
-                        "description": "创建机器申请单",
-                        "name": "APIPostHostApplyRequestCreateInputs",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/node.APIPostHostApplyRequestCreateInputs"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "json"
-                        }
-                    },
-                    "400": {
-                        "description": "bad arguments"
-                    },
-                    "417": {
-                        "description": "internal error"
-                    }
-                }
-            }
-        },
-        "/api/v1/host_apply_request/info": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "根据请求单ID获取详细信息",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "根据请求单ID获取详细信息",
-                        "name": "id",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/node.Host"
-                        }
-                    },
-                    "400": {
-                        "description": "bad arguments"
-                    },
-                    "417": {
-                        "description": "internal error"
-                    }
-                }
-            }
-        },
-        "/api/v1/host_apply_request/list": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "机器资源申请列表",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "name": "applier",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "name": "limit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "name": "order",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "name": "orderBy",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "name": "page",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/node.APIGetHostApplyRequestListOutputs"
-                        }
-                    },
-                    "400": {
-                        "description": "bad arguments"
-                    },
-                    "417": {
-                        "description": "internal error"
-                    }
-                }
-            }
-        },
-        "/api/v1/host_group/all": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "获取所有host group信息",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/node.APIGetHostGroupListOutputs"
-                        }
-                    },
-                    "400": {
-                        "description": "bad arguments"
-                    },
-                    "417": {
-                        "description": "internal error"
-                    }
-                }
-            }
-        },
-        "/api/v1/host_group/bind_host": {
-            "post": {
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "获取host group信息",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "根据ID获取host group树状信息",
-                        "name": "id",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/node.HostGroupRel"
-                        }
-                    },
-                    "417": {
-                        "description": "internal error"
-                    }
-                }
-            }
-        },
-        "/api/v1/host_group/create": {
-            "post": {
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "创建host group信息",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "name": "limit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "name": "name",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "name": "page",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/node.APIGetHostGroupListOutputs"
-                        }
-                    },
-                    "400": {
-                        "description": "bad arguments"
-                    },
-                    "417": {
-                        "description": "internal error"
-                    }
-                }
-            }
-        },
-        "/api/v1/host_group/delete": {
-            "post": {
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "删除host group信息",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "删除host group信息",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/node.HostGroup"
-                        }
-                    },
-                    "417": {
-                        "description": "internal error"
-                    }
-                }
-            }
-        },
-        "/api/v1/host_group/get": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "根据机器群组名称获取机器群组详细信息",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "根据机器群组名称获取机器群组详细信息",
-                        "name": "id",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "400": {
-                        "description": "bad arguments"
-                    },
-                    "417": {
-                        "description": "internal error"
-                    }
-                }
-            }
-        },
-        "/api/v1/host_group/list": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "获取host group列表",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "name": "limit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "name": "name",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "name": "page",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/node.APIGetHostGroupListOutputs"
-                        }
-                    },
-                    "400": {
-                        "description": "bad arguments"
-                    },
-                    "417": {
-                        "description": "internal error"
-                    }
-                }
-            }
-        },
-        "/api/v1/host_group/related_hosts": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "根据group路径获取group下所有的host",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "group路径",
-                        "name": "path",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/node.HostGroup"
-                        }
-                    },
-                    "417": {
-                        "description": "internal error"
-                    }
-                }
-            }
-        },
-        "/api/v1/host_group/update": {
-            "put": {
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "更新host group信息",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "name": "caasServiceId",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "name": "desc",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "name": "id",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "name": "name",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "name": "parentID",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "name": "parentName",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "name": "type",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/node.HostGroup"
-                        }
-                    },
-                    "400": {
-                        "description": "bad arguments"
-                    },
-                    "417": {
-                        "description": "internal error"
-                    }
-                }
-            }
-        },
         "/api/v1/menu/info/:id": {
             "get": {
                 "produces": [
@@ -1501,6 +675,832 @@ var doc = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/sys.APIPostMenuUpdateInputs"
+                        }
+                    },
+                    "400": {
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
+                    }
+                }
+            }
+        },
+        "/api/v1/node/area_choices": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "区域类别",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.APIGetVariableOutputs"
+                        }
+                    },
+                    "400": {
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
+                    }
+                }
+            }
+        },
+        "/api/v1/node/batch/update": {
+            "put": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "更新机器标签和负责人",
+                "parameters": [
+                    {
+                        "description": "更新机器标签和负责人信息",
+                        "name": "APIPostNodeBatchUpdateInputs",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/node.APIPostNodeBatchUpdateInputs"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/node.APIPostNodeBatchUpdateInputs"
+                        }
+                    },
+                    "400": {
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
+                    }
+                }
+            }
+        },
+        "/api/v1/node/create": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "创建新机器",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "创建新机器IP",
+                        "name": "IP",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "创建NodeName",
+                        "name": "Nodename",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "创建NodeGroup",
+                        "name": "GroupID",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "创建Tenant",
+                        "name": "Tenant",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "创建Env",
+                        "name": "Env",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "创建Project",
+                        "name": "Project",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "创建Module",
+                        "name": "Module",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "创建DevOwner",
+                        "name": "DevOwner",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/node.APIPostNodeUpdateInputs"
+                        }
+                    },
+                    "400": {
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
+                    }
+                }
+            }
+        },
+        "/api/v1/node/detail": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "根据机器ID或IP获取机器详细信息",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "根据机器ID获取机器详细信息",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "根据机器IP获取机器详细信息",
+                        "name": "ip",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/node.Node"
+                        }
+                    },
+                    "400": {
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
+                    }
+                }
+            }
+        },
+        "/api/v1/node/info": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "根据机器ID获取机器详细信息",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "根据机器ID获取机器详细信息",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/node.Node"
+                        }
+                    },
+                    "400": {
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
+                    }
+                }
+            }
+        },
+        "/api/v1/node/list": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "机器列表接口",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "areaName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "cpuNumber",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "name": "cpuUsageLowerLimit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "name": "cpuUsageUpperLimit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "name": "fsUsageLowerLimit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "name": "fsUsageUpperLimit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "ip",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "name": "memoryUsageLowerLimit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "name": "memoryUsageUpperLimit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "orderBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "physicalSystem",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "relatedTag",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "description": "G6Combos                 string  ` + "`" + `json:\"group\" form:\"group\"` + "`" + `\nBoundGroup            string  ` + "`" + `json:\"boundGroup\" form:\"boundGroup\"` + "`" + `",
+                        "name": "tagIDs[]",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/node.APIGetNodeListOutputs"
+                        }
+                    },
+                    "400": {
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
+                    }
+                }
+            }
+        },
+        "/api/v1/node/physical_system_choices": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "物理子系统类别",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.APIGetVariableOutputs"
+                        }
+                    },
+                    "400": {
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
+                    }
+                }
+            }
+        },
+        "/api/v1/node/select": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "机器查找",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "query",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/node.APIGetNodeListOutputs"
+                        }
+                    },
+                    "400": {
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
+                    }
+                }
+            }
+        },
+        "/api/v1/node/update": {
+            "put": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "更新机器信息",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "根据IP更新机器信息",
+                        "name": "IP",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "更新NodeName",
+                        "name": "Nodename",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "更新NodeGroup",
+                        "name": "GroupID",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "更新DevOwner",
+                        "name": "DevOwner",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/node.APIPostNodeUpdateInputs"
+                        }
+                    },
+                    "400": {
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
+                    }
+                }
+            }
+        },
+        "/api/v1/node_apply_request/assign": {
+            "put": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "创建机器申请单处理",
+                "parameters": [
+                    {
+                        "description": "创建机器申请单处理",
+                        "name": "APIPostNodeApplyRequestAssignInputs",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/node.APIPostNodeApplyRequestAssignInputs"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "json"
+                        }
+                    },
+                    "400": {
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
+                    }
+                }
+            }
+        },
+        "/api/v1/node_apply_request/create": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "创建机器申请单",
+                "parameters": [
+                    {
+                        "description": "创建机器申请单",
+                        "name": "APIPostNodeApplyRequestCreateInputs",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/node.APIPostNodeApplyRequestCreateInputs"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "json"
+                        }
+                    },
+                    "400": {
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
+                    }
+                }
+            }
+        },
+        "/api/v1/node_apply_request/info": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "根据请求单ID获取详细信息",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "根据请求单ID获取详细信息",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/node.Node"
+                        }
+                    },
+                    "400": {
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
+                    }
+                }
+            }
+        },
+        "/api/v1/node_apply_request/list": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "机器资源申请列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "applier",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "orderBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/node.APIGetNodeApplyRequestListOutputs"
+                        }
+                    },
+                    "400": {
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
+                    }
+                }
+            }
+        },
+        "/api/v1/node_group/all": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "获取所有node group信息",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/node.APIGetNodeGroupListOutputs"
+                        }
+                    },
+                    "400": {
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
+                    }
+                }
+            }
+        },
+        "/api/v1/node_group/bind_node": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "绑定node到node group",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "绑定node到node group",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/node.NodeGroupRel"
+                        }
+                    },
+                    "417": {
+                        "description": "internal error"
+                    }
+                }
+            }
+        },
+        "/api/v1/node_group/create": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "创建node group",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/node.APIGetNodeGroupListOutputs"
+                        }
+                    },
+                    "400": {
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
+                    }
+                }
+            }
+        },
+        "/api/v1/node_group/delete": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "删除node group",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "删除node group",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/node.NodeGroup"
+                        }
+                    },
+                    "417": {
+                        "description": "internal error"
+                    }
+                }
+            }
+        },
+        "/api/v1/node_group/get": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "根据机器群组名称获取机器群组详细信息",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "根据机器群组名称获取机器群组详细信息",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "400": {
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
+                    }
+                }
+            }
+        },
+        "/api/v1/node_group/list": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "获取node group列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/node.APIGetNodeGroupListOutputs"
+                        }
+                    },
+                    "400": {
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
+                    }
+                }
+            }
+        },
+        "/api/v1/node_group/related_nodes": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "根据group路径获取group下所有的node",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "group路径",
+                        "name": "path",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/node.NodeGroup"
+                        }
+                    },
+                    "417": {
+                        "description": "internal error"
+                    }
+                }
+            }
+        },
+        "/api/v1/node_group/update": {
+            "put": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "更新node group",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "name": "caasServiceId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "desc",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "name": "name",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "name": "parentID",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "parentName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "type",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/node.NodeGroup"
                         }
                     },
                     "400": {
@@ -2612,6 +2612,60 @@ var doc = `{
                 }
             }
         },
+        "/api/v1/template/all": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "展现模板所有数据",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "orderBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "remark",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.APIGetTemplateListOutputs"
+                        }
+                    },
+                    "400": {
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
+                    }
+                }
+            }
+        },
         "/api/v1/template/create": {
             "post": {
                 "produces": [
@@ -2801,11 +2855,11 @@ var doc = `{
                 "produces": [
                     "application/json"
                 ],
-                "summary": "获取host group信息",
+                "summary": "获取node children信息",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "根据ID获取host group树状信息",
+                        "description": "根据ID获取node children信息",
                         "name": "id",
                         "in": "query",
                         "required": true
@@ -2815,7 +2869,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app.APIGetHostGroupTreeOutputs"
+                            "$ref": "#/definitions/app.APIGetNodeGroupTreeOutputs"
                         }
                     },
                     "400": {
@@ -2839,7 +2893,7 @@ var doc = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/node.HostGroup"
+                                "$ref": "#/definitions/node.NodeGroup"
                             }
                         }
                     },
@@ -3002,7 +3056,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app.APIGetHostGroupTreeOutputs"
+                            "$ref": "#/definitions/app.APIGetNodeGroupTreeOutputs"
                         }
                     },
                     "400": {
@@ -3192,13 +3246,13 @@ var doc = `{
                 }
             }
         },
-        "app.APIGetHostGroupTreeOutputs": {
+        "app.APIGetNodeGroupTreeOutputs": {
             "type": "object",
             "properties": {
-                "hostGroups": {
+                "nodeGroups": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/node.HostGroup"
+                        "$ref": "#/definitions/node.NodeGroup"
                     }
                 }
             }
@@ -3419,16 +3473,16 @@ var doc = `{
         "app.APIPostTemplateDesignInputs": {
             "type": "object",
             "properties": {
+                "combos": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/app.G6Combos"
+                    }
+                },
                 "edges": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/app.G6Edge"
-                    }
-                },
-                "groups": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/app.G6Group"
                     }
                 },
                 "id": {
@@ -3458,6 +3512,9 @@ var doc = `{
                     "type": "string"
                 }
             }
+        },
+        "app.G6Combos": {
+            "type": "object"
         },
         "app.G6Edge": {
             "type": "object",
@@ -3502,9 +3559,6 @@ var doc = `{
                 }
             }
         },
-        "app.G6Group": {
-            "type": "object"
-        },
         "app.G6Node": {
             "type": "object",
             "properties": {
@@ -3530,7 +3584,6 @@ var doc = `{
                     "type": "string"
                 },
                 "name": {
-                    "description": "TagID      int64       ` + "`" + `json:\"tagID\" form:\"tagID\"` + "`" + `",
                     "type": "string"
                 },
                 "offsetX": {
@@ -3608,7 +3661,6 @@ var doc = `{
                     "type": "string"
                 },
                 "type": {
-                    "description": "Label        string      ` + "`" + `json:\"label\" gorm:\"column:label;type:string;size:128;comment:画布上的展现文字\"` + "`" + `\nSize         string      ` + "`" + `json:\"size\" gorm:\"column:size;type:string;size:64;comment:大小，譬如170*34\"` + "`" + `",
                     "type": "string"
                 }
             }
@@ -4321,19 +4373,19 @@ var doc = `{
                 "totalCpuCount": {
                     "type": "integer"
                 },
-                "totalHostCount": {
+                "totalNodeCount": {
                     "type": "integer"
                 },
                 "unUsedCpuCount": {
                     "type": "integer"
                 },
-                "unUsedHostCount": {
+                "unUsedNodeCount": {
                     "type": "integer"
                 },
                 "usedCpuCount": {
                     "type": "integer"
                 },
-                "usedHostCount": {
+                "usedNodeCount": {
                     "type": "integer"
                 }
             }
@@ -4353,19 +4405,19 @@ var doc = `{
                 "totalCpuCount": {
                     "type": "integer"
                 },
-                "totalHostCount": {
+                "totalNodeCount": {
                     "type": "integer"
                 },
                 "unUsedCpuCount": {
                     "type": "integer"
                 },
-                "unUsedHostCount": {
+                "unUsedNodeCount": {
                     "type": "integer"
                 },
                 "usedCpuCount": {
                     "type": "integer"
                 },
-                "usedHostCount": {
+                "usedNodeCount": {
                     "type": "integer"
                 }
             }
@@ -4398,7 +4450,7 @@ var doc = `{
                 }
             }
         },
-        "node.APIGetHostApplyRequestListData": {
+        "node.APIGetNodeApplyRequestListData": {
             "type": "object",
             "properties": {
                 "applier": {
@@ -4424,15 +4476,6 @@ var doc = `{
                 "creator": {
                     "type": "string"
                 },
-                "hostIDs": {
-                    "type": "string"
-                },
-                "hosts": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/node.Host"
-                    }
-                },
                 "id": {
                     "type": "integer"
                 },
@@ -4441,6 +4484,15 @@ var doc = `{
                 },
                 "name": {
                     "type": "string"
+                },
+                "nodeIDs": {
+                    "type": "string"
+                },
+                "nodes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/node.Node"
+                    }
                 },
                 "releaseAt": {
                     "type": "object",
@@ -4463,7 +4515,7 @@ var doc = `{
                 }
             }
         },
-        "node.APIGetHostApplyRequestListInputs": {
+        "node.APIGetNodeApplyRequestListInputs": {
             "type": "object",
             "properties": {
                 "applier": {
@@ -4483,13 +4535,13 @@ var doc = `{
                 }
             }
         },
-        "node.APIGetHostApplyRequestListOutputs": {
+        "node.APIGetNodeApplyRequestListOutputs": {
             "type": "object",
             "properties": {
                 "list": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/node.APIGetHostApplyRequestListData"
+                        "$ref": "#/definitions/node.APIGetNodeApplyRequestListData"
                     }
                 },
                 "totalCount": {
@@ -4497,7 +4549,7 @@ var doc = `{
                 }
             }
         },
-        "node.APIGetHostGroupListInputs": {
+        "node.APIGetNodeGroupListInputs": {
             "type": "object",
             "properties": {
                 "limit": {
@@ -4511,13 +4563,13 @@ var doc = `{
                 }
             }
         },
-        "node.APIGetHostGroupListOutputs": {
+        "node.APIGetNodeGroupListOutputs": {
             "type": "object",
             "properties": {
                 "list": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/node.HostGroup"
+                        "$ref": "#/definitions/node.NodeGroup"
                     }
                 },
                 "totalCount": {
@@ -4525,7 +4577,7 @@ var doc = `{
                 }
             }
         },
-        "node.APIGetHostListInputs": {
+        "node.APIGetNodeListInputs": {
             "type": "object",
             "properties": {
                 "areaName": {
@@ -4577,7 +4629,7 @@ var doc = `{
                     "type": "string"
                 },
                 "tagIDs[]": {
-                    "description": "G6Group                 string  ` + "`" + `json:\"group\" form:\"group\"` + "`" + `\nBoundGroup            string  ` + "`" + `json:\"boundGroup\" form:\"boundGroup\"` + "`" + `",
+                    "description": "G6Combos                 string  ` + "`" + `json:\"group\" form:\"group\"` + "`" + `\nBoundGroup            string  ` + "`" + `json:\"boundGroup\" form:\"boundGroup\"` + "`" + `",
                     "type": "array",
                     "items": {
                         "type": "integer"
@@ -4585,13 +4637,13 @@ var doc = `{
                 }
             }
         },
-        "node.APIGetHostListOutputs": {
+        "node.APIGetNodeListOutputs": {
             "type": "object",
             "properties": {
                 "list": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/node.Host"
+                        "$ref": "#/definitions/node.Node"
                     }
                 },
                 "totalCount": {
@@ -4599,7 +4651,7 @@ var doc = `{
                 }
             }
         },
-        "node.APIGetHostSelectInputs": {
+        "node.APIGetNodeSelectInputs": {
             "type": "object",
             "properties": {
                 "query": {
@@ -4607,17 +4659,17 @@ var doc = `{
                 }
             }
         },
-        "node.APIPostHostApplyRequestAssignInputs": {
+        "node.APIPostNodeApplyRequestAssignInputs": {
             "type": "object",
             "properties": {
-                "hostIDs": {
+                "id": {
+                    "type": "integer"
+                },
+                "nodeIDs": {
                     "type": "array",
                     "items": {
                         "type": "integer"
                     }
-                },
-                "id": {
-                    "type": "integer"
                 },
                 "state": {
                     "type": "string"
@@ -4630,7 +4682,7 @@ var doc = `{
                 }
             }
         },
-        "node.APIPostHostApplyRequestCreateInputs": {
+        "node.APIPostNodeApplyRequestCreateInputs": {
             "type": "object",
             "properties": {
                 "applier": {
@@ -4656,7 +4708,7 @@ var doc = `{
                 }
             }
         },
-        "node.APIPostHostBatchUpdateInputs": {
+        "node.APIPostNodeBatchUpdateInputs": {
             "type": "object",
             "properties": {
                 "devOwner": {
@@ -4676,7 +4728,7 @@ var doc = `{
                 }
             }
         },
-        "node.APIPostHostUpdateInputs": {
+        "node.APIPostNodeUpdateInputs": {
             "type": "object",
             "required": [
                 "ip"
@@ -4708,7 +4760,7 @@ var doc = `{
                 }
             }
         },
-        "node.APIPutHostGroupInputs": {
+        "node.APIPutNodeGroupInputs": {
             "type": "object",
             "required": [
                 "id",
@@ -4739,7 +4791,7 @@ var doc = `{
                 }
             }
         },
-        "node.Host": {
+        "node.Node": {
             "type": "object",
             "properties": {
                 "applyUser": {
@@ -4799,7 +4851,7 @@ var doc = `{
                 "groups": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/node.HostGroup"
+                        "$ref": "#/definitions/node.NodeGroup"
                     }
                 },
                 "id": {
@@ -4818,6 +4870,9 @@ var doc = `{
                     "type": "string"
                 },
                 "logicSystemCnName": {
+                    "type": "string"
+                },
+                "machine": {
                     "type": "string"
                 },
                 "manIp": {
@@ -4862,6 +4917,9 @@ var doc = `{
                 "physicalSystemEnName": {
                     "type": "string"
                 },
+                "release": {
+                    "type": "string"
+                },
                 "servSpaceCodeList": {
                     "type": "string"
                 },
@@ -4880,6 +4938,9 @@ var doc = `{
                 "status": {
                     "type": "string"
                 },
+                "sysName": {
+                    "type": "string"
+                },
                 "tags": {
                     "type": "array",
                     "items": {
@@ -4892,6 +4953,9 @@ var doc = `{
                 "updateTime": {
                     "type": "string"
                 },
+                "version": {
+                    "type": "string"
+                },
                 "virtFcNum": {
                     "type": "string"
                 },
@@ -4900,7 +4964,7 @@ var doc = `{
                 }
             }
         },
-        "node.HostGroup": {
+        "node.NodeGroup": {
             "type": "object",
             "properties": {
                 "caasServiceId": {
@@ -4909,10 +4973,10 @@ var doc = `{
                 "children": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/node.HostGroup"
+                        "$ref": "#/definitions/node.NodeGroup"
                     }
                 },
-                "childrenHostCount": {
+                "childrenNodeCount": {
                     "type": "integer"
                 },
                 "childrenPodCount": {
@@ -4945,7 +5009,7 @@ var doc = `{
                 "pathArray": {
                     "type": "string"
                 },
-                "relatedHostCount": {
+                "relatedNodeCount": {
                     "type": "integer"
                 },
                 "relatedPodCount": {
@@ -4959,13 +5023,13 @@ var doc = `{
                 }
             }
         },
-        "node.HostGroupRel": {
+        "node.NodeGroupRel": {
             "type": "object",
             "properties": {
                 "groupID": {
                     "type": "integer"
                 },
-                "hostID": {
+                "nodeID": {
                     "type": "integer"
                 }
             }
@@ -5134,29 +5198,14 @@ var doc = `{
                 }
             }
         },
-        "service.TagGraphChildNode": {
-            "type": "object"
-        },
         "service.TagGraphNode": {
             "type": "object",
             "properties": {
-                "UnTaggedHostsCount": {
-                    "type": "integer"
-                },
-                "UnTaggedPodsCount": {
-                    "type": "integer"
-                },
                 "categoryID": {
                     "type": "integer"
                 },
                 "categoryName": {
                     "type": "string"
-                },
-                "children": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/service.TagGraphChildNode"
-                    }
                 },
                 "cnName": {
                     "type": "string"
@@ -5184,13 +5233,13 @@ var doc = `{
                         "type": "integer"
                     }
                 },
-                "relatedHosts": {
+                "relatedNodes": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/node.Host"
+                        "$ref": "#/definitions/node.Node"
                     }
                 },
-                "relatedHostsCount": {
+                "relatedNodesCount": {
                     "type": "integer"
                 },
                 "relatedPods": {
@@ -5207,15 +5256,17 @@ var doc = `{
                     "type": "string"
                 },
                 "type": {
-                    "description": "Label        string      ` + "`" + `json:\"label\" gorm:\"column:label;type:string;size:128;comment:画布上的展现文字\"` + "`" + `\nSize         string      ` + "`" + `json:\"size\" gorm:\"column:size;type:string;size:64;comment:大小，譬如170*34\"` + "`" + `",
                     "type": "string"
                 },
-                "unTaggedHosts": {
+                "unTaggedNodes": {
                     "description": "当前tag下未关联到子tag的机器",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/node.Host"
+                        "$ref": "#/definitions/node.Node"
                     }
+                },
+                "unTaggedNodesCount": {
+                    "type": "integer"
                 },
                 "unTaggedPods": {
                     "description": "当前tag下未关联到子tag的Pod",
@@ -5223,6 +5274,9 @@ var doc = `{
                     "items": {
                         "$ref": "#/definitions/caas.Pod"
                     }
+                },
+                "unTaggedPodsCount": {
+                    "type": "integer"
                 }
             }
         },

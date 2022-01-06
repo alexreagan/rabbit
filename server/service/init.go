@@ -1,7 +1,7 @@
 package service
 
 var (
-	HostService        *hostService
+	NodeService        *nodeService
 	TagService         *tagService
 	TagCategoryService *tagCategoryService
 	ParamService       *paramService
@@ -11,7 +11,7 @@ var (
 )
 
 func init() {
-	HostService = newHostService()
+	NodeService = newNodeService()
 	TagService = newTagService()
 	TagCategoryService = newTagCategoryService()
 	ParamService = newParamService()
