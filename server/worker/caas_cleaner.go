@@ -72,7 +72,7 @@ func (s *CaasCleaner) Clean() {
 }
 
 func (s *CaasCleaner) StartClean() {
-	log.Infoln("[CaasCleaner] StartClean...")
+	log.Infoln("[CaasCleaner] StartCleaner...")
 
 	var err error
 	// load config

@@ -1,7 +1,6 @@
 package node
 
 import (
-	"fmt"
 	"github.com/alexreagan/rabbit/g"
 	h "github.com/alexreagan/rabbit/server/helper"
 	"github.com/alexreagan/rabbit/server/model"
@@ -22,16 +21,16 @@ type OrderBy struct {
 }
 
 type APIGetNodeListInputs struct {
-	IP                    string  `json:"ip" form:"ip"`
-	PhysicalSystem        string  `json:"physicalSystem" form:"physicalSystem"`
-	CpuNumber             int64   `json:"cpuNumber" form:"cpuNumber"`
-	AreaName              string  `json:"areaName" form:"areaName"`
-	CpuUsageUpperLimit    float64 `json:"cpuUsageUpperLimit" form:"cpuUsageUpperLimit"`
-	CpuUsageLowerLimit    float64 `json:"cpuUsageLowerLimit" form:"cpuUsageLowerLimit"`
-	FsUsageUpperLimit     float64 `json:"fsUsageUpperLimit" form:"fsUsageUpperLimit"`
-	FsUsageLowerLimit     float64 `json:"fsUsageLowerLimit" form:"fsUsageLowerLimit"`
-	MemoryUsageUpperLimit float64 `json:"memoryUsageUpperLimit" form:"memoryUsageUpperLimit"`
-	MemoryUsageLowerLimit float64 `json:"memoryUsageLowerLimit" form:"memoryUsageLowerLimit"`
+	IP                     string  `json:"ip" form:"ip"`
+	PhysicalSystem         string  `json:"physicalSystem" form:"physicalSystem"`
+	CpuCount               int64   `json:"cpuCount" form:"cpuCount"`
+	AreaName               string  `json:"areaName" form:"areaName"`
+	CpuAvailableUpperLimit float64 `json:"cpuAvailableUpperLimit" form:"cpuAvailableUpperLimit"`
+	CpuAvailableLowerLimit float64 `json:"cpuAvailableLowerLimit" form:"cpuAvailableLowerLimit"`
+	FsAvailableUpperLimit  float64 `json:"fsAvailableUpperLimit" form:"fsAvailableUpperLimit"`
+	FsAvailableLowerLimit  float64 `json:"fsAvailableLowerLimit" form:"fsAvailableLowerLimit"`
+	MemAvailableUpperLimit float64 `json:"memAvailableUpperLimit" form:"memAvailableUpperLimit"`
+	MemAvailableLowerLimit float64 `json:"memAvailableLowerLimit" form:"memAvailableLowerLimit"`
 	//G6Combos                 string  `json:"group" form:"group"`
 	//BoundGroup            string  `json:"boundGroup" form:"boundGroup"`
 	TagIDs     []int64 `json:"tagIDs[]" form:"tagIDs[]"`
@@ -88,44 +87,26 @@ func NodeList(c *gin.Context) {
 	if inputs.PhysicalSystem != "" {
 		tx = tx.Where("`node`.`physical_system` = ?", inputs.PhysicalSystem)
 	}
-	if inputs.CpuUsageLowerLimit != 0 {
-		if inputs.CpuUsageLowerLimit > 1 {
-			inputs.CpuUsageLowerLimit = inputs.CpuUsageLowerLimit / 100
-		}
-		tx = tx.Where("`node`.`cpu_usage` >= ?", inputs.CpuUsageLowerLimit)
+	if inputs.CpuAvailableLowerLimit != 0 {
+		tx = tx.Where("`node`.`cpu_available` >= ?", inputs.CpuAvailableLowerLimit)
 	}
-	if inputs.CpuUsageUpperLimit != 0 {
-		if inputs.CpuUsageUpperLimit > 1 {
-			inputs.CpuUsageUpperLimit = inputs.CpuUsageUpperLimit / 100
-		}
-		tx = tx.Where("`node`.`cpu_usage` < ?", inputs.CpuUsageUpperLimit)
+	if inputs.CpuAvailableUpperLimit != 0 {
+		tx = tx.Where("`node`.`cpu_available` < ?", inputs.CpuAvailableUpperLimit)
 	}
-	if inputs.FsUsageLowerLimit != 0 {
-		if inputs.FsUsageLowerLimit > 1 {
-			inputs.FsUsageLowerLimit = inputs.FsUsageLowerLimit / 100
-		}
-		tx = tx.Where("`node`.`fs_usage` >= ?", inputs.FsUsageLowerLimit)
+	if inputs.FsAvailableLowerLimit != 0 {
+		tx = tx.Where("`node`.`file_system_available` >= ?", inputs.FsAvailableLowerLimit)
 	}
-	if inputs.FsUsageUpperLimit != 0 {
-		if inputs.FsUsageUpperLimit > 1 {
-			inputs.FsUsageUpperLimit = inputs.FsUsageUpperLimit / 100
-		}
-		tx = tx.Where("`node`.`fs_usage` < ?", inputs.FsUsageUpperLimit)
+	if inputs.FsAvailableUpperLimit != 0 {
+		tx = tx.Where("`node`.`file_system_available` < ?", inputs.FsAvailableUpperLimit)
 	}
-	if inputs.MemoryUsageLowerLimit != 0 {
-		if inputs.MemoryUsageLowerLimit > 1 {
-			inputs.MemoryUsageLowerLimit = inputs.MemoryUsageLowerLimit / 100
-		}
-		tx = tx.Where("`node`.`memory_usage` >= ?", inputs.FsUsageLowerLimit)
+	if inputs.MemAvailableLowerLimit != 0 {
+		tx = tx.Where("`node`.`mem_available` >= ?", inputs.MemAvailableLowerLimit)
 	}
-	if inputs.MemoryUsageUpperLimit != 0 {
-		if inputs.MemoryUsageUpperLimit > 1 {
-			inputs.MemoryUsageUpperLimit = inputs.MemoryUsageUpperLimit / 100
-		}
-		tx = tx.Where("`node`.`memory_usage` < ?", inputs.MemoryUsageUpperLimit)
+	if inputs.MemAvailableUpperLimit != 0 {
+		tx = tx.Where("`node`.`mem_available` < ?", inputs.MemAvailableUpperLimit)
 	}
-	if inputs.CpuNumber != 0 {
-		tx = tx.Where("`node`.`cpu_number` = ?", inputs.CpuNumber)
+	if inputs.CpuCount != 0 {
+		tx = tx.Where("`node`.`cpu_count` = ?", inputs.CpuCount)
 	}
 	if inputs.AreaName != "" {
 		tx = tx.Where("`node`.`area_name` = ?", inputs.AreaName)
@@ -164,9 +145,9 @@ func NodeList(c *gin.Context) {
 	tx.Find(&nodes)
 
 	for _, n := range nodes {
-		n.CpuUsage, _ = strconv.ParseFloat(fmt.Sprintf("%.2f", n.CpuUsage*100), 64)
-		n.FsUsage, _ = strconv.ParseFloat(fmt.Sprintf("%.2f", n.FsUsage*100), 64)
-		n.MemoryUsage, _ = strconv.ParseFloat(fmt.Sprintf("%.2f", n.MemoryUsage*100), 64)
+		//n.CpuUsage, _ = strconv.ParseFloat(fmt.Sprintf("%.2f", n.CpuUsage*100), 64)
+		//n.FsUsage, _ = strconv.ParseFloat(fmt.Sprintf("%.2f", n.FsUsage*100), 64)
+		//n.MemoryUsage, _ = strconv.ParseFloat(fmt.Sprintf("%.2f", n.MemoryUsage*100), 64)
 		n.Tags = n.RelatedTags()
 	}
 

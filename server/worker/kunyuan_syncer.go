@@ -52,11 +52,12 @@ type KunYuanSyncerAlarmConfig struct {
 }
 
 type KunYuanSyncerConfig struct {
-	Enable  bool                       `json:"enable"`
-	Login   KunYuanSyncerLoginConfig   `json:"login"`
-	Base    KunYuanSyncerBaseConfig    `json:"base"`
-	Monitor KunYuanSyncerMonitorConfig `json:"monitor"`
-	Alarm   KunYuanSyncerAlarmConfig   `json:"alarm"`
+	Enable   bool                       `json:"enable"`
+	Login    KunYuanSyncerLoginConfig   `json:"login"`
+	BlackIPs []string                   `json:"black_ips"`
+	Base     KunYuanSyncerBaseConfig    `json:"base"`
+	Monitor  KunYuanSyncerMonitorConfig `json:"monitor"`
+	Alarm    KunYuanSyncerAlarmConfig   `json:"alarm"`
 }
 
 func initKunYuanSyncerConfigFromDB() (*KunYuanSyncerConfig, error) {
@@ -353,6 +354,11 @@ func (s *KunYuanSyncer) SyncBase() {
 		return
 	}
 
+	blackIPs := kunyuanConfig.BlackIPs
+	blackIPMap := make(map[string]int)
+	for i, ip := range blackIPs {
+		blackIPMap[ip] = i
+	}
 	//abbrs := viper.GetStringSlice("kunyuan.syncer.base.physical_systems")
 	abbrs := kunyuanConfig.Base.PhysicalSystems
 	for _, abbr := range abbrs {
@@ -369,11 +375,11 @@ func (s *KunYuanSyncer) SyncBase() {
 			for _, record := range syncerResult.Data.Records {
 				vt, _ := time.ParseInLocation(tTimeFormat, record.DeployDate, time.Local)
 				h := &node.Node{
-					Name:                 record.ServPartName,
-					ApplyUser:            record.ApplyUser,
-					AreaName:             record.AreaName,
-					CpuNumber:            record.CpuNumber,
-					MemorySize:           record.MemorySize,
+					//Name:                 record.ServPartName,
+					ApplyUser: record.ApplyUser,
+					AreaName:  record.AreaName,
+					//CpuNumber:            record.CpuNumber,
+					//MemorySize:           record.MemorySize,
 					DeployDate:           vt,
 					DevAreaCode:          record.DevAreaCode,
 					FunDesc:              record.FunDesc,
@@ -388,7 +394,13 @@ func (s *KunYuanSyncer) SyncBase() {
 					PhysicalSystemArea:   record.SubSystemAreaName,
 					LogicSystemCnName:    record.LogicSystemCnName,
 					UpdateTime:           time.Now(),
-					State:                node.NodeStatusServicing,
+					State:                node.StatusServicing,
+				}
+
+				if _, ok := blackIPMap[record.ProdIp]; !ok {
+					h.Name = record.ServPartName
+					h.CpuCount = strconv.Itoa(record.CpuNumber)
+					h.MemTotalBytes = strconv.Itoa(record.MemorySize * 1024 * 1024)
 				}
 
 				var hh node.Node
@@ -601,6 +613,12 @@ func (s *KunYuanSyncer) SyncMonitor() {
 		return
 	}
 
+	blackIPs := kunyuanConfig.BlackIPs
+	blackIPMap := make(map[string]int)
+	for i, ip := range blackIPs {
+		blackIPMap[ip] = i
+	}
+
 	//abbrs := viper.GetStringSlice("kunyuan.syncer.monitor.physical_systems")
 	abbrs := kunyuanConfig.Monitor.PhysicalSystems
 	for _, abbr := range abbrs {
@@ -616,17 +634,17 @@ func (s *KunYuanSyncer) SyncMonitor() {
 			for _, record := range syncerResult.Data.Servers {
 				coreTotalNum, _ := strconv.Atoi(record.CoreTotalNum)
 				h := &node.Node{
-					IP:                   record.ProdIp,
-					Name:                 record.ServPartName,
-					CloudPoolCode:        record.CloudPoolCode,
-					CloudPoolName:        record.CloudPoolName,
-					CoreTotalNum:         coreTotalNum,
-					CpuUsage:             record.CpuUsage,
-					DatabaseVersion:      record.DatabaseVersion,
-					DevCenterName:        record.DevCenterName,
-					DevTypeCode:          record.DevTypeCode,
-					FsUsage:              record.FsUsage,
-					MemoryUsage:          record.MemoryUsage,
+					IP: record.ProdIp,
+					//Name:                 record.ServPartName,
+					CloudPoolCode: record.CloudPoolCode,
+					CloudPoolName: record.CloudPoolName,
+					CoreTotalNum:  coreTotalNum,
+					//CpuUsage:             record.CpuUsage,
+					DatabaseVersion: record.DatabaseVersion,
+					DevCenterName:   record.DevCenterName,
+					DevTypeCode:     record.DevTypeCode,
+					//FsUsage:              record.FsUsage,
+					//MemoryUsage:          record.MemoryUsage,
 					ManagerA:             record.ManagerA,
 					ManagerB:             record.ManagerB,
 					Oracle:               record.Oracle,
@@ -646,7 +664,7 @@ func (s *KunYuanSyncer) SyncMonitor() {
 					VirtFcNum:            record.VirtFcNum,
 					VirtNetNum:           record.VirtNetNum,
 					UpdateTime:           time.Now(),
-					State:                node.NodeStatusServicing,
+					State:                node.StatusServicing,
 					//ApplyUser:            record.ApplyUser,
 					//AreaName:             record.AreaName,
 					//CpuNumber:            record.CpuNumber,
@@ -656,6 +674,12 @@ func (s *KunYuanSyncer) SyncMonitor() {
 					//FunDesc:             record.FunDesc,
 					//ProdIp:               record.ProdIp,
 					//OsVersion:            record.OsVersion,
+				}
+				if _, ok := blackIPMap[record.ProdIp]; !ok {
+					h.Name = record.ServPartName
+					h.CPUAvailable = strconv.FormatFloat(record.CpuUsage*100, 'f', 5, 64)
+					h.MemAvailable = strconv.FormatFloat(record.MemoryUsage*100, 'f', 5, 64)
+					h.FileSystemAvailable = strconv.FormatFloat(record.FsUsage*100, 'f', 5, 64)
 				}
 
 				var hh node.Node
