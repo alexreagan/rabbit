@@ -1,6 +1,8 @@
 package caas
 
 import (
+	"github.com/alexreagan/rabbit/g"
+	"github.com/alexreagan/rabbit/server/model/app"
 	"github.com/alexreagan/rabbit/server/model/gtime"
 )
 
@@ -62,4 +64,15 @@ type Service struct {
 
 func (this Service) TableName() string {
 	return "caas_service"
+}
+
+func (this Service) RelatedTags() []*app.Tag {
+	var tags []*app.Tag
+	tx := g.Con().Portal.Model(app.Tag{})
+	tx = tx.Select("`tag`.*, `tag_category`.name as category_name")
+	tx = tx.Joins("left join `caas_service_tag_rel` on `caas_service_tag_rel`.tag = `tag`.id")
+	tx = tx.Joins("left join `tag_category` on `tag_category`.id = `tag`.category_id")
+	tx = tx.Where("`caas_service_tag_rel`.service = ?", this.ID)
+	tx.Find(&tags)
+	return tags
 }

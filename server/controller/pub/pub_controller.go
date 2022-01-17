@@ -12,6 +12,8 @@ import (
 )
 
 type APIGetPubListInputs struct {
+	DeployUnitID int `json:"deployUnitID" form:"deployUnitID"`
+	Creator string `json:"creator" form:"creator"`
 	Limit   int    `json:"limit" form:"limit"`
 	Page    int    `json:"page" form:"page"`
 	OrderBy string `json:"orderBy" form:"orderBy"`
@@ -46,7 +48,13 @@ func List(c *gin.Context) {
 
 	var pubs []*pub.Pub
 	var totalCount int64
-	tx := g.Con().Portal.Debug().Model(pub.Pub{})
+	tx := g.Con().Portal.Model(pub.Pub{})
+	if inputs.DeployUnitID != 0 {
+		tx = tx.Where("deploy_unit_id = ?",  inputs.DeployUnitID)
+	}
+	if inputs.Creator != "" {
+		tx = tx.Where("creator_name regexp ?",  inputs.Creator)
+	}
 	tx.Count(&totalCount)
 	if inputs.OrderBy != "" {
 		tx = tx.Order(utils.Camel2Case(inputs.OrderBy) + " " + inputs.Order)
@@ -68,6 +76,8 @@ type APIPostPubUpdateInputs struct {
 	DeployUnitName        string      `json:"deployUnitName" form:"deployUnitName"`
 	VersionDate           gtime.GTime `json:"versionDate" form:"versionDate"`
 	PubContent            string      `json:"pubContent" form:"pubContent"`
+	Git            string      `json:"git" form:"git"`
+	CommitID            string      `json:"commitID" form:"commitID"`
 	PubStep               string      `json:"pubStep" form:"pubStep"`
 	RollbackStep          string      `json:"rollbackStep" form:"rollbackStep"`
 	Requirement           string      `json:"requirement" form:"requirement"`
@@ -107,6 +117,8 @@ func Create(c *gin.Context) {
 		DeployUnitID:          inputs.DeployUnitID,
 		DeployUnitName:        deployUnit.Name,
 		VersionDate:           inputs.VersionDate,
+		Git: inputs.Git,
+		CommitID: inputs.CommitID,
 		PubContent:            inputs.PubContent,
 		PubStep:               inputs.PubStep,
 		RollbackStep:          inputs.RollbackStep,
@@ -123,11 +135,13 @@ func Create(c *gin.Context) {
 		TrialOperationDesign:  inputs.TrialOperationDesign,
 		TrialOperationCase:    inputs.TrialOperationCase,
 		Creator:               user.JgygUserID,
+		CreatorName:           user.CnName,
 		CreateAt:              gtime.Now(),
 	}
 	tx := g.Con().Portal
-	if tx = tx.Model(pub.Pub{}).Create(&p); tx.Error != nil {
-		h.JSONR(c, h.ExpecStatus, tx.Error)
+	if err := tx.Model(pub.Pub{}).Create(&p).Error; err != nil {
+		h.JSONR(c, h.ExpecStatus, err)
+		return
 	}
 
 	h.JSONR(c, h.OKStatus, inputs)
@@ -148,6 +162,7 @@ func Update(c *gin.Context) {
 		h.JSONR(c, h.BadStatus, err)
 		return
 	}
+	user, _ := h.GetUser(c)
 
 	var deployUnit *app.Tag
 	g.Con().Portal.Model(app.Tag{}).Where("id = ?", inputs.DeployUnitID).Find(&deployUnit)
@@ -157,6 +172,8 @@ func Update(c *gin.Context) {
 		DeployUnitID:          inputs.DeployUnitID,
 		DeployUnitName:        deployUnit.Name,
 		VersionDate:           inputs.VersionDate,
+		Git: inputs.Git,
+		CommitID: inputs.CommitID,
 		PubContent:            inputs.PubContent,
 		PubStep:               inputs.PubStep,
 		RollbackStep:          inputs.RollbackStep,
@@ -172,10 +189,13 @@ func Update(c *gin.Context) {
 		PubShellReview:        inputs.PubShellReview,
 		TrialOperationDesign:  inputs.TrialOperationDesign,
 		TrialOperationCase:    inputs.TrialOperationCase,
+		Creator:               user.JgygUserID,
+		CreatorName:           user.CnName,
+		CreateAt:              gtime.Now(),
 	}
-	tx := g.Con().Portal.Model(pub.Pub{}).Debug()
-	if dt := tx.Where("id = ?", inputs.ID).Updates(&p); dt.Error != nil {
-		h.JSONR(c, h.ExpecStatus, dt.Error)
+	tx := g.Con().Portal.Model(pub.Pub{})
+	if err := tx.Where("id = ?", inputs.ID).Updates(&p).Error; err != nil {
+		h.JSONR(c, h.ExpecStatus, err)
 		return
 	}
 
@@ -196,5 +216,42 @@ func Info(c *gin.Context) {
 	p := pub.Pub{}
 	g.Con().Portal.Model(p).Where("id = ?", id).First(&p)
 	h.JSONR(c, p)
+	return
+}
+
+type APIPostPubAssignInputs struct {
+	ID     int64  `json:"id" form:"id"`
+	Status string `json:"status" form:"status"`
+}
+
+// @Summary 更新发布单实施状态信息
+// @Description
+// @Produce json
+// @Param APIPostPubAssignInputs body APIPostPubAssignInputs true "更新发布单实施状态信息"
+// @Success 200 {object} APIPostPubUpdateInputs
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
+// @Router /api/v1/pub/assign [put]
+func Assign(c *gin.Context) {
+	var inputs APIPostPubAssignInputs
+	if err := c.Bind(&inputs); err != nil {
+		h.JSONR(c, h.BadStatus, err)
+		return
+	}
+	user, _ := h.GetUser(c)
+	p := pub.Pub{
+		ID:              inputs.ID,
+		Status:          inputs.Status,
+		Implementer:     user.JgygUserID,
+		ImplementerName: user.UserName,
+		ImplementAt:     gtime.Now(),
+	}
+	tx := g.Con().Portal.Model(pub.Pub{})
+	if err := tx.Where("id = ?", inputs.ID).Updates(&p).Error; err != nil {
+		h.JSONR(c, h.ExpecStatus, err)
+		return
+	}
+
+	h.JSONR(c, h.OKStatus, inputs)
 	return
 }

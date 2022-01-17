@@ -119,24 +119,30 @@ func RoleCreate(c *gin.Context) {
 	}
 
 	tx := g.Con().Portal.Begin()
-	tx = tx.Model(uic.Role{})
 	role := &uic.Role{
 		Name:      inputs.Name,
 		CnName:    inputs.CnName,
 		Remark:    inputs.Remark,
 		CreatedAt: gtime.Now(),
 	}
-	tx.Create(role)
+	if err := tx.Model(uic.Role{}).Create(role).Error; err != nil {
+		tx.Rollback()
+		h.JSONR(c, http.StatusExpectationFailed, err)
+		return
+	}
 
 	var rels []*uic.RolePermRel
-	tx = tx.Model(uic.RolePermRel{})
-	tx.Where("id = ?", role.ID).Delete(&rels)
+	tx.Model(uic.RolePermRel{}).Where("role = ?", role.ID).Delete(&rels)
 
 	for _, v := range inputs.PermList {
-		tx.Create(&uic.RolePermRel{
+		if err := tx.Model(uic.RolePermRel{}).Create(&uic.RolePermRel{
 			Role: role.ID,
 			Perm: v,
-		})
+		}).Error; err != nil {
+			tx.Rollback()
+			h.JSONR(c, http.StatusExpectationFailed, err)
+			return
+		}
 	}
 	tx.Commit()
 

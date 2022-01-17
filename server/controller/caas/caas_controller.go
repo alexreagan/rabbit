@@ -11,6 +11,9 @@ import (
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"net/http"
+	"sort"
+	"strconv"
+	"strings"
 )
 
 type APIGetEnvListInputs struct {
@@ -21,6 +24,7 @@ type APIGetEnvListInputs struct {
 
 type APIGetCaasServiceListInputs struct {
 	ServiceName string `json:"serviceName" form:"serviceName"`
+	TagIDs     []int64 `json:"tagIDs[]" form:"tagIDs[]"`
 	Limit       int    `json:"limit" form:"limit"`
 	Page        int    `json:"page" form:"page"`
 }
@@ -66,11 +70,33 @@ func ServiceList(c *gin.Context) {
 	tx = tx.Select("`caas_service`.*, `caas_namespace`.`namespace`, `caas_namespace`.`workspace_name`, `caas_namespace`.`cluster_name`, `caas_namespace`.`physical_system_name`")
 	tx = tx.Joins("left join `caas_namespace_service_rel` on `service` = `caas_service`.`id`")
 	tx = tx.Joins("left join `caas_namespace` on `caas_namespace`.`id` = `caas_namespace_service_rel`.`namespace`")
+	tx = tx.Joins("left join `caas_service_tag_rel` on `caas_service`.id=`caas_service_tag_rel`.`service`")
 	if inputs.ServiceName != "" {
 		tx.Where("`caas_service`.`service_name` regexp ?", inputs.ServiceName)
 	}
+	if len(inputs.TagIDs) > 0 {
+		var tIDs []int
+		for _, i := range inputs.TagIDs {
+			tIDs = append(tIDs, int(i))
+		}
+		sort.Ints(tIDs)
+
+		var tmp []string
+		for _, i := range tIDs {
+			tmp = append(tmp, strconv.Itoa(i))
+		}
+		tx = tx.Where("`caas_service_tag_rel`.`tag` in (?)", inputs.TagIDs)
+		tx = tx.Group("`caas_service_tag_rel`.`service`")
+		tx = tx.Having("group_concat(`caas_service_tag_rel`.`tag` order by `caas_service_tag_rel`.`tag`) = ?", strings.Join(tmp, ","))
+	} else {
+		tx = tx.Group("`caas_service`.`id`")
+	}
 	tx.Count(&totalCount)
 	tx.Offset(offset).Limit(limit).Find(&services)
+
+	for _, s := range services {
+		s.Tags = s.RelatedTags()
+	}
 
 	resp := &APIGetCaasServiceListOutputs{
 		List:       services,

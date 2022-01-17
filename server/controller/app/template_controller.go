@@ -44,13 +44,14 @@ func TemplateAll(c *gin.Context) {
 
 	var templates []*app.Template
 	var totalCount int64
-	tx := g.Con().Portal.Debug().Model(app.Template{})
+	tx := g.Con().Portal.Model(app.Template{})
 	if inputs.Name != "" {
 		tx = tx.Where("`template`.`name` = ?", inputs.Name)
 	}
 	if inputs.Remark != "" {
 		tx = tx.Where("`template`.`remark` regexp ?", inputs.Remark)
 	}
+	tx = tx.Where("`template`.`state` = ?", "enable")
 
 	tx.Count(&totalCount)
 	if inputs.OrderBy != "" {

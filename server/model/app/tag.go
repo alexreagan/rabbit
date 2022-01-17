@@ -19,13 +19,13 @@ func (t TagCategory) TableName() string {
 
 type Tag struct {
 	ID           int64       `json:"id" gorm:"primary_key;column:id"`
-	Name         string      `json:"name" gorm:"column:name;type:string;size:128;comment:名称"`
+	Name         string      `json:"name" gorm:"primary_key;column:name;type:string;size:128;comment:名称"`
+	Type         string      `json:"type" gorm:"column:type;type:string;size:64;default:node;comment:类型"`
 	CnName       string      `json:"cnName" gorm:"column:cn_name;unique;type:string;size:128;comment:中文名称"`
-	CategoryID   int64       `json:"categoryID" gorm:"column:category_id;comment:类别id"`
+	CategoryID   int64       `json:"categoryID" gorm:"primary_key;column:category_id;comment:类别id"`
 	CategoryName string      `json:"categoryName" gorm:"column:category_name;type:string;size:128;comment:类别名称"`
 	Remark       string      `json:"remark" gorm:"column:remark;type:string;size:1024;comment:描述"`
 	CreateAt     gtime.GTime `json:"createAt" gorm:"column:create_at;comment:创建时间"`
-	Type         string      `json:"type" gorm:"column:type;type:string;size:64;default:node;comment:类型"`
 	//Label        string      `json:"label" gorm:"column:label;type:string;size:128;comment:画布上的展现文字"`
 	//Size         string      `json:"size" gorm:"column:size;type:string;size:64;comment:大小，譬如170*34"`
 	//Color        string      `json:"color" gorm:"column:color;type:string;size:64;default:#1890ff;comment:颜色"`

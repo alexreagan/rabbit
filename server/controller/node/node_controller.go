@@ -145,9 +145,6 @@ func NodeList(c *gin.Context) {
 	tx.Find(&nodes)
 
 	for _, n := range nodes {
-		//n.CpuUsage, _ = strconv.ParseFloat(fmt.Sprintf("%.2f", n.CpuUsage*100), 64)
-		//n.FsUsage, _ = strconv.ParseFloat(fmt.Sprintf("%.2f", n.FsUsage*100), 64)
-		//n.MemoryUsage, _ = strconv.ParseFloat(fmt.Sprintf("%.2f", n.MemoryUsage*100), 64)
 		n.Tags = n.RelatedTags()
 	}
 
