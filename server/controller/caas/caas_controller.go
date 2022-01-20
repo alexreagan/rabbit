@@ -23,10 +23,10 @@ type APIGetEnvListInputs struct {
 }
 
 type APIGetCaasServiceListInputs struct {
-	ServiceName string `json:"serviceName" form:"serviceName"`
-	TagIDs     []int64 `json:"tagIDs[]" form:"tagIDs[]"`
-	Limit       int    `json:"limit" form:"limit"`
-	Page        int    `json:"page" form:"page"`
+	ServiceName string  `json:"serviceName" form:"serviceName"`
+	TagIDs      []int64 `json:"tagIDs[]" form:"tagIDs[]"`
+	Limit       int     `json:"limit" form:"limit"`
+	Page        int     `json:"page" form:"page"`
 }
 
 type APIGetCaasServiceListOutputs struct {

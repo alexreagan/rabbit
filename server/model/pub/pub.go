@@ -11,6 +11,7 @@ type Pub struct {
 	VersionDate           gtime.GTime `json:"versionDate" gorm:"column:versionDate;comment:"`
 	Git                   string      `json:"git" gorm:"column:git;type:string;size:512;comment:git地址"`
 	CommitID              string      `json:"commitID" gorm:"column:commit_id;type:string;size:128;comment:commit id"`
+	PackageAddress        string      `json:"packageAddress" gorm:"column:package_address;type:string;size:512;comment:版本包地址"`
 	PubContent            string      `json:"pubContent" gorm:"column:pub_content;type:text;comment:"`
 	PubStep               string      `json:"pubStep" gorm:"column:pub_step;type:text;comment:"`
 	RollbackStep          string      `json:"rollbackStep" gorm:"column:rollback_step;type:text;comment:"`

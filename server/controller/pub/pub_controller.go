@@ -12,12 +12,12 @@ import (
 )
 
 type APIGetPubListInputs struct {
-	DeployUnitID int `json:"deployUnitID" form:"deployUnitID"`
-	Creator string `json:"creator" form:"creator"`
-	Limit   int    `json:"limit" form:"limit"`
-	Page    int    `json:"page" form:"page"`
-	OrderBy string `json:"orderBy" form:"orderBy"`
-	Order   string `json:"order" form:"order"`
+	DeployUnitID int    `json:"deployUnitID" form:"deployUnitID"`
+	Creator      string `json:"creator" form:"creator"`
+	Limit        int    `json:"limit" form:"limit"`
+	Page         int    `json:"page" form:"page"`
+	OrderBy      string `json:"orderBy" form:"orderBy"`
+	Order        string `json:"order" form:"order"`
 }
 
 type APIGetPubListOutputs struct {
@@ -50,10 +50,10 @@ func List(c *gin.Context) {
 	var totalCount int64
 	tx := g.Con().Portal.Model(pub.Pub{})
 	if inputs.DeployUnitID != 0 {
-		tx = tx.Where("deploy_unit_id = ?",  inputs.DeployUnitID)
+		tx = tx.Where("deploy_unit_id = ?", inputs.DeployUnitID)
 	}
 	if inputs.Creator != "" {
-		tx = tx.Where("creator_name regexp ?",  inputs.Creator)
+		tx = tx.Where("creator_name regexp ?", inputs.Creator)
 	}
 	tx.Count(&totalCount)
 	if inputs.OrderBy != "" {
@@ -76,8 +76,9 @@ type APIPostPubUpdateInputs struct {
 	DeployUnitName        string      `json:"deployUnitName" form:"deployUnitName"`
 	VersionDate           gtime.GTime `json:"versionDate" form:"versionDate"`
 	PubContent            string      `json:"pubContent" form:"pubContent"`
-	Git            string      `json:"git" form:"git"`
-	CommitID            string      `json:"commitID" form:"commitID"`
+	Git                   string      `json:"git" form:"git"`
+	CommitID              string      `json:"commitID" form:"commitID"`
+	PackageAddress        string      `json:"packageAddress" form:"packageAddress"`
 	PubStep               string      `json:"pubStep" form:"pubStep"`
 	RollbackStep          string      `json:"rollbackStep" form:"rollbackStep"`
 	Requirement           string      `json:"requirement" form:"requirement"`
@@ -94,10 +95,10 @@ type APIPostPubUpdateInputs struct {
 	TrialOperationCase    string      `json:"trialOperationCase" form:"trialOperationCase"`
 }
 
-// @Summary 创建新发布单
+// @Summary 创建新发布单并启动发布流程
 // @Description
 // @Produce json
-// @Param APIPostPubUpdateInputs body APIPostPubUpdateInputs true "创建新发布单"
+// @Param APIPostPubUpdateInputs body APIPostPubUpdateInputs true "创建新发布单并启动发布流程"
 // @Success 200 {object} APIPostPubUpdateInputs
 // @Failure 400 "bad arguments"
 // @Failure 417 "internal error"
@@ -117,8 +118,9 @@ func Create(c *gin.Context) {
 		DeployUnitID:          inputs.DeployUnitID,
 		DeployUnitName:        deployUnit.Name,
 		VersionDate:           inputs.VersionDate,
-		Git: inputs.Git,
-		CommitID: inputs.CommitID,
+		Git:                   inputs.Git,
+		CommitID:              inputs.CommitID,
+		PackageAddress:        inputs.PackageAddress,
 		PubContent:            inputs.PubContent,
 		PubStep:               inputs.PubStep,
 		RollbackStep:          inputs.RollbackStep,
@@ -172,8 +174,9 @@ func Update(c *gin.Context) {
 		DeployUnitID:          inputs.DeployUnitID,
 		DeployUnitName:        deployUnit.Name,
 		VersionDate:           inputs.VersionDate,
-		Git: inputs.Git,
-		CommitID: inputs.CommitID,
+		Git:                   inputs.Git,
+		CommitID:              inputs.CommitID,
+		PackageAddress:        inputs.PackageAddress,
 		PubContent:            inputs.PubContent,
 		PubStep:               inputs.PubStep,
 		RollbackStep:          inputs.RollbackStep,
