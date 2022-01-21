@@ -17,6 +17,8 @@ func Routes(r *gin.Engine) {
 	pubGroup.PUT("/assign", Assign)
 
 	procGroup := r.Group("/api/v1/proc")
+	procGroup.POST("/create", ProcCreate)
+	procGroup.POST("/execute", ProcExecute)
 	procGroup.GET("/nextNodeInfo", NextNodeInfo)
 	procGroup.GET("/getPersonByNode", GetPersonByNode)
 	procGroup.GET("/getHistDetailList", GetHistDetailList)
