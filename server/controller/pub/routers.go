@@ -18,4 +18,6 @@ func Routes(r *gin.Engine) {
 
 	procGroup := r.Group("/api/v1/proc")
 	procGroup.GET("/nextNodeInfo", NextNodeInfo)
+	procGroup.GET("/getPersonByNode", GetPersonByNode)
+	procGroup.GET("/getHistDetailList", GetHistDetailList)
 }

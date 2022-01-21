@@ -60,3 +60,65 @@ func NextNodeInfo(c *gin.Context) {
 	h.JSONR(c, http.StatusOK, resp)
 	return
 }
+
+type ApiGetProcGetPersonByNodeInputs struct {
+	TemplateID string `json:"templateID" form:"templateID"`
+	TaskID string `json:"taskID" form:"taskID"`
+}
+
+// @Summary 根据节点获取审批用户
+// @Description
+// @Produce json
+// @Param ApiGetProcNextNodeInfoInputs body ApiGetProcNextNodeInfoInputs true "根据节点获取审批用户"
+// @Success 200 {object} ApiGetProcNextNodeInfoOutputs
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
+// @Router /api/v1/proc/getPersonByNode [get]
+func GetPersonByNode(c *gin.Context) {
+	var inputs ApiGetProcGetPersonByNodeInputs
+
+	if err := c.Bind(&inputs); err != nil {
+		h.JSONR(c, h.BadStatus, err)
+		return
+	}
+
+	resp, e := service.ProcService.GetPersonByNode(inputs.TemplateID, inputs.TaskID)
+	if e != nil {
+		h.JSONR(c, http.StatusExpectationFailed, e)
+		return
+	}
+	h.JSONR(c, http.StatusOK, resp)
+	return
+}
+
+type ApiGetProcGetHistDetailListInputs struct {
+	TemplateID string `json:"templateID" form:"templateID"`
+	ProcessInstID string `json:"processInstID" form:"processInstID"`
+	TaskID string `json:"TaskID" form:"TaskID"`
+}
+
+
+// @Summary 获取审批历史
+// @Description
+// @Produce json
+// @Param ApiGetProcGetHistDetailListInputs body ApiGetProcGetHistDetailListInputs true "获取审批历史"
+// @Success 200 {object} ApiGetProcNextNodeInfoOutputs
+// @Failure 400 "bad arguments"
+// @Failure 417 "internal error"
+// @Router /api/v1/proc/getHistDetailList [get]
+func GetHistDetailList(c *gin.Context) {
+	var inputs ApiGetProcGetHistDetailListInputs
+
+	if err := c.Bind(&inputs); err != nil {
+		h.JSONR(c, h.BadStatus, err)
+		return
+	}
+
+	resp, e := service.ProcService.GetHistDetailList(inputs.ProcessInstID, inputs.TaskID)
+	if e != nil {
+		h.JSONR(c, http.StatusExpectationFailed, e)
+		return
+	}
+	h.JSONR(c, http.StatusOK, resp)
+	return
+}
