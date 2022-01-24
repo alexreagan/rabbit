@@ -8,7 +8,7 @@ var (
 	BucketService      *bucketService
 	CaasService        *caasService
 	TemplateService    *templateService
-	ProcService *procService
+	ProcService        *procService
 )
 
 func init() {
