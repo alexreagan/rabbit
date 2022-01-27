@@ -1,14 +1,15 @@
 package service
 
 var (
-	NodeService        *nodeService
-	TagService         *tagService
-	TagCategoryService *tagCategoryService
-	ParamService       *paramService
-	BucketService      *bucketService
-	CaasService        *caasService
-	TemplateService    *templateService
-	ProcService        *procService
+	NodeService           *nodeService
+	TagService            *tagService
+	TagCategoryService    *tagCategoryService
+	ParamService          *paramService
+	BucketService         *bucketService
+	CaasService           *caasService
+	TemplateService       *templateService
+	ProcService           *procService
+	ProcManagerApiService *procManagerApiService
 )
 
 func init() {
@@ -20,4 +21,5 @@ func init() {
 	CaasService = newCaasService()
 	TemplateService = newTemplateService()
 	ProcService = newProcService()
+	ProcManagerApiService = newProcManagerApiService()
 }
