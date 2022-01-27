@@ -39,7 +39,6 @@ type ProcManagerApiLoginInputs struct {
 }
 
 type ProcManagerApiSession struct {
-	// req.Header.Add("Cookie", "uliweb_session_id=session:6d8.....e99")
 	UliWebSessionID string
 	BodyContentLen  int
 }
@@ -298,7 +297,7 @@ func (s *procManagerApiService) procManagerApiProcCreate(param ProcManagerApiCre
 	return &createProcessMap, err
 }
 
-// 登录：获得Cookie.uliweb_session_id= session:654...e99}
+// 登录：获得Cookie
 func (s *procManagerApiService) procManagerApiLogin(param ProcManagerApiLoginInputs) (*ProcManagerApiSession, error) {
 	// http://{IP}:{port}/login
 	u1, err := url.Parse(s.Addr)
@@ -324,7 +323,7 @@ func (s *procManagerApiService) procManagerApiLogin(param ProcManagerApiLoginInp
 		passWord = viper.GetString("procManager.passWord")
 	}
 
-	// 先登录{s.Addr}/procmanager/api项目, 才能使用登录成功跳转时携带的cookie.uliweb_session_id继续调用流程引擎其它接口
+	// 先登录{s.Addr}/procmanager/api项目, 才能使用登录成功跳转时携带的cookie继续调用流程引擎其它接口
 	var uliWebSessionId string
 	jar, err := cookiejar.New(nil)
 	if err != nil {
