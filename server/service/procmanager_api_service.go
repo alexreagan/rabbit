@@ -111,6 +111,85 @@ type ProcManagerApiTodoRecords struct {
 	TODO_INFO        []ProcManagerToDoItem
 }
 
+type ProcManageApiProcExecuteInputs struct {
+	PROCESS_INST_ID string
+	TEMPLATE_ID     string
+	TASK_ID         string
+	REMARK          string
+	OPIN_DESC       string
+	PRJ_ID          string
+	PRJ_SN          string
+	TO_DO_TM_TTL    string
+	TODO_ID         string
+	NEXT_USER_GRP   []ProcManagerApiNextUser
+	BUTTON_NAME     string
+	CONDITIONS      []ProcManagerApiCondition
+}
+
+type ProcManagerApiProcExecuteRecord struct {
+	SYS_RESP_DESC    string
+	SYS_TX_TYPE      string
+	SYS_RECV_TIME    string
+	SYS_TX_STATUS    string
+	SYS_EVT_TRACE_ID string
+	SYS_RESP_CODE    string
+	RESULT_DESC      string
+	SYS_RESP_TIME    string
+}
+
+// 流程处理: 根据编号和待办标识
+func (s *procManagerApiService) procManagerApiExecute(param ProcManageApiProcExecuteInputs) (*ProcManagerApiProcExecuteRecord, error) {
+	client := &http.Client{}
+	targetUrl := fmt.Sprintf("%s/procmanager/api/procExecute", s.Addr)
+
+	var ItemExecuteVal = ProcManageApiProcExecuteInputs{
+		PROCESS_INST_ID: string(param.PROCESS_INST_ID),
+		TEMPLATE_ID:     string(param.TEMPLATE_ID),
+		TASK_ID:         string(param.TASK_ID),
+		REMARK:          string(param.REMARK),
+		OPIN_DESC:       string(param.OPIN_DESC),
+		PRJ_ID:          string(param.PRJ_ID),
+		PRJ_SN:          string(param.PRJ_SN),
+		TO_DO_TM_TTL:    string(param.TO_DO_TM_TTL),
+		TODO_ID:         string(param.TODO_ID),
+		NEXT_USER_GRP:   param.NEXT_USER_GRP,
+		BUTTON_NAME:     string(param.BUTTON_NAME),
+		CONDITIONS:      param.CONDITIONS,
+	}
+	postBytes, _ := json.Marshal(ItemExecuteVal)
+	req, _ := http.NewRequest(ProcManagerApiMethodPost, targetUrl, strings.NewReader("jsonData="+string(postBytes)))
+
+	var uliWebSessionId string
+	var pLogin ProcManagerApiLoginInputs
+	uliWebSessionMap, err := s.procManagerApiLogin(pLogin)
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+	uliWebSessionId = string(uliWebSessionMap.UliWebSessionID)
+
+	req.Header.Set("Content-Type", ProcManagerApiContentType)
+	req.Header.Add("Cookie", ProcManagerApiSessionIdName+"="+uliWebSessionId)
+
+	resp, err := client.Do(req)
+
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	var executeRecord ProcManagerApiProcExecuteRecord
+	err = json.Unmarshal(body, &executeRecord)
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+	return &executeRecord, err
+}
+
+// 获取流程编号对应的待办数据
 func (s *procManagerApiService) procManagerApiTodoInfo(param ProcManagerApiTodoInputs) (*ProcManagerApiTodoRecords, error) {
 	client := &http.Client{}
 	targetUrl := fmt.Sprintf("%s/procmanager/api/procInstTodoInfo", s.Addr)
@@ -151,7 +230,7 @@ func (s *procManagerApiService) procManagerApiTodoInfo(param ProcManagerApiTodoI
 	return &toDoRecords, err
 }
 
-// 流程引擎创建发布
+// 流程发起
 func (s *procManagerApiService) procManagerApiProcCreate(param ProcManagerApiCreateInputs) (*ProcManagerApiCreateProcess, error) {
 	client := &http.Client{}
 	targetUrl := fmt.Sprintf("%s/procmanager/api/procCreate", s.Addr)
@@ -219,9 +298,9 @@ func (s *procManagerApiService) procManagerApiProcCreate(param ProcManagerApiCre
 	return &createProcessMap, err
 }
 
-// 登录流程引擎后台,获得Cookie.uliweb_session_id= session:654...e99}
+// 登录：获得Cookie.uliweb_session_id= session:654...e99}
 func (s *procManagerApiService) procManagerApiLogin(param ProcManagerApiLoginInputs) (*ProcManagerApiSession, error) {
-	// http://128.196.96.216:8080/login
+	// http://{IP}:{port}/login
 	u1, err := url.Parse(s.Addr)
 	if err != nil {
 		log.Error(err)
@@ -244,9 +323,6 @@ func (s *procManagerApiService) procManagerApiLogin(param ProcManagerApiLoginInp
 	} else {
 		passWord = viper.GetString("procManager.passWord")
 	}
-
-	// jsonData, _ := json.Marshal(param)
-	// req.Param("jsonData", string(jsonData))
 
 	// 先登录{s.Addr}/procmanager/api项目, 才能使用登录成功跳转时携带的cookie.uliweb_session_id继续调用流程引擎其它接口
 	var uliWebSessionId string
