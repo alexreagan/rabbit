@@ -15,38 +15,37 @@ type Condition struct {
 }
 
 type NextUser struct {
-	ID string `json:"ID"`
-	Name string `json:"name"`
+	ID            string `json:"ID"`
+	Name          string `json:"name"`
 	IDPrcActionID string `json:"IDPrcActionID"`
-	UsrIDLandNm string `json:"UsrIDLandNm"`
+	UsrIDLandNm   string `json:"UsrIDLandNm"`
 	CurUserInstID string `json:"curUserInstID"`
 	CurUserInstNm string `json:"curUserInstNm"`
 }
 
 type ApiPostProcCreateInputs struct {
-	TemplateID string `json:"templateID" form:"templateID"`
-	TaskID string `json:"taskID" form:"taskID"`
-	Remark string `json:"remark" form:"remark"`
-	OpinDesc string `json:"opinDesc" form:"opinDesc"`
-	NextUserFlag string `json:"nextUserFlag" form:"nextUserFlag"`
-	ButtonName string `json:"buttonName" form:"buttonName"`
-	UserID string `json:"userID" form:"userID"`
-	UserName string `json:"userName" form:"userName"`
-	UsrIDLandNm string `json:"usrIDLandNm" form:"usrIDLandNm"`
-	CurUsrInstID string `json:"curUsrInstID" form:"curUsrInstID"`
-	CurUsrInstNm string `json:"curUsrInstNm" form:"curUsrInstNm"`
-	NextUserGrp  []*NextUser `json:"nextUserGrp" form:"nextUserGrp"`
-	Conditions []*Condition `json:"conditions" form:"conditions"`
-	PrjID  string `json:"prjID" form:"prjID"`
-	PrjSn  string `json:"prjSn" form:"prjSn"`
-	ToDoTmTpCd  string `json:"toDoTmTpCd" form:"toDoTmTpCd"`
-	ToDoTmTtl  string `json:"toDoTmTtl" form:"toDoTmTtl"`
-	BlngInstID  string `json:"blngInstID" form:"blngInstID"`
-	DmnGrpID  string `json:"dmnGrpID" form:"dmnGrpID"`
+	TemplateID   string       `json:"templateID" form:"templateID"`
+	TaskID       string       `json:"taskID" form:"taskID"`
+	Remark       string       `json:"remark" form:"remark"`
+	OpinDesc     string       `json:"opinDesc" form:"opinDesc"`
+	NextUserFlag string       `json:"nextUserFlag" form:"nextUserFlag"`
+	ButtonName   string       `json:"buttonName" form:"buttonName"`
+	UserID       string       `json:"userID" form:"userID"`
+	UserName     string       `json:"userName" form:"userName"`
+	UsrIDLandNm  string       `json:"usrIDLandNm" form:"usrIDLandNm"`
+	CurUsrInstID string       `json:"curUsrInstID" form:"curUsrInstID"`
+	CurUsrInstNm string       `json:"curUsrInstNm" form:"curUsrInstNm"`
+	NextUserGrp  []*NextUser  `json:"nextUserGrp" form:"nextUserGrp"`
+	Conditions   []*Condition `json:"conditions" form:"conditions"`
+	PrjID        string       `json:"prjID" form:"prjID"`
+	PrjSn        string       `json:"prjSn" form:"prjSn"`
+	ToDoTmTpCd   string       `json:"toDoTmTpCd" form:"toDoTmTpCd"`
+	ToDoTmTtl    string       `json:"toDoTmTtl" form:"toDoTmTtl"`
+	BlngInstID   string       `json:"blngInstID" form:"blngInstID"`
+	DmnGrpID     string       `json:"dmnGrpID" form:"dmnGrpID"`
 }
 
 type ApiPostProcCreateOutputs struct {
-
 }
 
 // @Summary 流程发起
@@ -65,46 +64,41 @@ func ProcCreate(c *gin.Context) {
 		return
 	}
 
-	nextUserGrp := make([]*service.NextUser, 0)
+	nextUserGrp := make([]service.ProcManagerApiNextUser, 0)
 	for _, nxg := range nextUserGrp {
-		nextUserGrp = append(nextUserGrp, &service.NextUser{
-			ID: nxg.ID,
-			Name: nxg.Name,
-			IDPrcActionID: nxg.IDPrcActionID,
-			UsrIDLandNm: nxg.UsrIDLandNm,
-			CurUserInstID: nxg.CurUserInstID,
-			CurUserInstNm: nxg.CurUserInstNm,
+		nextUserGrp = append(nextUserGrp, service.ProcManagerApiNextUser{
+			ID:              nxg.ID,
+			NAME:            nxg.NAME,
+			IDPRC_ACTION_ID: nxg.IDPRC_ACTION_ID,
+			USR_ID_LAND_NM:  nxg.USR_ID_LAND_NM,
+			CUR_USR_INST_ID: nxg.CUR_USR_INST_ID,
+			CUR_USR_INST_NM: nxg.CUR_USR_INST_NM,
 		})
 	}
 
-	conditions := make([]*service.Condition, 0)
+	conditions := make([]service.ProcManagerApiCondition, 0)
 	for _, cond := range conditions {
-		conditions = append(conditions, &service.Condition{
-			Key: cond.Key,
-			Value: cond.Value,
+		conditions = append(conditions, service.ProcManagerApiCondition{
+			KEY:   cond.KEY,
+			VALUE: cond.VALUE,
 		})
 	}
 
-	resp, e := service.ProcService.ProcCreate(service.ProcCreateInputs{
-		TemplateID:inputs.TemplateID,
-		TaskID:inputs.TaskID,
-		Remark:inputs.Remark,
-		OpinDesc:inputs.OpinDesc,
-		NextUserFlag:inputs.NextUserFlag,
-		ButtonName:inputs.ButtonName,
-		UserID:inputs.UserID,
-		UserName:inputs.UserName,
-		UsrIDLandNm:inputs.UsrIDLandNm,
-		CurUsrInstID:inputs.CurUsrInstID,
-		CurUsrInstNm:inputs.CurUsrInstNm,
-		NextUserGrp:nextUserGrp,
-		Conditions:conditions,
-		PrjID:inputs.PrjID,
-		PrjSn:inputs.PrjSn,
-		ToDoTmTpCd:inputs.ToDoTmTpCd,
-		ToDoTmTtl:inputs.ToDoTmTtl,
-		BlngInstID:inputs.BlngInstID,
-		DmnGrpID:inputs.DmnGrpID,
+	resp, e := service.ProcManagerApiService.ProcManagerApiProcCreate(service.ProcManagerApiCreateInputs{
+		inputs.TemplateID,
+		inputs.TaskID,
+		inputs.Remark,
+		inputs.UserID,
+		inputs.CurUsrInstID,
+		inputs.UsrIDLandNm,
+		inputs.PrjID,
+		inputs.PrjSn,
+		inputs.ToDoTmTtl,
+		inputs.ButtonName,
+		inputs.UserName,
+		inputs.UsrIDLandNm,
+		nextUserGrp,
+		conditions,
 	})
 	if e != nil {
 		h.JSONR(c, http.StatusExpectationFailed, e)
@@ -114,27 +108,29 @@ func ProcCreate(c *gin.Context) {
 	return
 }
 
-
 type ApiPostProcExecuteInputs struct {
-	ProcessInstID string `json:"processInstID" form:"processInstID"`
-	TemplateID string `json:"templateID" form:"templateID"`
-	TaskID string `json:"taskID" form:"taskID"`
-	Remark string `json:"remark" form:"remark"`
-	OpinCode string `json:"opinCode" form:"opinCode"`
-	OpinDesc string `json:"opinDesc" form:"opinDesc"`
-	NextUserFlag string `json:"nextUserFlag" form:"nextUserFlag"`
-	ButtonName string `json:"buttonName" form:"buttonName"`
-	UserID string `json:"userID" form:"userID"`
-	UserName string `json:"userName" form:"userName"`
-	UsrIDLandNm string `json:"usrIDLandNm" form:"usrIDLandNm"`
-	CurUsrInstID string `json:"curUsrInstID" form:"curUsrInstID"`
-	CurUsrInstNm string `json:"curUsrInstNm" form:"curUsrInstNm"`
-	NextUserGrp  []*NextUser `json:"nextUserGrp" form:"nextUserGrp"`
-	Conditions []*Condition `json:"conditions" form:"conditions"`
+	ProcessInstID string       `json:"processInstID" form:"processInstID"`
+	TemplateID    string       `json:"templateID" form:"templateID"`
+	TaskID        string       `json:"taskID" form:"taskID"`
+	Remark        string       `json:"remark" form:"remark"`
+	OpinCode      string       `json:"opinCode" form:"opinCode"`
+	OpinDesc      string       `json:"opinDesc" form:"opinDesc"`
+	NextUserFlag  string       `json:"nextUserFlag" form:"nextUserFlag"`
+	ButtonName    string       `json:"buttonName" form:"buttonName"`
+	UserID        string       `json:"userID" form:"userID"`
+	UserName      string       `json:"userName" form:"userName"`
+	UsrIDLandNm   string       `json:"usrIDLandNm" form:"usrIDLandNm"`
+	CurUsrInstID  string       `json:"curUsrInstID" form:"curUsrInstID"`
+	CurUsrInstNm  string       `json:"curUsrInstNm" form:"curUsrInstNm"`
+	PrjID         string       `json:"prjID" form:"prjID"`
+	PrjSn         string       `json:"prjSn" form:"prjSn"`
+	ToDoID        string       `json:"toDoID" form:"toDoID"`
+	ToDoTmTtl     string       `json:"toDoTmTtl" form:"toDoTmTtl"`
+	NextUserGrp   []*NextUser  `json:"nextUserGrp" form:"nextUserGrp"`
+	Conditions    []*Condition `json:"conditions" form:"conditions"`
 }
 
 type ApiPostProcExecuteOutputs struct {
-
 }
 
 // @Summary 流程处理
@@ -153,42 +149,40 @@ func ProcExecute(c *gin.Context) {
 		return
 	}
 
-	nextUserGrp := make([]*service.NextUser, 0)
+	nextUserGrp := make([]service.ProcManagerApiNextUser, 0)
 	for _, nxg := range nextUserGrp {
-		nextUserGrp = append(nextUserGrp, &service.NextUser{
-			ID: nxg.ID,
-			Name: nxg.Name,
-			IDPrcActionID: nxg.IDPrcActionID,
-			UsrIDLandNm: nxg.UsrIDLandNm,
-			CurUserInstID: nxg.CurUserInstID,
-			CurUserInstNm: nxg.CurUserInstNm,
+		nextUserGrp = append(nextUserGrp, service.ProcManagerApiNextUser{
+			ID:              nxg.ID,
+			NAME:            nxg.NAME,
+			PRC_ACTION_ID:   nxg.PRC_ACTION_ID,
+			IDPRC_ACTION_ID: nxg.IDPRC_ACTION_ID,
+			USR_ID_LAND_NM:  nxg.USR_ID_LAND_NM,
+			CUR_USR_INST_ID: nxg.CUR_USR_INST_ID,
+			CUR_USR_INST_NM: nxg.CUR_USR_INST_NM,
 		})
 	}
 
-	conditions := make([]*service.Condition, 0)
+	conditions := make([]service.ProcManagerApiCondition, 0)
 	for _, cond := range conditions {
-		conditions = append(conditions, &service.Condition{
-			Key: cond.Key,
-			Value: cond.Value,
+		conditions = append(conditions, service.ProcManagerApiCondition{
+			KEY:   cond.KEY,
+			VALUE: cond.VALUE,
 		})
 	}
 
-	resp, e := service.ProcService.ProcExecute(service.ProcExecuteInputs{
-		ProcessInstID:inputs.ProcessInstID,
-		TemplateID:inputs.TemplateID,
-		TaskID:inputs.TaskID,
-		Remark:inputs.Remark,
-		OpinCode:inputs.OpinCode,
-		OpinDesc:inputs.OpinDesc,
-		NextUserFlag:inputs.NextUserFlag,
-		ButtonName:inputs.ButtonName,
-		UserID:inputs.UserID,
-		UserName:inputs.UserName,
-		UsrIDLandNm:inputs.UsrIDLandNm,
-		CurUsrInstID:inputs.CurUsrInstID,
-		CurUsrInstNm:inputs.CurUsrInstNm,
-		NextUserGrp:nextUserGrp,
-		Conditions:conditions,
+	resp, e := service.ProcManagerApiService.ProcManagerApiExecute(service.ProcManageApiProcExecuteInputs{
+		PROCESS_INST_ID: inputs.ProcessInstID,
+		TEMPLATE_ID:     inputs.TemplateID,
+		TASK_ID:         inputs.TaskID,
+		REMARK:          inputs.Remark,
+		OPIN_DESC:       inputs.OpinDesc,
+		PRJ_ID:          inputs.PrjID,
+		PRJ_SN:          inputs.PrjSn,
+		TO_DO_TM_TTL:    inputs.ToDoTmTtl,
+		TODO_ID:         inputs.ToDoID,
+		NEXT_USER_GRP:   nextUserGrp,
+		BUTTON_NAME:     inputs.ButtonName,
+		CONDITIONS:      conditions,
 	})
 	if e != nil {
 		h.JSONR(c, http.StatusExpectationFailed, e)
@@ -308,7 +302,6 @@ func GetHistDetailList(c *gin.Context) {
 	h.JSONR(c, http.StatusOK, resp)
 	return
 }
-
 
 type APIGetPubProcInfoInputs struct {
 	ID string `json:"ID" form:"ID"`

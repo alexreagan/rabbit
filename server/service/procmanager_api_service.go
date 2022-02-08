@@ -137,7 +137,7 @@ type ProcManagerApiProcExecuteRecord struct {
 }
 
 // 流程处理: 根据编号和待办标识
-func (s *procManagerApiService) procManagerApiExecute(param ProcManageApiProcExecuteInputs) (*ProcManagerApiProcExecuteRecord, error) {
+func (s *procManagerApiService) ProcManagerApiExecute(param ProcManageApiProcExecuteInputs) (*ProcManagerApiProcExecuteRecord, error) {
 	client := &http.Client{}
 	targetUrl := fmt.Sprintf("%s/procmanager/api/procExecute", s.Addr)
 
@@ -189,7 +189,7 @@ func (s *procManagerApiService) procManagerApiExecute(param ProcManageApiProcExe
 }
 
 // 获取流程编号对应的待办数据
-func (s *procManagerApiService) procManagerApiTodoInfo(param ProcManagerApiTodoInputs) (*ProcManagerApiTodoRecords, error) {
+func (s *procManagerApiService) ProcManagerApiTodoInfo(param ProcManagerApiTodoInputs) (*ProcManagerApiTodoRecords, error) {
 	client := &http.Client{}
 	targetUrl := fmt.Sprintf("%s/procmanager/api/procInstTodoInfo", s.Addr)
 
@@ -230,7 +230,7 @@ func (s *procManagerApiService) procManagerApiTodoInfo(param ProcManagerApiTodoI
 }
 
 // 流程发起
-func (s *procManagerApiService) procManagerApiProcCreate(param ProcManagerApiCreateInputs) (*ProcManagerApiCreateProcess, error) {
+func (s *procManagerApiService) ProcManagerApiProcCreate(param ProcManagerApiCreateInputs) (*ProcManagerApiCreateProcess, error) {
 	client := &http.Client{}
 	targetUrl := fmt.Sprintf("%s/procmanager/api/procCreate", s.Addr)
 
