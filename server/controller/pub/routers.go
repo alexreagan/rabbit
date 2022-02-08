@@ -20,7 +20,7 @@ func Routes(r *gin.Engine) {
 	procGroup := r.Group("/api/v1/proc")
 	procGroup.POST("/create", ProcCreate)
 	procGroup.POST("/execute", ProcExecute)
-	procGroup.GET("/nextNodeInfo", NextNodeInfo)
+	procGroup.POST("/nextNodeInfo", NextNodeInfo)
 	procGroup.GET("/getPersonByNode", GetPersonByNode)
 	procGroup.GET("/getHistDetailList", GetHistDetailList)
 }
