@@ -6,6 +6,7 @@ import (
 	"github.com/alexreagan/rabbit/server/model/pub"
 	"github.com/alexreagan/rabbit/server/service"
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 	"net/http"
 )
 
@@ -82,6 +83,10 @@ func ProcCreate(c *gin.Context) {
 			KEY:   cond.KEY,
 			VALUE: cond.VALUE,
 		})
+	}
+
+	if service.ProcManagerApiService.Addr == "" {
+		service.ProcManagerApiService.Addr = viper.GetString("procManager.addr")
 	}
 
 	resp, e := service.ProcManagerApiService.ProcManagerApiProcCreate(service.ProcManagerApiCreateInputs{
@@ -168,6 +173,10 @@ func ProcExecute(c *gin.Context) {
 			KEY:   cond.KEY,
 			VALUE: cond.VALUE,
 		})
+	}
+
+	if service.ProcManagerApiService.Addr == "" {
+		service.ProcManagerApiService.Addr = viper.GetString("procManager.addr")
 	}
 
 	resp, e := service.ProcManagerApiService.ProcManagerApiExecute(service.ProcManageApiProcExecuteInputs{
