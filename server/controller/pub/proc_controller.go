@@ -85,20 +85,20 @@ func ProcCreate(c *gin.Context) {
 	}
 
 	resp, e := service.ProcManagerApiService.ProcManagerApiProcCreate(service.ProcManagerApiCreateInputs{
-		inputs.TemplateID,
-		inputs.TaskID,
-		inputs.Remark,
-		inputs.UserID,
-		inputs.CurUsrInstID,
-		inputs.UsrIDLandNm,
-		inputs.PrjID,
-		inputs.PrjSn,
-		inputs.ToDoTmTtl,
-		inputs.ButtonName,
-		inputs.UserName,
-		inputs.UsrIDLandNm,
-		nextUserGrp,
-		conditions,
+		TEMPLATE_ID:     inputs.TemplateID,
+		TASK_ID:         inputs.TaskID,
+		REMARK:          inputs.Remark,
+		USER_ID:         inputs.UserID,
+		CUR_USR_INST_ID: inputs.CurUsrInstID,
+		CUR_USR_INST_NM: inputs.UsrIDLandNm,
+		PRJ_ID:          inputs.PrjID,
+		PRJ_SN:          inputs.PrjSn,
+		TO_DO_TM_TTL:    inputs.ToDoTmTtl,
+		BUTTON_NAME:     inputs.ButtonName,
+		USER_NAME:       inputs.UserName,
+		USR_ID_LAND_NM:  inputs.UsrIDLandNm,
+		NEXT_USER_GRP:   nextUserGrp,
+		CONDITIONS:      conditions,
 	})
 	if e != nil {
 		h.JSONR(c, http.StatusExpectationFailed, e)
