@@ -66,22 +66,22 @@ func ProcCreate(c *gin.Context) {
 	}
 
 	nextUserGrp := make([]service.ProcManagerApiNextUser, 0)
-	for _, nxg := range nextUserGrp {
+	for _, nxg := range inputs.NextUserGrp {
 		nextUserGrp = append(nextUserGrp, service.ProcManagerApiNextUser{
 			ID:              nxg.ID,
-			NAME:            nxg.NAME,
-			IDPRC_ACTION_ID: nxg.IDPRC_ACTION_ID,
-			USR_ID_LAND_NM:  nxg.USR_ID_LAND_NM,
-			CUR_USR_INST_ID: nxg.CUR_USR_INST_ID,
-			CUR_USR_INST_NM: nxg.CUR_USR_INST_NM,
+			NAME:            nxg.Name,
+			IDPRC_ACTION_ID: nxg.IDPrcActionID,
+			USR_ID_LAND_NM:  nxg.UsrIDLandNm,
+			CUR_USR_INST_ID: nxg.CurUserInstID,
+			CUR_USR_INST_NM: nxg.CurUserInstNm,
 		})
 	}
 
 	conditions := make([]service.ProcManagerApiCondition, 0)
-	for _, cond := range conditions {
+	for _, cond := range inputs.Conditions {
 		conditions = append(conditions, service.ProcManagerApiCondition{
-			KEY:   cond.KEY,
-			VALUE: cond.VALUE,
+			KEY:   cond.Key,
+			VALUE: cond.Value,
 		})
 	}
 
@@ -155,23 +155,23 @@ func ProcExecute(c *gin.Context) {
 	}
 
 	nextUserGrp := make([]service.ProcManagerApiNextUser, 0)
-	for _, nxg := range nextUserGrp {
+	for _, nxg := range inputs.NextUserGrp {
 		nextUserGrp = append(nextUserGrp, service.ProcManagerApiNextUser{
 			ID:              nxg.ID,
-			NAME:            nxg.NAME,
-			PRC_ACTION_ID:   nxg.PRC_ACTION_ID,
-			IDPRC_ACTION_ID: nxg.IDPRC_ACTION_ID,
-			USR_ID_LAND_NM:  nxg.USR_ID_LAND_NM,
-			CUR_USR_INST_ID: nxg.CUR_USR_INST_ID,
-			CUR_USR_INST_NM: nxg.CUR_USR_INST_NM,
+			NAME:            nxg.Name,
+			PRC_ACTION_ID:   nxg.IDPrcActionID,
+			IDPRC_ACTION_ID: nxg.IDPrcActionID,
+			USR_ID_LAND_NM:  nxg.UsrIDLandNm,
+			CUR_USR_INST_ID: nxg.CurUserInstID,
+			CUR_USR_INST_NM: nxg.CurUserInstNm,
 		})
 	}
 
 	conditions := make([]service.ProcManagerApiCondition, 0)
-	for _, cond := range conditions {
+	for _, cond := range inputs.Conditions {
 		conditions = append(conditions, service.ProcManagerApiCondition{
-			KEY:   cond.KEY,
-			VALUE: cond.VALUE,
+			KEY:   cond.Key,
+			VALUE: cond.Value,
 		})
 	}
 
