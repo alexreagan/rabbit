@@ -1,6 +1,7 @@
 package pub
 
 import (
+	"encoding/json"
 	"github.com/alexreagan/rabbit/g"
 	h "github.com/alexreagan/rabbit/server/helper"
 	"github.com/alexreagan/rabbit/server/model/pub"
@@ -235,6 +236,10 @@ func NextNodeInfo(c *gin.Context) {
 		})
 	}
 
+	if service.ProcService.Addr == "" {
+		service.ProcService.Addr = viper.GetString("procManager.addr")
+	}
+
 	resp, e := service.ProcService.NextNodeInfo(service.NextNodeInfoInputs{
 		ProcessInstID: inputs.ProcessInstID,
 		TemplateID:    inputs.TemplateID,
@@ -245,7 +250,9 @@ func NextNodeInfo(c *gin.Context) {
 		h.JSONR(c, http.StatusExpectationFailed, e)
 		return
 	}
-	h.JSONR(c, http.StatusOK, resp)
+	var outputs interface{}
+	e = json.Unmarshal([]byte(resp), &outputs)
+	h.JSONR(c, http.StatusOK, outputs)
 	return
 }
 
@@ -268,6 +275,9 @@ func GetPersonByNode(c *gin.Context) {
 	if err := c.Bind(&inputs); err != nil {
 		h.JSONR(c, h.BadStatus, err)
 		return
+	}
+	if service.ProcService.Addr == "" {
+		service.ProcService.Addr = viper.GetString("procManager.addr")
 	}
 
 	resp, e := service.ProcService.GetPersonByNode(inputs.TemplateID, inputs.TaskID)
@@ -303,6 +313,10 @@ func GetHistDetailList(c *gin.Context) {
 		return
 	}
 
+	if service.ProcService.Addr == "" {
+		service.ProcService.Addr = viper.GetString("procManager.addr")
+	}
+
 	resp, e := service.ProcService.GetHistDetailList(inputs.ProcessInstID, inputs.TaskID, inputs.BelongInstID, inputs.SelectMode)
 	if e != nil {
 		h.JSONR(c, http.StatusExpectationFailed, e)
@@ -335,6 +349,11 @@ func ProcInfo(c *gin.Context) {
 	if err := c.Bind(&inputs); err != nil {
 		h.JSONR(c, h.BadStatus, err)
 		return
+	}
+
+	id := c.Query("id")
+	if inputs.ID == "" {
+		inputs.ID = id
 	}
 	var p pub.PubProc
 	tx := g.Con().Portal.Model(pub.PubProc{})

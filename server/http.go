@@ -1,3 +1,4 @@
+//go:build !windows
 // +build !windows
 
 package server
@@ -8,6 +9,7 @@ import (
 	"github.com/alexreagan/rabbit/server/controller/caas"
 	"github.com/alexreagan/rabbit/server/controller/chart"
 	"github.com/alexreagan/rabbit/server/controller/node"
+	"github.com/alexreagan/rabbit/server/controller/procmanager"
 	"github.com/alexreagan/rabbit/server/controller/pub"
 	"github.com/alexreagan/rabbit/server/controller/sys"
 	"github.com/alexreagan/rabbit/server/controller/uic"
@@ -51,6 +53,8 @@ func Start() {
 	chart.Routes(r)
 	caas.Routes(r)
 	pub.Routes(r)
+	// procmanager debug
+	procmanager.Routes(r)
 
 	// start server graceful
 	endless.ListenAndServe(viper.GetString("serv.addr"), r)
