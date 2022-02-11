@@ -17,4 +17,10 @@ func Routes(r *gin.Engine) {
 	paramGroup.GET("/info", ParamInfo)
 	paramGroup.POST("/create", ParamCreate)
 	paramGroup.PUT("/update", ParamUpdate)
+
+	noticeGroup := r.Group("/api/v1/notice")
+	noticeGroup.GET("/info", NoticeInfo)
+	noticeGroup.GET("/list", NoticeList)
+	noticeGroup.POST("/create", NoticeCreate)
+	noticeGroup.PUT("/update", NoticeUpdate)
 }

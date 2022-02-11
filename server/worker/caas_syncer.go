@@ -55,7 +55,7 @@ type CaasSyncerPodConfig struct {
 }
 
 type CaasSyncerConfig struct {
-	Enable    bool                      `json:"enable"`
+	Enabled   bool                      `json:"enabled"`
 	Duration  int                       `json:"duration"`
 	Login     CaasSyncerLoginConfig     `json:"login"`
 	WorkSpace CaasSyncerWorkSpaceConfig `json:"workspace"`
@@ -112,7 +112,7 @@ func (s *CaasSyncer) Start() {
 func (s *CaasSyncer) StartSyncer() {
 	log.Infoln("[CaasSyncer] StartSyncer...")
 
-	//if viper.GetBool("caas.syncer.enable") == false {
+	//if viper.GetBool("caas.syncer.enabled") == false {
 	//	return
 	//}
 
@@ -123,7 +123,7 @@ func (s *CaasSyncer) StartSyncer() {
 		log.Error(err)
 		return
 	}
-	if caasSyncConfig.Enable == false {
+	if caasSyncConfig.Enabled == false {
 		return
 	}
 	// start sync
@@ -145,7 +145,7 @@ func (s *CaasSyncer) StartSyncer() {
 				log.Error(err)
 				return
 			}
-			if caasSyncConfig.Enable == false {
+			if caasSyncConfig.Enabled == false {
 				return
 			}
 

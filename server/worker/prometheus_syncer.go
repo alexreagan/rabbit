@@ -63,7 +63,7 @@ type MaxRateNodeNetWorkTransmitBytesConfig PrometheusConfig
 var prometheusSyncerConfig *PrometheusSyncerConfig
 
 type PrometheusSyncerConfig struct {
-	Enable                          bool                                  `json:"enable"`
+	Enabled                         bool                                  `json:"enabled"`
 	Addr                            string                                `json:"addr"`
 	Duration                        int64                                 `json:"duration"`
 	NodeUnameInfo                   NodeUnameInfoConfig                   `json:"nodeUnameInfo"`
@@ -722,7 +722,7 @@ func (s *PrometheusSyncer) StartSyncer() {
 		log.Error(err)
 		return
 	}
-	if prometheusSyncerConfig.Enable == false {
+	if prometheusSyncerConfig.Enabled == false {
 		return
 	}
 
@@ -741,7 +741,7 @@ func (s *PrometheusSyncer) StartSyncer() {
 				log.Error(err)
 				return
 			}
-			if prometheusSyncerConfig.Enable == false {
+			if prometheusSyncerConfig.Enabled == false {
 				return
 			}
 

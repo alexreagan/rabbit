@@ -372,6 +372,14 @@ var doc = `{
                         "type": "string",
                         "name": "serviceName",
                         "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "name": "tagIDs[]",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -410,6 +418,14 @@ var doc = `{
                     {
                         "type": "string",
                         "name": "serviceName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "name": "tagIDs[]",
                         "in": "query"
                     }
                 ],
@@ -895,28 +911,28 @@ var doc = `{
                         "in": "query"
                     },
                     {
+                        "type": "number",
+                        "name": "cpuAvailableLowerLimit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "name": "cpuAvailableUpperLimit",
+                        "in": "query"
+                    },
+                    {
                         "type": "integer",
-                        "name": "cpuNumber",
+                        "name": "cpuCount",
                         "in": "query"
                     },
                     {
                         "type": "number",
-                        "name": "cpuUsageLowerLimit",
+                        "name": "fsAvailableLowerLimit",
                         "in": "query"
                     },
                     {
                         "type": "number",
-                        "name": "cpuUsageUpperLimit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "number",
-                        "name": "fsUsageLowerLimit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "number",
-                        "name": "fsUsageUpperLimit",
+                        "name": "fsAvailableUpperLimit",
                         "in": "query"
                     },
                     {
@@ -931,12 +947,12 @@ var doc = `{
                     },
                     {
                         "type": "number",
-                        "name": "memoryUsageLowerLimit",
+                        "name": "memAvailableLowerLimit",
                         "in": "query"
                     },
                     {
                         "type": "number",
-                        "name": "memoryUsageUpperLimit",
+                        "name": "memAvailableUpperLimit",
                         "in": "query"
                     },
                     {
@@ -1512,6 +1528,138 @@ var doc = `{
                 }
             }
         },
+        "/api/v1/notice/create": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "系统公告创建",
+                "parameters": [
+                    {
+                        "description": "系统公告创建",
+                        "name": "APIPostNoticeCreateInputs",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/sys.Notice"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/sys.Notice"
+                        }
+                    },
+                    "400": {
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
+                    }
+                }
+            }
+        },
+        "/api/v1/notice/info": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "系统公告信息",
+                "parameters": [
+                    {
+                        "description": "系统公告信息",
+                        "name": "APIGetNoticeInfoInputs",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/sys.Notice"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/sys.Notice"
+                        }
+                    },
+                    "400": {
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
+                    }
+                }
+            }
+        },
+        "/api/v1/notice/list": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "系统公告",
+                "parameters": [
+                    {
+                        "description": "根据查询条件查询系统公告",
+                        "name": "APIGetNoticeListInputs",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/sys.APIGetNoticeListOutputs"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/sys.APIGetNoticeListOutputs"
+                        }
+                    },
+                    "400": {
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
+                    }
+                }
+            }
+        },
+        "/api/v1/notice/update": {
+            "put": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "系统公告更新",
+                "parameters": [
+                    {
+                        "description": "系统公告更新",
+                        "name": "APIPostNoticeCreateInputs",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/sys.Notice"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/sys.Notice"
+                        }
+                    },
+                    "400": {
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
+                    }
+                }
+            }
+        },
         "/api/v1/param/create": {
             "post": {
                 "produces": [
@@ -1853,15 +2001,48 @@ var doc = `{
                 }
             }
         },
+        "/api/v1/pub/assign": {
+            "put": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "更新发布单实施状态信息",
+                "parameters": [
+                    {
+                        "description": "更新发布单实施状态信息",
+                        "name": "APIPostPubAssignInputs",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/pub.APIPostPubAssignInputs"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pub.APIPostPubUpdateInputs"
+                        }
+                    },
+                    "400": {
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
+                    }
+                }
+            }
+        },
         "/api/v1/pub/create": {
             "post": {
                 "produces": [
                     "application/json"
                 ],
-                "summary": "创建新发布单",
+                "summary": "创建新发布单并启动发布流程",
                 "parameters": [
                     {
-                        "description": "创建新发布单",
+                        "description": "创建新发布单并启动发布流程",
                         "name": "APIPostPubUpdateInputs",
                         "in": "body",
                         "required": true,
@@ -1875,6 +2056,37 @@ var doc = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/pub.APIPostPubUpdateInputs"
+                        }
+                    },
+                    "400": {
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
+                    }
+                }
+            }
+        },
+        "/api/v1/pub/execute": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "处理发布单信息",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "处理发布单信息",
+                        "name": "IP",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/service.WfeExecuteResponse"
                         }
                     },
                     "400": {
@@ -1925,6 +2137,16 @@ var doc = `{
                 "summary": "发布列表接口",
                 "parameters": [
                     {
+                        "type": "string",
+                        "name": "creator",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "deployUnitID",
+                        "in": "query"
+                    },
+                    {
                         "type": "integer",
                         "name": "limit",
                         "in": "query"
@@ -1950,6 +2172,39 @@ var doc = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/pub.APIGetPubListOutputs"
+                        }
+                    },
+                    "400": {
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
+                    }
+                }
+            }
+        },
+        "/api/v1/pub/proc/info": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "发布单流程信息",
+                "parameters": [
+                    {
+                        "description": "发布单流程信息",
+                        "name": "APIGetPubProcInfoInputs",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/pub.APIGetPubProcInfoOutputs"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pub.APIGetPubProcInfoOutputs"
                         }
                     },
                     "400": {
@@ -3037,6 +3292,204 @@ var doc = `{
                 }
             }
         },
+        "/api/v1/wfe/create": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "创建流程A0902S102",
+                "parameters": [
+                    {
+                        "description": "创建流程",
+                        "name": "APIPostCreateInputs",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/wfe.APIPostCreateInputs"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/service.WfeCreateResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
+                    }
+                }
+            }
+        },
+        "/api/v1/wfe/execute": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "处理流程A0902S102",
+                "parameters": [
+                    {
+                        "description": "处理流程",
+                        "name": "APIPostExecuteInputs",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/wfe.APIPostExecuteInputs"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/service.WfeExecuteResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
+                    }
+                }
+            }
+        },
+        "/api/v1/wfe/histDetails": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "流程处理历史记录A0902S124",
+                "parameters": [
+                    {
+                        "description": "处理流程",
+                        "name": "APIPostHistDetailListInputs",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/wfe.APIPostHistDetailListInputs"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/service.WfeExecuteResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
+                    }
+                }
+            }
+        },
+        "/api/v1/wfe/nextNodeInfo": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "下个节点信息A0902S112",
+                "parameters": [
+                    {
+                        "description": "下个节点信息A0902S112",
+                        "name": "APIPostNextNodeInfoInputs",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/wfe.APIPostNextNodeInfoInputs"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/service.WfeTodosResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
+                    }
+                }
+            }
+        },
+        "/api/v1/wfe/todo2doing": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "待办转在办A0902S132",
+                "parameters": [
+                    {
+                        "description": "待办转在办A0902S132",
+                        "name": "APIPostTodo2DoingInputs",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/wfe.APIPostTodo2DoingInputs"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/service.WfeTodo2DoingResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
+                    }
+                }
+            }
+        },
+        "/api/v1/wfe/todos": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "待办A0902S119",
+                "parameters": [
+                    {
+                        "description": "待办A0902S119",
+                        "name": "APIPostTodoListInputs",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/wfe.APIPostTodoListInputs"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/service.WfeTodosResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "bad arguments"
+                    },
+                    "417": {
+                        "description": "internal error"
+                    }
+                }
+            }
+        },
         "/api/v2/tree/children": {
             "get": {
                 "produces": [
@@ -3796,6 +4249,12 @@ var doc = `{
                 },
                 "serviceName": {
                     "type": "string"
+                },
+                "tagIDs[]": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 }
             }
         },
@@ -4456,11 +4915,17 @@ var doc = `{
                 "applier": {
                     "type": "string"
                 },
+                "applierName": {
+                    "type": "string"
+                },
                 "assignAt": {
                     "type": "object",
                     "$ref": "#/definitions/gtime.GTime"
                 },
                 "assigner": {
+                    "type": "string"
+                },
+                "assignerName": {
                     "type": "string"
                 },
                 "count": {
@@ -4474,6 +4939,9 @@ var doc = `{
                     "$ref": "#/definitions/gtime.GTime"
                 },
                 "creator": {
+                    "type": "string"
+                },
+                "creatorName": {
                     "type": "string"
                 },
                 "id": {
@@ -4583,19 +5051,19 @@ var doc = `{
                 "areaName": {
                     "type": "string"
                 },
-                "cpuNumber": {
+                "cpuAvailableLowerLimit": {
+                    "type": "number"
+                },
+                "cpuAvailableUpperLimit": {
+                    "type": "number"
+                },
+                "cpuCount": {
                     "type": "integer"
                 },
-                "cpuUsageLowerLimit": {
+                "fsAvailableLowerLimit": {
                     "type": "number"
                 },
-                "cpuUsageUpperLimit": {
-                    "type": "number"
-                },
-                "fsUsageLowerLimit": {
-                    "type": "number"
-                },
-                "fsUsageUpperLimit": {
+                "fsAvailableUpperLimit": {
                     "type": "number"
                 },
                 "ip": {
@@ -4604,10 +5072,10 @@ var doc = `{
                 "limit": {
                     "type": "integer"
                 },
-                "memoryUsageLowerLimit": {
+                "memAvailableLowerLimit": {
                     "type": "number"
                 },
-                "memoryUsageUpperLimit": {
+                "memAvailableUpperLimit": {
                     "type": "number"
                 },
                 "order": {
@@ -4800,6 +5268,9 @@ var doc = `{
                 "areaName": {
                     "type": "string"
                 },
+                "bootTime": {
+                    "type": "string"
+                },
                 "cloudPoolCode": {
                     "type": "string"
                 },
@@ -4809,11 +5280,11 @@ var doc = `{
                 "coreTotalNum": {
                     "type": "integer"
                 },
-                "cpuNumber": {
-                    "type": "integer"
+                "cpuAvailable": {
+                    "type": "string"
                 },
-                "cpuUsage": {
-                    "type": "number"
+                "cpuCount": {
+                    "type": "string"
                 },
                 "createTime": {
                     "type": "string"
@@ -4825,6 +5296,7 @@ var doc = `{
                     "type": "string"
                 },
                 "deployDate": {
+                    "description": "CpuNumber            int          ` + "`" + `json:\"cpuNumber\" gorm:\"column:cpu_number;type:int\"` + "`" + `\nMemorySize           int          ` + "`" + `json:\"memorySize\" gorm:\"column:memory_size\"` + "`" + `\nCpuUsage             float64      ` + "`" + `json:\"cpuUsage\" gorm:\"column:cpu_usage;comment:\"` + "`" + `\nMemoryUsage          float64      ` + "`" + `json:\"memoryUsage\" gorm:\"column:memory_usage;comment:\"` + "`" + `\nFsUsage              float64      ` + "`" + `json:\"fsUsage\" gorm:\"column:fs_usage;comment:\"` + "`" + `",
                     "type": "string"
                 },
                 "desc": {
@@ -4842,8 +5314,8 @@ var doc = `{
                 "devTypeCode": {
                     "type": "string"
                 },
-                "fsUsage": {
-                    "type": "number"
+                "fileSystemAvailable": {
+                    "type": "string"
                 },
                 "funDesc": {
                     "type": "string"
@@ -4866,6 +5338,9 @@ var doc = `{
                 "isWarning": {
                     "type": "boolean"
                 },
+                "load5": {
+                    "type": "string"
+                },
                 "logicSystem": {
                     "type": "string"
                 },
@@ -4884,11 +5359,17 @@ var doc = `{
                 "managerB": {
                     "type": "string"
                 },
-                "memorySize": {
-                    "type": "integer"
+                "maxDiskReadBytes": {
+                    "type": "string"
                 },
-                "memoryUsage": {
-                    "type": "number"
+                "maxDiskWrittenBytes": {
+                    "type": "string"
+                },
+                "memAvailable": {
+                    "type": "string"
+                },
+                "memTotalBytes": {
+                    "type": "string"
                 },
                 "name": {
                     "type": "string"
@@ -5037,6 +5518,12 @@ var doc = `{
         "pub.APIGetPubListInputs": {
             "type": "object",
             "properties": {
+                "creator": {
+                    "type": "string"
+                },
+                "deployUnitID": {
+                    "type": "integer"
+                },
                 "limit": {
                     "type": "integer"
                 },
@@ -5065,6 +5552,31 @@ var doc = `{
                 }
             }
         },
+        "pub.APIGetPubProcInfoOutputs": {
+            "type": "object",
+            "properties": {
+                "processInstID": {
+                    "type": "string"
+                },
+                "taskID": {
+                    "type": "string"
+                },
+                "templateID": {
+                    "type": "string"
+                }
+            }
+        },
+        "pub.APIPostPubAssignInputs": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
         "pub.APIPostPubUpdateInputs": {
             "type": "object",
             "properties": {
@@ -5083,14 +5595,23 @@ var doc = `{
                 "codeReview": {
                     "type": "string"
                 },
+                "commitID": {
+                    "type": "string"
+                },
                 "deployUnitID": {
                     "type": "integer"
                 },
                 "deployUnitName": {
                     "type": "string"
                 },
+                "git": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer"
+                },
+                "packageAddress": {
+                    "type": "string"
                 },
                 "pubContent": {
                     "type": "string"
@@ -5146,11 +5667,17 @@ var doc = `{
                 "codeReview": {
                     "type": "string"
                 },
+                "commitID": {
+                    "type": "string"
+                },
                 "createAt": {
                     "type": "object",
                     "$ref": "#/definitions/gtime.GTime"
                 },
                 "creator": {
+                    "type": "string"
+                },
+                "creatorName": {
                     "type": "string"
                 },
                 "deployUnitID": {
@@ -5159,8 +5686,24 @@ var doc = `{
                 "deployUnitName": {
                     "type": "string"
                 },
+                "git": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer"
+                },
+                "implementAt": {
+                    "type": "object",
+                    "$ref": "#/definitions/gtime.GTime"
+                },
+                "implementer": {
+                    "type": "string"
+                },
+                "implementerName": {
+                    "type": "string"
+                },
+                "packageAddress": {
+                    "type": "string"
                 },
                 "pubContent": {
                     "type": "string"
@@ -5180,6 +5723,9 @@ var doc = `{
                 "rollbackStep": {
                     "type": "string"
                 },
+                "status": {
+                    "type": "string"
+                },
                 "trialOperationCase": {
                     "type": "string"
                 },
@@ -5195,6 +5741,369 @@ var doc = `{
                 "versionDate": {
                     "type": "object",
                     "$ref": "#/definitions/gtime.GTime"
+                }
+            }
+        },
+        "service.Condition": {
+            "type": "object",
+            "properties": {
+                "key": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "service.SortField": {
+            "type": "object",
+            "properties": {
+                "FIELD_ASC": {
+                    "type": "string"
+                },
+                "FIELD_NM": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "service.TXBodyCommon": {
+            "type": "object",
+            "properties": {
+                "COM1": {
+                    "type": "object",
+                    "$ref": "#/definitions/service.TXBodyCommonCom1"
+                },
+                "COM4": {
+                    "type": "object",
+                    "$ref": "#/definitions/service.TXBodyCommonCom4"
+                },
+                "COMB": {
+                    "type": "object",
+                    "$ref": "#/definitions/service.TXBodyCommonComB"
+                }
+            }
+        },
+        "service.TXBodyCommonCom1": {
+            "type": "object",
+            "properties": {
+                "LNG_ID": {
+                    "type": "string"
+                },
+                "MULTI_TENANCY_ID": {
+                    "type": "string"
+                },
+                "TXN_INSID": {
+                    "type": "string"
+                },
+                "TXN_ITT_CHNL_CGY_CODE": {
+                    "type": "string"
+                },
+                "TXN_ITT_CHNL_ID": {
+                    "type": "string"
+                },
+                "TXN_STFF_ID": {
+                    "type": "string"
+                },
+                "TxnDT": {
+                    "type": "string"
+                },
+                "TxnTM": {
+                    "type": "string"
+                }
+            }
+        },
+        "service.TXBodyCommonCom4": {
+            "type": "object",
+            "properties": {
+                "PAGE_JUMP": {
+                    "type": "string"
+                },
+                "REC_IN_PAGE": {
+                    "type": "string"
+                }
+            }
+        },
+        "service.TXBodyCommonComB": {
+            "type": "object",
+            "properties": {
+                "CMPT_TRCNO": {
+                    "type": "string"
+                },
+                "CURR_TOTAL_PAGE": {
+                    "type": "integer"
+                },
+                "CURR_TOTAL_REC": {
+                    "type": "integer"
+                },
+                "ERR_MSG_NUM": {
+                    "type": "string"
+                },
+                "STS_TRACE_ID": {
+                    "type": "string"
+                },
+                "TOTAL_PAGE": {
+                    "type": "integer"
+                },
+                "TOTAL_REC": {
+                    "type": "integer"
+                }
+            }
+        },
+        "service.TXEmb": {
+            "type": "object"
+        },
+        "service.TXHeader": {
+            "type": "object",
+            "properties": {
+                "SYS_COMPRESS_TYPE": {
+                    "type": "string"
+                },
+                "SYS_EMB_MSG_LEN": {
+                    "type": "integer"
+                },
+                "SYS_ENCRYPT_TYPE": {
+                    "type": "string"
+                },
+                "SYS_EVT_TRACE_ID": {
+                    "type": "string"
+                },
+                "SYS_HDR_LEN": {
+                    "type": "integer"
+                },
+                "SYS_IS_ENCRYPTED": {
+                    "type": "string"
+                },
+                "SYS_MSG_LEN": {
+                    "type": "integer"
+                },
+                "SYS_PKG_STS_TYPE": {
+                    "type": "string"
+                },
+                "SYS_PKG_TYPE": {
+                    "type": "string"
+                },
+                "SYS_PKG_VRSN": {
+                    "type": "string"
+                },
+                "SYS_RECV_TIME": {
+                    "type": "string"
+                },
+                "SYS_REQ_SEC_ID": {
+                    "type": "string"
+                },
+                "SYS_REQ_TIME": {
+                    "type": "string"
+                },
+                "SYS_RESERVED": {
+                    "type": "string"
+                },
+                "SYS_RESP_CODE": {
+                    "type": "string"
+                },
+                "SYS_RESP_DESC": {
+                    "type": "string"
+                },
+                "SYS_RESP_DESC_LEN": {
+                    "type": "string"
+                },
+                "SYS_RESP_TIME": {
+                    "type": "string"
+                },
+                "SYS_SEC_CONTEXT": {
+                    "type": "string"
+                },
+                "SYS_SEC_CONTEXT_LEN": {
+                    "type": "integer"
+                },
+                "SYS_SND_SEC_ID": {
+                    "type": "string"
+                },
+                "SYS_SND_SERIAL_NO": {
+                    "type": "string"
+                },
+                "SYS_TIME_LEFT": {
+                    "type": "string"
+                },
+                "SYS_TTL_LEN": {
+                    "type": "integer"
+                },
+                "SYS_TX_CODE": {
+                    "type": "string"
+                },
+                "SYS_TX_STATUS": {
+                    "type": "string"
+                },
+                "SYS_TX_TYPE": {
+                    "type": "string"
+                },
+                "SYS_TX_VRSN": {
+                    "type": "string"
+                }
+            }
+        },
+        "service.TXNextNodeInfo": {
+            "type": "object",
+            "properties": {
+                "NEXT_USER_FLAG": {
+                    "type": "string"
+                },
+                "NODE_ID": {
+                    "type": "string"
+                },
+                "NODE_NAME": {
+                    "type": "string"
+                },
+                "multiple": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "service.TXResponseBody": {
+            "type": "object",
+            "properties": {
+                "COMMON": {
+                    "type": "object",
+                    "$ref": "#/definitions/service.TXBodyCommon"
+                },
+                "ENTITY": {
+                    "type": "object",
+                    "$ref": "#/definitions/service.TXResponseBodyEntity"
+                }
+            }
+        },
+        "service.TXResponseBodyEntity": {
+            "type": "object",
+            "properties": {
+                "EVT_TRACE_ID": {
+                    "type": "string"
+                },
+                "PROCESS_INST_ID": {
+                    "type": "string"
+                }
+            }
+        },
+        "service.TXTodo2DoingResponseBody": {
+            "type": "object",
+            "properties": {
+                "COMMON": {
+                    "type": "object",
+                    "$ref": "#/definitions/service.TXBodyCommon"
+                },
+                "ENTITY": {
+                    "type": "object",
+                    "$ref": "#/definitions/service.TXTodo2DoingResponseBodyEntity"
+                }
+            }
+        },
+        "service.TXTodo2DoingResponseBodyEntity": {
+            "type": "object",
+            "properties": {
+                "RESULT_DESC": {
+                    "type": "string"
+                }
+            }
+        },
+        "service.TXTodosResponseBody": {
+            "type": "object",
+            "properties": {
+                "COMMON": {
+                    "type": "object",
+                    "$ref": "#/definitions/service.TXBodyCommon"
+                },
+                "ENTITY": {
+                    "type": "object",
+                    "$ref": "#/definitions/service.TXTodosResponseBodyEntity"
+                }
+            }
+        },
+        "service.TXTodosResponseBodyEntity": {
+            "type": "object",
+            "properties": {
+                "TODO_INFO": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/service.TXTodosResponseBodyEntityTodoInfo"
+                    }
+                }
+            }
+        },
+        "service.TXTodosResponseBodyEntityTodoInfo": {
+            "type": "object",
+            "properties": {
+                "AGENT_TYPE": {
+                    "type": "string"
+                },
+                "BLNG_INST_ID": {
+                    "type": "string"
+                },
+                "DMN_GRP_ID": {
+                    "type": "string"
+                },
+                "FORM_EDIT": {
+                    "type": "string"
+                },
+                "PCS_AVY_NM": {
+                    "type": "string"
+                },
+                "PCS_AVY_STATUS": {
+                    "type": "string"
+                },
+                "PCS_STATUS": {
+                    "type": "string"
+                },
+                "PRJ_BELONG_TYPE": {
+                    "type": "string"
+                },
+                "PRJ_ID": {
+                    "type": "string"
+                },
+                "PRJ_NM": {
+                    "type": "string"
+                },
+                "PRJ_SN": {
+                    "type": "string"
+                },
+                "PRJ_TYPE": {
+                    "type": "string"
+                },
+                "PROCESS_INST_ID": {
+                    "type": "string"
+                },
+                "SKIP_PCS_AVY_ID": {
+                    "type": "string"
+                },
+                "SOURCE_TYPE": {
+                    "type": "string"
+                },
+                "TASK_ID": {
+                    "type": "string"
+                },
+                "TEMPLATE_ID": {
+                    "type": "string"
+                },
+                "TODO_SN": {
+                    "type": "string"
+                },
+                "TO_START_TM": {
+                    "type": "string"
+                },
+                "URL": {
+                    "type": "string"
+                },
+                "WF_EXTR_ID": {
+                    "type": "string"
+                },
+                "WF_EXTR_NM": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
                 }
             }
         },
@@ -5280,6 +6189,86 @@ var doc = `{
                 }
             }
         },
+        "service.WfeCreateResponse": {
+            "type": "object",
+            "properties": {
+                "TX": {
+                    "type": "string"
+                },
+                "TX_BODY": {
+                    "type": "object",
+                    "$ref": "#/definitions/service.TXResponseBody"
+                },
+                "TX_EMB": {
+                    "type": "object",
+                    "$ref": "#/definitions/service.TXEmb"
+                },
+                "TX_HEADER": {
+                    "type": "object",
+                    "$ref": "#/definitions/service.TXHeader"
+                }
+            }
+        },
+        "service.WfeExecuteResponse": {
+            "type": "object",
+            "properties": {
+                "TX": {
+                    "type": "string"
+                },
+                "TX_BODY": {
+                    "type": "object",
+                    "$ref": "#/definitions/service.TXResponseBody"
+                },
+                "TX_EMB": {
+                    "type": "object",
+                    "$ref": "#/definitions/service.TXEmb"
+                },
+                "TX_HEADER": {
+                    "type": "object",
+                    "$ref": "#/definitions/service.TXHeader"
+                }
+            }
+        },
+        "service.WfeTodo2DoingResponse": {
+            "type": "object",
+            "properties": {
+                "TX": {
+                    "type": "string"
+                },
+                "TX_BODY": {
+                    "type": "object",
+                    "$ref": "#/definitions/service.TXTodo2DoingResponseBody"
+                },
+                "TX_EMB": {
+                    "type": "object",
+                    "$ref": "#/definitions/service.TXEmb"
+                },
+                "TX_HEADER": {
+                    "type": "object",
+                    "$ref": "#/definitions/service.TXHeader"
+                }
+            }
+        },
+        "service.WfeTodosResponse": {
+            "type": "object",
+            "properties": {
+                "TX": {
+                    "type": "string"
+                },
+                "TX_BODY": {
+                    "type": "object",
+                    "$ref": "#/definitions/service.TXTodosResponseBody"
+                },
+                "TX_EMB": {
+                    "type": "object",
+                    "$ref": "#/definitions/service.TXEmb"
+                },
+                "TX_HEADER": {
+                    "type": "object",
+                    "$ref": "#/definitions/service.TXHeader"
+                }
+            }
+        },
         "sys.APIGetMenuNavListOutputs": {
             "type": "object",
             "properties": {
@@ -5294,6 +6283,20 @@ var doc = `{
                     "items": {
                         "$ref": "#/definitions/uic.Perm"
                     }
+                }
+            }
+        },
+        "sys.APIGetNoticeListOutputs": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/sys.Notice"
+                    }
+                },
+                "totalCount": {
+                    "type": "integer"
                 }
             }
         },
@@ -5399,6 +6402,38 @@ var doc = `{
                     "type": "integer"
                 },
                 "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "sys.Notice": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "createAt": {
+                    "type": "object",
+                    "$ref": "#/definitions/gtime.GTime"
+                },
+                "creator": {
+                    "type": "string"
+                },
+                "creatorName": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "timeBegin": {
+                    "type": "object",
+                    "$ref": "#/definitions/gtime.GTime"
+                },
+                "timeEnd": {
+                    "type": "object",
+                    "$ref": "#/definitions/gtime.GTime"
+                },
+                "title": {
                     "type": "string"
                 }
             }
@@ -5722,6 +6757,171 @@ var doc = `{
                     "type": "string"
                 },
                 "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "wfe.APIPostCreateInputs": {
+            "type": "object",
+            "properties": {
+                "blngInstID": {
+                    "type": "string"
+                },
+                "buttonName": {
+                    "type": "string"
+                },
+                "dmnGrpID": {
+                    "type": "string"
+                },
+                "nextNode": {
+                    "type": "object",
+                    "$ref": "#/definitions/service.TXNextNodeInfo"
+                },
+                "nextUserGrp": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "prjID": {
+                    "type": "string"
+                },
+                "prjSN": {
+                    "type": "string"
+                },
+                "remark": {
+                    "type": "string"
+                },
+                "taskID": {
+                    "type": "string"
+                },
+                "templateID": {
+                    "type": "string"
+                },
+                "todoTmTpCd": {
+                    "type": "string"
+                },
+                "todoTmTtl": {
+                    "type": "string"
+                }
+            }
+        },
+        "wfe.APIPostExecuteInputs": {
+            "type": "object",
+            "properties": {
+                "buttonName": {
+                    "type": "string"
+                },
+                "conditions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/service.Condition"
+                    }
+                },
+                "exeFstTask": {
+                    "type": "string"
+                },
+                "nextNode": {
+                    "type": "object",
+                    "$ref": "#/definitions/service.TXNextNodeInfo"
+                },
+                "nextUserGrp": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "opinCode": {
+                    "type": "string"
+                },
+                "opinDesc": {
+                    "type": "string"
+                },
+                "prjID": {
+                    "type": "string"
+                },
+                "prjSN": {
+                    "type": "integer"
+                },
+                "processInstID": {
+                    "type": "string"
+                },
+                "remark": {
+                    "type": "string"
+                },
+                "taskID": {
+                    "type": "string"
+                },
+                "templateID": {
+                    "type": "string"
+                }
+            }
+        },
+        "wfe.APIPostHistDetailListInputs": {
+            "type": "object",
+            "properties": {
+                "processInstID": {
+                    "type": "string"
+                }
+            }
+        },
+        "wfe.APIPostNextNodeInfoInputs": {
+            "type": "object",
+            "properties": {
+                "processInstID": {
+                    "type": "string"
+                },
+                "taskID": {
+                    "type": "string"
+                },
+                "templateID": {
+                    "type": "string"
+                }
+            }
+        },
+        "wfe.APIPostTodo2DoingInputs": {
+            "type": "object",
+            "required": [
+                "todoID"
+            ],
+            "properties": {
+                "todoID": {
+                    "type": "string"
+                }
+            }
+        },
+        "wfe.APIPostTodoListInputs": {
+            "type": "object",
+            "properties": {
+                "WfExtrNm": {
+                    "type": "string"
+                },
+                "limit": {
+                    "type": "string"
+                },
+                "page": {
+                    "type": "string"
+                },
+                "prjID": {
+                    "type": "string"
+                },
+                "prjNm": {
+                    "type": "string"
+                },
+                "prjTypeList": {
+                    "type": "string"
+                },
+                "sortFields": {
+                    "description": "ProcessInstIDList string   ` + "`" + `json:\"processInstIDList\" form:\"processInstIDList\"` + "`" + `\nPrjBelongTypeList string   ` + "`" + `json:\"prjBelongTypeList\" form:\"prjBelongTypeList\"` + "`" + `\nAvyOwrNm          string   ` + "`" + `json:\"avyOwrNm\" form:\"avyOwrNm\"` + "`" + `\nTodoType          string   ` + "`" + `json:\"TodoType\" form:\"TodoType\"` + "`" + `",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/service.SortField"
+                    }
+                },
+                "timeEnd": {
+                    "type": "string"
+                },
+                "timeStart": {
                     "type": "string"
                 }
             }

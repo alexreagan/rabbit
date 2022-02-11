@@ -52,7 +52,7 @@ type KunYuanSyncerAlarmConfig struct {
 }
 
 type KunYuanSyncerConfig struct {
-	Enable   bool                       `json:"enable"`
+	Enabled  bool                       `json:"enabled"`
 	Login    KunYuanSyncerLoginConfig   `json:"login"`
 	BlackIPs []string                   `json:"black_ips"`
 	Base     KunYuanSyncerBaseConfig    `json:"base"`
@@ -88,7 +88,7 @@ func (s *KunYuanSyncer) Close() {
 }
 
 func (s *KunYuanSyncer) Start() {
-	//if viper.GetBool("kunyuan.syncer.enable") == false {
+	//if viper.GetBool("kunyuan.syncer.enabled") == false {
 	//	return
 	//}
 	var err error
@@ -97,7 +97,7 @@ func (s *KunYuanSyncer) Start() {
 		log.Error(err)
 		return
 	}
-	if kunyuanConfig.Enable == false {
+	if kunyuanConfig.Enabled == false {
 		return
 	}
 

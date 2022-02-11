@@ -14,8 +14,8 @@ type procService struct {
 }
 
 type Condition struct {
-	Key   string `json:"KEY"`
-	Value string `json:"VALUE"`
+	Key   string `json:"key" form:"key,omitempty"`
+	Value string `json:"value" form:"value,omitempty"`
 }
 
 type NextNodeInfoInputs struct {
@@ -27,7 +27,7 @@ type NextNodeInfoInputs struct {
 
 func (s *procService) NextNodeInfo(param NextNodeInfoInputs) (string, error) {
 
-	uri := fmt.Sprintf("%s/procmanager/api/procNextNodeInfo", s.Addr)
+	uri := fmt.Sprintf("%s/procmanager/api/procNextNodeInfo", viper.GetString("proc_manager.addr"))
 	req := httplib.Post(uri)
 	byts, _ := json.Marshal(param)
 	req.Param("jsonData", string(byts))
@@ -35,7 +35,7 @@ func (s *procService) NextNodeInfo(param NextNodeInfoInputs) (string, error) {
 }
 
 func (s *procService) GetPersonByNode(templateID string, taskID string) (interface{}, interface{}) {
-	uri := fmt.Sprintf("%s/procmanager/api/getPersonByNode", s.Addr)
+	uri := fmt.Sprintf("%s/procmanager/api/getPersonByNode", viper.GetString("proc_manager.addr"))
 	req := httplib.Post(uri)
 	param := make(map[string]string, 0)
 	param["TEMPLATE_ID"] = templateID
@@ -59,8 +59,5 @@ func (s *procService) GetHistDetailList(processInstID string, taskID string, bel
 }
 
 func newProcService() *procService {
-	addr := viper.GetString("procManager.addr")
-	return &procService{
-		Addr: addr,
-	}
+	return &procService{}
 }

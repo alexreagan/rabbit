@@ -4,6 +4,7 @@ import (
 	"github.com/alexreagan/rabbit/server/model/gtime"
 )
 
+// 发布单
 type Pub struct {
 	ID                    int64       `json:"id" gorm:"primary_key;column:id"`
 	DeployUnitID          int64       `json:"deployUnitID" gorm:"column:deploy_unit_id;comment:"`

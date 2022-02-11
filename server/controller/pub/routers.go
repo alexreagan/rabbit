@@ -13,12 +13,13 @@ func Routes(r *gin.Engine) {
 	pubGroup.GET("/list", List)
 	pubGroup.GET("/info", Info)
 	pubGroup.POST("/create", Create)
+	pubGroup.POST("/execute", Execute)
 	pubGroup.PUT("/update", Update)
 	pubGroup.PUT("/assign", Assign)
-	pubGroup.GET("/proc/info", ProcInfo)
 
-	procGroup := r.Group("/api/v1/proc")
-	procGroup.POST("/nextNodeInfo", NextNodeInfo)
-	procGroup.GET("/getPersonByNode", GetPersonByNode)
-	procGroup.GET("/getHistDetailList", GetHistDetailList)
+	pubProcGroup := r.Group("/api/v1/proc")
+	pubProcGroup.GET("/info", PubProcInfo)
+	//procGroup.POST("/nextNodeInfo", NextNodeInfo)
+	//procGroup.GET("/getPersonByNode", GetPersonByNode)
+	//procGroup.GET("/getHistDetailList", GetHistDetailList)
 }

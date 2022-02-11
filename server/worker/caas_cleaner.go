@@ -13,7 +13,7 @@ import (
 var caasCleanConfig *CaasCleanConfig
 
 type CaasCleanConfig struct {
-	Enable   bool `json:"enable"`
+	Enabled  bool `json:"enabled"`
 	Duration int  `json:"duration"`
 }
 
@@ -81,7 +81,7 @@ func (s *CaasCleaner) StartClean() {
 		log.Error(err)
 		return
 	}
-	if caasCleanConfig.Enable == false {
+	if caasCleanConfig.Enabled == false {
 		return
 	}
 	// 启动
@@ -103,7 +103,7 @@ func (s *CaasCleaner) StartClean() {
 				log.Error(err)
 				return
 			}
-			if caasCleanConfig.Enable == false {
+			if caasCleanConfig.Enabled == false {
 				return
 			}
 			s.Clean()

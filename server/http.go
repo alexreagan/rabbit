@@ -11,6 +11,7 @@ import (
 	"github.com/alexreagan/rabbit/server/controller/pub"
 	"github.com/alexreagan/rabbit/server/controller/sys"
 	"github.com/alexreagan/rabbit/server/controller/uic"
+	"github.com/alexreagan/rabbit/server/controller/wfe"
 	"github.com/alexreagan/rabbit/server/utils"
 	sentrygin "github.com/getsentry/sentry-go/gin"
 	"github.com/gin-gonic/gin"
@@ -51,6 +52,7 @@ func Start() {
 	chart.Routes(r)
 	caas.Routes(r)
 	pub.Routes(r)
+	wfe.Routes(r)
 
 	// start server graceful
 	endless.ListenAndServe(viper.GetString("serv.addr"), r)

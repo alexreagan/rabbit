@@ -24,7 +24,7 @@ type User struct {
 	//LastLogin   time.Time `json:"lastLogin" gorm:"column:last_login;type:time;null;comment:上次登录时间"`
 	//Age         uint8     `gorm:"column:age;type:uint;null;comment:年龄"`
 	//IdentityCard string                  `gorm:"column:identity_card;type:string;size:18;null;comment:身份证号"`
-	//Departments  []department.Depart `gorm:"many2many:user_department_rel;"`
+	//Departments  []department.Inst `gorm:"many2many:user_department_rel;"`
 	//Kfzx             string    `gorm:"type:varchar(10);null"`
 	//BelongDepartment string    `form:"belong_department" gorm:"type:varchar(20);null"`
 	//Org              string    `form:"org" json:"org" gorm:"type:varchar(20);null"`

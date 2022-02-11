@@ -1,17 +1,17 @@
 package uic
 
-type Depart struct {
+type Inst struct {
 	//gorm.Model
-	ID        int64   `json:"id" gorm:"primary_key;column:id"`
-	Name      string  `json:"name" gorm:"column:name;type:string;size:256;index;not null;comment:'名称'"`
-	Type      string  `json:"type" gorm:"column:type;type:string;size:1;comment:'机构类型'"`
-	Level     string  `json:"level" gorm:"column:level;type:string;size:11;comment:'级别'"`
-	Parent    *Depart `json:"parent" gorm:"-;comment:'上级机构'"`
-	ParentID  int64   `json:"parentID" gorm:"column:parent_depart;comment:上级机构ID"`
-	InstID    string  `json:"instID" gorm:"column:inst_id;type:string;size:10;comment:'行政机构编码'"`
-	FullName  string  `json:"fullName" gorm:"column:fullname;type:string;size:1024;null;comment:'机构全称'"`
-	ShortName string  `json:"shortName" gorm:"column:shortname;type:string;size:256;null;comment:'简称'"`
-	Deleted   bool    `json:"deleted" gorm:"column:deleted;type:tinyint;size:1;comment:'是否删除'"`
+	ID        int64  `json:"id" gorm:"primary_key;column:id"`
+	Name      string `json:"name" gorm:"column:name;type:string;size:256;index;not null;comment:'名称'"`
+	Type      string `json:"type" gorm:"column:type;type:string;size:1;comment:'机构类型'"`
+	Level     string `json:"level" gorm:"column:level;type:string;size:11;comment:'级别'"`
+	Parent    *Inst  `json:"parent" gorm:"-;comment:'上级机构'"`
+	ParentID  int64  `json:"parentID" gorm:"column:parent_depart;comment:上级机构ID"`
+	InstID    string `json:"instID" gorm:"column:inst_id;type:string;size:10;comment:'行政机构编码'"`
+	FullName  string `json:"fullName" gorm:"column:fullname;type:string;size:1024;null;comment:'机构全称'"`
+	ShortName string `json:"shortName" gorm:"column:shortname;type:string;size:256;null;comment:'简称'"`
+	Deleted   bool   `json:"deleted" gorm:"column:deleted;type:tinyint;size:1;comment:'是否删除'"`
 	//FuncType string      `json:"func_type" gorm:"column:func_type;type:string;size:1;comment:'职能类型'"`
 	//Order    int         `json:"order" gorm:"column:order;type:int;comment:'顺序'"`
 	//ResourceNum      int       `json:"resource_num" gorm:"column:resource_num;type:int;comment:'人数'"`
@@ -36,6 +36,6 @@ type Depart struct {
 	//IsDismissed      string    `json:"is_dismissed" gorm:"column:is_dismissed;type:tinyint;size:1;comment:'是否解散'"`
 }
 
-func (Depart) TableName() string {
+func (Inst) TableName() string {
 	return "kfzx"
 }

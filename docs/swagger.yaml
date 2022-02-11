@@ -425,6 +425,10 @@ definitions:
         type: integer
       serviceName:
         type: string
+      tagIDs[]:
+        items:
+          type: integer
+        type: array
     type: object
   caas.APIGetCaasServiceListOutputs:
     properties:
@@ -884,10 +888,14 @@ definitions:
     properties:
       applier:
         type: string
+      applierName:
+        type: string
       assignAt:
         $ref: '#/definitions/gtime.GTime'
         type: object
       assigner:
+        type: string
+      assignerName:
         type: string
       count:
         type: integer
@@ -897,6 +905,8 @@ definitions:
         $ref: '#/definitions/gtime.GTime'
         type: object
       creator:
+        type: string
+      creatorName:
         type: string
       id:
         type: integer
@@ -968,23 +978,23 @@ definitions:
     properties:
       areaName:
         type: string
-      cpuNumber:
+      cpuAvailableLowerLimit:
+        type: number
+      cpuAvailableUpperLimit:
+        type: number
+      cpuCount:
         type: integer
-      cpuUsageLowerLimit:
+      fsAvailableLowerLimit:
         type: number
-      cpuUsageUpperLimit:
-        type: number
-      fsUsageLowerLimit:
-        type: number
-      fsUsageUpperLimit:
+      fsAvailableUpperLimit:
         type: number
       ip:
         type: string
       limit:
         type: integer
-      memoryUsageLowerLimit:
+      memAvailableLowerLimit:
         type: number
-      memoryUsageUpperLimit:
+      memAvailableUpperLimit:
         type: number
       order:
         type: string
@@ -1113,16 +1123,18 @@ definitions:
         type: string
       areaName:
         type: string
+      bootTime:
+        type: string
       cloudPoolCode:
         type: string
       cloudPoolName:
         type: string
       coreTotalNum:
         type: integer
-      cpuNumber:
-        type: integer
-      cpuUsage:
-        type: number
+      cpuAvailable:
+        type: string
+      cpuCount:
+        type: string
       createTime:
         type: string
       databaseVersion:
@@ -1130,6 +1142,12 @@ definitions:
       department:
         type: string
       deployDate:
+        description: |-
+          CpuNumber            int          `json:"cpuNumber" gorm:"column:cpu_number;type:int"`
+          MemorySize           int          `json:"memorySize" gorm:"column:memory_size"`
+          CpuUsage             float64      `json:"cpuUsage" gorm:"column:cpu_usage;comment:"`
+          MemoryUsage          float64      `json:"memoryUsage" gorm:"column:memory_usage;comment:"`
+          FsUsage              float64      `json:"fsUsage" gorm:"column:fs_usage;comment:"`
         type: string
       desc:
         type: string
@@ -1141,8 +1159,8 @@ definitions:
         type: string
       devTypeCode:
         type: string
-      fsUsage:
-        type: number
+      fileSystemAvailable:
+        type: string
       funDesc:
         type: string
       groups:
@@ -1157,6 +1175,8 @@ definitions:
         type: string
       isWarning:
         type: boolean
+      load5:
+        type: string
       logicSystem:
         type: string
       logicSystemCnName:
@@ -1169,10 +1189,14 @@ definitions:
         type: string
       managerB:
         type: string
-      memorySize:
-        type: integer
-      memoryUsage:
-        type: number
+      maxDiskReadBytes:
+        type: string
+      maxDiskWrittenBytes:
+        type: string
+      memAvailable:
+        type: string
+      memTotalBytes:
+        type: string
       name:
         type: string
       oracle:
@@ -1270,6 +1294,10 @@ definitions:
     type: object
   pub.APIGetPubListInputs:
     properties:
+      creator:
+        type: string
+      deployUnitID:
+        type: integer
       limit:
         type: integer
       order:
@@ -1288,6 +1316,22 @@ definitions:
       totalCount:
         type: integer
     type: object
+  pub.APIGetPubProcInfoOutputs:
+    properties:
+      processInstID:
+        type: string
+      taskID:
+        type: string
+      templateID:
+        type: string
+    type: object
+  pub.APIPostPubAssignInputs:
+    properties:
+      id:
+        type: integer
+      status:
+        type: string
+    type: object
   pub.APIPostPubUpdateInputs:
     properties:
       appAssemblyTestCase:
@@ -1300,12 +1344,18 @@ definitions:
         type: string
       codeReview:
         type: string
+      commitID:
+        type: string
       deployUnitID:
         type: integer
       deployUnitName:
         type: string
+      git:
+        type: string
       id:
         type: integer
+      packageAddress:
+        type: string
       pubContent:
         type: string
       pubControlTable:
@@ -1342,17 +1392,32 @@ definitions:
         type: string
       codeReview:
         type: string
+      commitID:
+        type: string
       createAt:
         $ref: '#/definitions/gtime.GTime'
         type: object
       creator:
         type: string
+      creatorName:
+        type: string
       deployUnitID:
         type: integer
       deployUnitName:
         type: string
+      git:
+        type: string
       id:
         type: integer
+      implementAt:
+        $ref: '#/definitions/gtime.GTime'
+        type: object
+      implementer:
+        type: string
+      implementerName:
+        type: string
+      packageAddress:
+        type: string
       pubContent:
         type: string
       pubControlTable:
@@ -1365,6 +1430,8 @@ definitions:
         type: string
       rollbackStep:
         type: string
+      status:
+        type: string
       trialOperationCase:
         type: string
       trialOperationDesign:
@@ -1376,6 +1443,246 @@ definitions:
       versionDate:
         $ref: '#/definitions/gtime.GTime'
         type: object
+    type: object
+  service.Condition:
+    properties:
+      key:
+        type: string
+      value:
+        type: string
+    type: object
+  service.SortField:
+    properties:
+      FIELD_ASC:
+        type: string
+      FIELD_NM:
+        type: string
+      type:
+        type: string
+    type: object
+  service.TXBodyCommon:
+    properties:
+      COM1:
+        $ref: '#/definitions/service.TXBodyCommonCom1'
+        type: object
+      COM4:
+        $ref: '#/definitions/service.TXBodyCommonCom4'
+        type: object
+      COMB:
+        $ref: '#/definitions/service.TXBodyCommonComB'
+        type: object
+    type: object
+  service.TXBodyCommonCom1:
+    properties:
+      LNG_ID:
+        type: string
+      MULTI_TENANCY_ID:
+        type: string
+      TXN_INSID:
+        type: string
+      TXN_ITT_CHNL_CGY_CODE:
+        type: string
+      TXN_ITT_CHNL_ID:
+        type: string
+      TXN_STFF_ID:
+        type: string
+      TxnDT:
+        type: string
+      TxnTM:
+        type: string
+    type: object
+  service.TXBodyCommonCom4:
+    properties:
+      PAGE_JUMP:
+        type: string
+      REC_IN_PAGE:
+        type: string
+    type: object
+  service.TXBodyCommonComB:
+    properties:
+      CMPT_TRCNO:
+        type: string
+      CURR_TOTAL_PAGE:
+        type: integer
+      CURR_TOTAL_REC:
+        type: integer
+      ERR_MSG_NUM:
+        type: string
+      STS_TRACE_ID:
+        type: string
+      TOTAL_PAGE:
+        type: integer
+      TOTAL_REC:
+        type: integer
+    type: object
+  service.TXEmb:
+    type: object
+  service.TXHeader:
+    properties:
+      SYS_COMPRESS_TYPE:
+        type: string
+      SYS_EMB_MSG_LEN:
+        type: integer
+      SYS_ENCRYPT_TYPE:
+        type: string
+      SYS_EVT_TRACE_ID:
+        type: string
+      SYS_HDR_LEN:
+        type: integer
+      SYS_IS_ENCRYPTED:
+        type: string
+      SYS_MSG_LEN:
+        type: integer
+      SYS_PKG_STS_TYPE:
+        type: string
+      SYS_PKG_TYPE:
+        type: string
+      SYS_PKG_VRSN:
+        type: string
+      SYS_RECV_TIME:
+        type: string
+      SYS_REQ_SEC_ID:
+        type: string
+      SYS_REQ_TIME:
+        type: string
+      SYS_RESERVED:
+        type: string
+      SYS_RESP_CODE:
+        type: string
+      SYS_RESP_DESC:
+        type: string
+      SYS_RESP_DESC_LEN:
+        type: string
+      SYS_RESP_TIME:
+        type: string
+      SYS_SEC_CONTEXT:
+        type: string
+      SYS_SEC_CONTEXT_LEN:
+        type: integer
+      SYS_SND_SEC_ID:
+        type: string
+      SYS_SND_SERIAL_NO:
+        type: string
+      SYS_TIME_LEFT:
+        type: string
+      SYS_TTL_LEN:
+        type: integer
+      SYS_TX_CODE:
+        type: string
+      SYS_TX_STATUS:
+        type: string
+      SYS_TX_TYPE:
+        type: string
+      SYS_TX_VRSN:
+        type: string
+    type: object
+  service.TXNextNodeInfo:
+    properties:
+      NEXT_USER_FLAG:
+        type: string
+      NODE_ID:
+        type: string
+      NODE_NAME:
+        type: string
+      multiple:
+        type: string
+      type:
+        type: string
+    type: object
+  service.TXResponseBody:
+    properties:
+      COMMON:
+        $ref: '#/definitions/service.TXBodyCommon'
+        type: object
+      ENTITY:
+        $ref: '#/definitions/service.TXResponseBodyEntity'
+        type: object
+    type: object
+  service.TXResponseBodyEntity:
+    properties:
+      EVT_TRACE_ID:
+        type: string
+      PROCESS_INST_ID:
+        type: string
+    type: object
+  service.TXTodo2DoingResponseBody:
+    properties:
+      COMMON:
+        $ref: '#/definitions/service.TXBodyCommon'
+        type: object
+      ENTITY:
+        $ref: '#/definitions/service.TXTodo2DoingResponseBodyEntity'
+        type: object
+    type: object
+  service.TXTodo2DoingResponseBodyEntity:
+    properties:
+      RESULT_DESC:
+        type: string
+    type: object
+  service.TXTodosResponseBody:
+    properties:
+      COMMON:
+        $ref: '#/definitions/service.TXBodyCommon'
+        type: object
+      ENTITY:
+        $ref: '#/definitions/service.TXTodosResponseBodyEntity'
+        type: object
+    type: object
+  service.TXTodosResponseBodyEntity:
+    properties:
+      TODO_INFO:
+        items:
+          $ref: '#/definitions/service.TXTodosResponseBodyEntityTodoInfo'
+        type: array
+    type: object
+  service.TXTodosResponseBodyEntityTodoInfo:
+    properties:
+      AGENT_TYPE:
+        type: string
+      BLNG_INST_ID:
+        type: string
+      DMN_GRP_ID:
+        type: string
+      FORM_EDIT:
+        type: string
+      PCS_AVY_NM:
+        type: string
+      PCS_AVY_STATUS:
+        type: string
+      PCS_STATUS:
+        type: string
+      PRJ_BELONG_TYPE:
+        type: string
+      PRJ_ID:
+        type: string
+      PRJ_NM:
+        type: string
+      PRJ_SN:
+        type: string
+      PRJ_TYPE:
+        type: string
+      PROCESS_INST_ID:
+        type: string
+      SKIP_PCS_AVY_ID:
+        type: string
+      SOURCE_TYPE:
+        type: string
+      TASK_ID:
+        type: string
+      TEMPLATE_ID:
+        type: string
+      TO_START_TM:
+        type: string
+      TODO_SN:
+        type: string
+      URL:
+        type: string
+      WF_EXTR_ID:
+        type: string
+      WF_EXTR_NM:
+        type: string
+      type:
+        type: string
     type: object
   service.TagGraphNode:
     properties:
@@ -1433,6 +1740,62 @@ definitions:
       unTaggedPodsCount:
         type: integer
     type: object
+  service.WfeCreateResponse:
+    properties:
+      TX:
+        type: string
+      TX_BODY:
+        $ref: '#/definitions/service.TXResponseBody'
+        type: object
+      TX_EMB:
+        $ref: '#/definitions/service.TXEmb'
+        type: object
+      TX_HEADER:
+        $ref: '#/definitions/service.TXHeader'
+        type: object
+    type: object
+  service.WfeExecuteResponse:
+    properties:
+      TX:
+        type: string
+      TX_BODY:
+        $ref: '#/definitions/service.TXResponseBody'
+        type: object
+      TX_EMB:
+        $ref: '#/definitions/service.TXEmb'
+        type: object
+      TX_HEADER:
+        $ref: '#/definitions/service.TXHeader'
+        type: object
+    type: object
+  service.WfeTodo2DoingResponse:
+    properties:
+      TX:
+        type: string
+      TX_BODY:
+        $ref: '#/definitions/service.TXTodo2DoingResponseBody'
+        type: object
+      TX_EMB:
+        $ref: '#/definitions/service.TXEmb'
+        type: object
+      TX_HEADER:
+        $ref: '#/definitions/service.TXHeader'
+        type: object
+    type: object
+  service.WfeTodosResponse:
+    properties:
+      TX:
+        type: string
+      TX_BODY:
+        $ref: '#/definitions/service.TXTodosResponseBody'
+        type: object
+      TX_EMB:
+        $ref: '#/definitions/service.TXEmb'
+        type: object
+      TX_HEADER:
+        $ref: '#/definitions/service.TXHeader'
+        type: object
+    type: object
   sys.APIGetMenuNavListOutputs:
     properties:
       menus:
@@ -1443,6 +1806,15 @@ definitions:
         items:
           $ref: '#/definitions/uic.Perm'
         type: array
+    type: object
+  sys.APIGetNoticeListOutputs:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/sys.Notice'
+        type: array
+      totalCount:
+        type: integer
     type: object
   sys.APIGetParamListInputs:
     properties:
@@ -1511,6 +1883,28 @@ definitions:
       parentID:
         type: integer
       url:
+        type: string
+    type: object
+  sys.Notice:
+    properties:
+      content:
+        type: string
+      createAt:
+        $ref: '#/definitions/gtime.GTime'
+        type: object
+      creator:
+        type: string
+      creatorName:
+        type: string
+      id:
+        type: integer
+      timeBegin:
+        $ref: '#/definitions/gtime.GTime'
+        type: object
+      timeEnd:
+        $ref: '#/definitions/gtime.GTime'
+        type: object
+      title:
         type: string
     type: object
   sys.Param:
@@ -1724,6 +2118,119 @@ definitions:
       telephone:
         type: string
       username:
+        type: string
+    type: object
+  wfe.APIPostCreateInputs:
+    properties:
+      blngInstID:
+        type: string
+      buttonName:
+        type: string
+      dmnGrpID:
+        type: string
+      nextNode:
+        $ref: '#/definitions/service.TXNextNodeInfo'
+        type: object
+      nextUserGrp:
+        items:
+          type: string
+        type: array
+      prjID:
+        type: string
+      prjSN:
+        type: string
+      remark:
+        type: string
+      taskID:
+        type: string
+      templateID:
+        type: string
+      todoTmTpCd:
+        type: string
+      todoTmTtl:
+        type: string
+    type: object
+  wfe.APIPostExecuteInputs:
+    properties:
+      buttonName:
+        type: string
+      conditions:
+        items:
+          $ref: '#/definitions/service.Condition'
+        type: array
+      exeFstTask:
+        type: string
+      nextNode:
+        $ref: '#/definitions/service.TXNextNodeInfo'
+        type: object
+      nextUserGrp:
+        items:
+          type: string
+        type: array
+      opinCode:
+        type: string
+      opinDesc:
+        type: string
+      prjID:
+        type: string
+      prjSN:
+        type: integer
+      processInstID:
+        type: string
+      remark:
+        type: string
+      taskID:
+        type: string
+      templateID:
+        type: string
+    type: object
+  wfe.APIPostHistDetailListInputs:
+    properties:
+      processInstID:
+        type: string
+    type: object
+  wfe.APIPostNextNodeInfoInputs:
+    properties:
+      processInstID:
+        type: string
+      taskID:
+        type: string
+      templateID:
+        type: string
+    type: object
+  wfe.APIPostTodo2DoingInputs:
+    properties:
+      todoID:
+        type: string
+    required:
+    - todoID
+    type: object
+  wfe.APIPostTodoListInputs:
+    properties:
+      WfExtrNm:
+        type: string
+      limit:
+        type: string
+      page:
+        type: string
+      prjID:
+        type: string
+      prjNm:
+        type: string
+      prjTypeList:
+        type: string
+      sortFields:
+        description: |-
+          ProcessInstIDList string   `json:"processInstIDList" form:"processInstIDList"`
+          PrjBelongTypeList string   `json:"prjBelongTypeList" form:"prjBelongTypeList"`
+          AvyOwrNm          string   `json:"avyOwrNm" form:"avyOwrNm"`
+          TodoType          string   `json:"TodoType" form:"TodoType"`
+        items:
+          $ref: '#/definitions/service.SortField'
+        type: array
+      timeEnd:
+        type: string
+      timeStart:
         type: string
     type: object
 info:
@@ -1947,6 +2454,11 @@ paths:
       - in: query
         name: serviceName
         type: string
+      - in: query
+        items:
+          type: integer
+        name: tagIDs[]
+        type: array
       produces:
       - application/json
       responses:
@@ -1971,6 +2483,11 @@ paths:
       - in: query
         name: serviceName
         type: string
+      - in: query
+        items:
+          type: integer
+        name: tagIDs[]
+        type: array
       produces:
       - application/json
       responses:
@@ -2281,19 +2798,19 @@ paths:
         name: areaName
         type: string
       - in: query
-        name: cpuNumber
+        name: cpuAvailableLowerLimit
+        type: number
+      - in: query
+        name: cpuAvailableUpperLimit
+        type: number
+      - in: query
+        name: cpuCount
         type: integer
       - in: query
-        name: cpuUsageLowerLimit
+        name: fsAvailableLowerLimit
         type: number
       - in: query
-        name: cpuUsageUpperLimit
-        type: number
-      - in: query
-        name: fsUsageLowerLimit
-        type: number
-      - in: query
-        name: fsUsageUpperLimit
+        name: fsAvailableUpperLimit
         type: number
       - in: query
         name: ip
@@ -2302,10 +2819,10 @@ paths:
         name: limit
         type: integer
       - in: query
-        name: memoryUsageLowerLimit
+        name: memAvailableLowerLimit
         type: number
       - in: query
-        name: memoryUsageUpperLimit
+        name: memAvailableUpperLimit
         type: number
       - in: query
         name: order
@@ -2672,6 +3189,90 @@ paths:
         "417":
           description: internal error
       summary: 更新node group
+  /api/v1/notice/create:
+    post:
+      parameters:
+      - description: 系统公告创建
+        in: body
+        name: APIPostNoticeCreateInputs
+        required: true
+        schema:
+          $ref: '#/definitions/sys.Notice'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/sys.Notice'
+        "400":
+          description: bad arguments
+        "417":
+          description: internal error
+      summary: 系统公告创建
+  /api/v1/notice/info:
+    get:
+      parameters:
+      - description: 系统公告信息
+        in: body
+        name: APIGetNoticeInfoInputs
+        required: true
+        schema:
+          $ref: '#/definitions/sys.Notice'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/sys.Notice'
+        "400":
+          description: bad arguments
+        "417":
+          description: internal error
+      summary: 系统公告信息
+  /api/v1/notice/list:
+    get:
+      parameters:
+      - description: 根据查询条件查询系统公告
+        in: body
+        name: APIGetNoticeListInputs
+        required: true
+        schema:
+          $ref: '#/definitions/sys.APIGetNoticeListOutputs'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/sys.APIGetNoticeListOutputs'
+        "400":
+          description: bad arguments
+        "417":
+          description: internal error
+      summary: 系统公告
+  /api/v1/notice/update:
+    put:
+      parameters:
+      - description: 系统公告更新
+        in: body
+        name: APIPostNoticeCreateInputs
+        required: true
+        schema:
+          $ref: '#/definitions/sys.Notice'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/sys.Notice'
+        "400":
+          description: bad arguments
+        "417":
+          description: internal error
+      summary: 系统公告更新
   /api/v1/param/create:
     post:
       parameters:
@@ -2885,10 +3486,31 @@ paths:
         "417":
           description: internal error
       summary: 更新权限接口
+  /api/v1/pub/assign:
+    put:
+      parameters:
+      - description: 更新发布单实施状态信息
+        in: body
+        name: APIPostPubAssignInputs
+        required: true
+        schema:
+          $ref: '#/definitions/pub.APIPostPubAssignInputs'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/pub.APIPostPubUpdateInputs'
+        "400":
+          description: bad arguments
+        "417":
+          description: internal error
+      summary: 更新发布单实施状态信息
   /api/v1/pub/create:
     post:
       parameters:
-      - description: 创建新发布单
+      - description: 创建新发布单并启动发布流程
         in: body
         name: APIPostPubUpdateInputs
         required: true
@@ -2905,7 +3527,27 @@ paths:
           description: bad arguments
         "417":
           description: internal error
-      summary: 创建新发布单
+      summary: 创建新发布单并启动发布流程
+  /api/v1/pub/execute:
+    post:
+      parameters:
+      - description: 处理发布单信息
+        in: formData
+        name: IP
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/service.WfeExecuteResponse'
+        "400":
+          description: bad arguments
+        "417":
+          description: internal error
+      summary: 处理发布单信息
   /api/v1/pub/info:
     get:
       parameters:
@@ -2930,6 +3572,12 @@ paths:
     get:
       parameters:
       - in: query
+        name: creator
+        type: string
+      - in: query
+        name: deployUnitID
+        type: integer
+      - in: query
         name: limit
         type: integer
       - in: query
@@ -2953,6 +3601,27 @@ paths:
         "417":
           description: internal error
       summary: 发布列表接口
+  /api/v1/pub/proc/info:
+    get:
+      parameters:
+      - description: 发布单流程信息
+        in: body
+        name: APIGetPubProcInfoInputs
+        required: true
+        schema:
+          $ref: '#/definitions/pub.APIGetPubProcInfoOutputs'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/pub.APIGetPubProcInfoOutputs'
+        "400":
+          description: bad arguments
+        "417":
+          description: internal error
+      summary: 发布单流程信息
   /api/v1/pub/update:
     put:
       parameters:
@@ -3627,6 +4296,132 @@ paths:
         "417":
           description: internal error
       summary: 更新用户信息
+  /api/v1/wfe/create:
+    post:
+      parameters:
+      - description: 创建流程
+        in: body
+        name: APIPostCreateInputs
+        required: true
+        schema:
+          $ref: '#/definitions/wfe.APIPostCreateInputs'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/service.WfeCreateResponse'
+        "400":
+          description: bad arguments
+        "417":
+          description: internal error
+      summary: 创建流程A0902S102
+  /api/v1/wfe/execute:
+    post:
+      parameters:
+      - description: 处理流程
+        in: body
+        name: APIPostExecuteInputs
+        required: true
+        schema:
+          $ref: '#/definitions/wfe.APIPostExecuteInputs'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/service.WfeExecuteResponse'
+        "400":
+          description: bad arguments
+        "417":
+          description: internal error
+      summary: 处理流程A0902S102
+  /api/v1/wfe/histDetails:
+    post:
+      parameters:
+      - description: 处理流程
+        in: body
+        name: APIPostHistDetailListInputs
+        required: true
+        schema:
+          $ref: '#/definitions/wfe.APIPostHistDetailListInputs'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/service.WfeExecuteResponse'
+        "400":
+          description: bad arguments
+        "417":
+          description: internal error
+      summary: 流程处理历史记录A0902S124
+  /api/v1/wfe/nextNodeInfo:
+    post:
+      parameters:
+      - description: 下个节点信息A0902S112
+        in: body
+        name: APIPostNextNodeInfoInputs
+        required: true
+        schema:
+          $ref: '#/definitions/wfe.APIPostNextNodeInfoInputs'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/service.WfeTodosResponse'
+        "400":
+          description: bad arguments
+        "417":
+          description: internal error
+      summary: 下个节点信息A0902S112
+  /api/v1/wfe/todo2doing:
+    post:
+      parameters:
+      - description: 待办转在办A0902S132
+        in: body
+        name: APIPostTodo2DoingInputs
+        required: true
+        schema:
+          $ref: '#/definitions/wfe.APIPostTodo2DoingInputs'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/service.WfeTodo2DoingResponse'
+        "400":
+          description: bad arguments
+        "417":
+          description: internal error
+      summary: 待办转在办A0902S132
+  /api/v1/wfe/todos:
+    post:
+      parameters:
+      - description: 待办A0902S119
+        in: body
+        name: APIPostTodoListInputs
+        required: true
+        schema:
+          $ref: '#/definitions/wfe.APIPostTodoListInputs'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/service.WfeTodosResponse'
+        "400":
+          description: bad arguments
+        "417":
+          description: internal error
+      summary: 待办A0902S119
   /api/v2/tree/children:
     get:
       parameters:

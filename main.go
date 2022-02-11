@@ -24,14 +24,12 @@ import (
 // @title rabbit
 // @description 一个简单的运维系统
 func main() {
-
 	g.BinaryName = BinaryName
 	g.Version = Version
 	g.GitCommit = GitCommit
 
 	cfg := flag.String("c", "./config/cfg.json", "configuration file")
 	version := flag.Bool("v", false, "show version")
-
 	flag.Parse()
 
 	if *version {
@@ -40,11 +38,10 @@ func main() {
 	}
 
 	g.ParseConfig(*cfg)
-
 	g.InitLog()
 	g.InitSentry()
 	g.InitDBPool()
-	if viper.GetBool("auto_migrate.enable") == true {
+	if viper.GetBool("auto_migrate.enabled") == true {
 		//migrate database
 		//g.Con().Uic.AutoMigrate(&uic.User{})
 		//g.Con().Uic.AutoMigrate(&uic.Session{})
@@ -53,7 +50,7 @@ func main() {
 		g.Con().Portal.AutoMigrate(&uic.Perm{})
 		g.Con().Portal.AutoMigrate(&uic.RolePermRel{})
 		g.Con().Portal.AutoMigrate(&uic.UserRoleRel{})
-		//g.Con().Portal.AutoMigrate(&uic.Depart{})
+		//g.Con().Portal.AutoMigrate(&uic.Inst{})
 		g.Con().Portal.AutoMigrate(&sys.Param{})
 		g.Con().Portal.AutoMigrate(&sys.Menu{})
 		g.Con().Portal.AutoMigrate(&sys.MenuPermission{})
@@ -86,6 +83,10 @@ func main() {
 
 		// pub
 		g.Con().Portal.AutoMigrate(&pub.Pub{})
+		g.Con().Portal.AutoMigrate(&pub.PubProc{})
+
+		// notice
+		g.Con().Portal.AutoMigrate(&sys.Notice{})
 	}
 
 	// start gin server

@@ -85,6 +85,13 @@ func SessionChecking(c *gin.Context) (auth bool, err error) {
 }
 
 func GetUser(c *gin.Context) (user uic.User, err error) {
+	if viper.GetBool("mock.user.enabled") {
+		tx := g.Con().Uic.Model(&user)
+		if err = tx.Where("jgyg_user_id = ?", viper.GetString("mock.user.jgyg_user_id")).First(&user).Error; err != nil {
+			return user, err
+		}
+		return user, err
+	}
 	db := g.Con().Uic
 	websession, getserr := GetSession(c)
 	if getserr != nil {

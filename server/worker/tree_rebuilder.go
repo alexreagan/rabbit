@@ -13,7 +13,7 @@ import (
 var treeRebuilderConfig *TreeReBuilderConfig
 
 type TreeReBuilderConfig struct {
-	Enable   bool `json:"enable"`
+	Enabled  bool `json:"enabled"`
 	Duration int  `json:"duration"`
 }
 
@@ -48,7 +48,7 @@ func (s *TreeReBuilder) Close() {
 }
 
 func (s *TreeReBuilder) Start() {
-	//if viper.GetBool("tree.rebuild.enable") == false {
+	//if viper.GetBool("tree.rebuild.enabled") == false {
 	//	return
 	//}
 	var err error
@@ -57,7 +57,7 @@ func (s *TreeReBuilder) Start() {
 		log.Error(err)
 		return
 	}
-	if treeRebuilderConfig.Enable == false {
+	if treeRebuilderConfig.Enabled == false {
 		return
 	}
 
@@ -74,7 +74,7 @@ func (s *TreeReBuilder) Start() {
 			log.Error(err)
 			return
 		}
-		if treeRebuilderConfig.Enable == false {
+		if treeRebuilderConfig.Enabled == false {
 			return
 		}
 		s.StartReBuilder()

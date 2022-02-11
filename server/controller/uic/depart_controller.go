@@ -51,9 +51,9 @@ func DepartmentLists(c *gin.Context) {
 		return
 	}
 	//for get correct table name
-	f := uic.Depart{}
+	f := uic.Inst{}
 	tx := inputs.collectDBFilters(g.Con().Uic, f.TableName(), nil)
-	var data []uic.Depart
+	var data []uic.Inst
 	//if no specific, will give return first 2000 records
 	if inputs.Page == -1 && inputs.Limit == -1 {
 		inputs.Limit = 2000
