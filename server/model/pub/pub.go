@@ -7,7 +7,7 @@ import (
 // 发布单
 type Pub struct {
 	ID                    int64       `json:"id" gorm:"primary_key;column:id"`
-	DeployUnitID          int64       `json:"deployUnitID" gorm:"column:deploy_unit_id;comment:"`
+	DeployUnitID          string       `json:"deployUnitID" gorm:"column:deploy_unit_id;comment:"`
 	DeployUnitName        string      `json:"deployUnitName" gorm:"column:deploy_unit_name;type:string;size:128;comment:"`
 	VersionDate           gtime.GTime `json:"versionDate" gorm:"column:versionDate;comment:"`
 	Git                   string      `json:"git" gorm:"column:git;type:string;size:512;comment:git地址"`

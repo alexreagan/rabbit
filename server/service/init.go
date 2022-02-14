@@ -10,7 +10,6 @@ var (
 	BucketService      *bucketService
 	CaasService        *caasService
 	TemplateService    *templateService
-	ProcService        *procService
 	WfeService         *wfeService
 )
 
@@ -24,6 +23,5 @@ func init() {
 	BucketService = newBucketService()
 	CaasService = newCaasService()
 	TemplateService = newTemplateService()
-	ProcService = newProcService()
 	WfeService = newWfeService()
 }

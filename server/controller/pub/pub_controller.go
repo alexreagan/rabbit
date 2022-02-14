@@ -14,11 +14,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 )
 
-//const pubProcTemplateID = "600100PubAudit"
-const pubProcTemplateID = "040500ChgTskBizReq"
+const pubProcTemplateID = "600100PubAudit"
+//const pubProcTemplateID = "040500ChgTskBizReq"
 const pubProcStartTaskID = "10101"
 
 type APIGetPubListInputs struct {
@@ -106,8 +107,8 @@ type APIPostPubUpdateInputs struct {
 }
 
 type APIPostPubCreateInputs struct {
-	DeployUnitID   int64                  `json:"deployUnitID" form:"deployUnitID"`
-	DeployUnitName string                 `json:"deployUnitName" form:"deployUnitName"`
+	DeployUnitID   []string                  `json:"deployUnitID[]" form:"deployUnitID[]"`
+	//DeployUnitName string                 `json:"deployUnitName" form:"deployUnitName"`
 	VersionDate    time.Time              `json:"versionDate" form:"versionDate"`
 	PubContent     string                 `json:"pubContent" form:"pubContent"`
 	Git            string                 `json:"git" form:"git"`
@@ -141,14 +142,18 @@ func Create(c *gin.Context) {
 	}
 	u, _ := h.GetUser(c)
 
-	var deployUnit *app.Tag
-	g.Con().Portal.Model(app.Tag{}).Where("id = ?", inputs.DeployUnitID).Find(&deployUnit)
-
 	tx := g.Con().Portal.Begin()
+	deployUnitIDs, err := json.Marshal(inputs.DeployUnitID)
+	deployUnitNames := make([]string, 0)
+	for _, deployUnitID := range inputs.DeployUnitID {
+		duID, _ := strconv.ParseInt(deployUnitID, 10, 64)
+		du, _ := service.TagService.Get(duID)
+		deployUnitNames = append(deployUnitNames, du.CnName)
+	}
 	// 发布单信息
 	p := pub.Pub{
-		DeployUnitID:   inputs.DeployUnitID,
-		DeployUnitName: deployUnit.Name,
+		DeployUnitID:   string(deployUnitIDs),
+		DeployUnitName: strings.Join(deployUnitNames, ","),
 		VersionDate:    gtime.NewGTime(inputs.VersionDate),
 		Git:            inputs.Git,
 		CommitID:       inputs.CommitID,
@@ -316,9 +321,10 @@ func Update(c *gin.Context) {
 	var deployUnit *app.Tag
 	g.Con().Portal.Model(app.Tag{}).Where("id = ?", inputs.DeployUnitID).Find(&deployUnit)
 
+	deployUnitIDs, _ := json.Marshal(inputs.DeployUnitID)
 	p := pub.Pub{
 		ID:                    inputs.ID,
-		DeployUnitID:          inputs.DeployUnitID,
+		DeployUnitID:          string(deployUnitIDs),
 		DeployUnitName:        deployUnit.Name,
 		VersionDate:           inputs.VersionDate,
 		Git:                   inputs.Git,

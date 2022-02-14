@@ -70,14 +70,14 @@ func (s *tagService) GlobalTagGraphNodeV2() *TagGraphNode {
 	return globalTagGraphNodeV2
 }
 
-func (s *tagService) Get(id int64) *app.Tag {
+func (s *tagService) Get(id int64) (*app.Tag, error) {
 	var tag app.Tag
 	tx := g.Con().Portal.Model(tag)
 	tx = tx.Select("`tag`.*, `tag_category`.name as category_name")
 	tx = tx.Joins("left join `tag_category` on `tag_category`.id = `tag`.`category_id`")
 	tx = tx.Where("`tag`.id = ?", id)
 	tx.Find(&tag)
-	return &tag
+	return &tag, nil
 }
 
 func (s *tagService) GetAll() []*app.Tag {
