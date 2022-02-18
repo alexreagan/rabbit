@@ -876,10 +876,10 @@ type TXHasDoneResponseBody struct {
 }
 
 type WfeHasDoneResponse struct {
-	XMLName  xml.Name             `json:"TX" xml:"TX"`
-	TXHeader *TXHeader            `json:"TX_HEADER" xml:"TX_HEADER"`
-	TXBody   *TXTodosResponseBody `json:"TX_BODY" xml:"TX_BODY"`
-	TXEmb    *TXEmb               `json:"TX_EMB" xml:"TX_EMB"`
+	XMLName  xml.Name               `jsons:"TX" xml:"TX"`
+	TXHeader *TXHeader              `json:"TX_HEADER" xml:"TX_HEADER"`
+	TXBody   *TXHasDoneResponseBody `json:"TX_BODY" xml:"TX_BODY"`
+	TXEmb    *TXEmb                 `json:"TX_EMB" xml:"TX_EMB"`
 }
 
 func (s *wfeService) HasDone(u *uic.User, timeStart string, timeEnd string, prjID string, prjTypeList string,
