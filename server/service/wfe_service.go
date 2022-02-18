@@ -821,7 +821,7 @@ type TXHasDoneBodyEntityAppEntity struct {
 	PrjTypeList string `json:"PRJ_TYPE_LIST" xml:"PRJ_TYPE_LIST,omitempty"`
 	PrjNm       string `json:"PRJ_NM" xml:"PRJ_NM,omitempty"`
 	WfExtrNm    string `json:"WF_EXTR_NM" xml:"WF_EXTR_NM,omitempty"`
-	HistType    string `json:"TODO_TYPE" xml:"TODO_TYPE"`
+	HistType    string `json:"HIST_TYPE" xml:"HIST_TYPE"`
 }
 
 type TXHasDoneBodyEntity struct {
