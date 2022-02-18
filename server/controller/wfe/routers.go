@@ -12,4 +12,5 @@ func Routes(r *gin.Engine) {
 	procGroup.POST("/todos", Todos)
 	procGroup.POST("/todo2doing", Todo2Doing)
 	procGroup.POST("/nextNodeInfo", NextNodeInfo)
+	procGroup.POST("/hasDone", HasDone)
 }

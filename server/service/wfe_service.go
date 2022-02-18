@@ -810,6 +810,130 @@ func (s *wfeService) todo2Doing(inputs *WfeTodo2DoingRequest) (*WfeTodo2DoingRes
 	return &wfeResponse, err
 }
 
+type TXHasDoneBodyEntityComSortEntity struct {
+	SortFields []*SortField `json:"SORT_FIELDS" xml:"SORT_FIELDS,omitempty"`
+}
+
+type TXHasDoneBodyEntityAppEntity struct {
+	TimeStart   string `json:"TIME_START" xml:"TIME_START,omitempty"`
+	TimeEnd     string `json:"TIME_END" xml:"TIME_END,omitempty"`
+	PrjID       string `json:"PRJ_ID" xml:"PRJ_ID,omitempty"`
+	PrjTypeList string `json:"PRJ_TYPE_LIST" xml:"PRJ_TYPE_LIST,omitempty"`
+	PrjNm       string `json:"PRJ_NM" xml:"PRJ_NM,omitempty"`
+	WfExtrNm    string `json:"WF_EXTR_NM" xml:"WF_EXTR_NM,omitempty"`
+	HistType    string `json:"TODO_TYPE" xml:"TODO_TYPE"`
+}
+
+type TXHasDoneBodyEntity struct {
+	ComSortEntity *TXHasDoneBodyEntityComSortEntity `json:"COM_SORT_ENTITY" xml:"COM_SORT_ENTITY,omitempty"`
+	AppEntity     *TXHasDoneBodyEntityAppEntity     `json:"APP_ENTITY" xml:"APP_ENTITY,omitempty"`
+}
+
+type TXHasDoneBody struct {
+	Common *TXBodyCommon        `json:"COMMON" xml:"COMMON,omitempty"`
+	Entity *TXHasDoneBodyEntity `json:"ENTITY" xml:"ENTITY,omitempty"`
+}
+
+type WfeHasDoneRequest struct {
+	XMLName  xml.Name       `xml:"TX"`
+	TXHeader *TXHeader      `json:"TX_HEADER" xml:"TX_HEADER"`
+	TXBody   *TXHasDoneBody `json:"TX_BODY" xml:"TX_BODY"`
+}
+
+type TXHasDoneResponseBodyEntityHasDoneInfo struct {
+	Type          string `json:"type" xml:"type,attr,omitempty"`
+	ProcessInstID string `json:"PROCESS_INST_ID" xml:"PROCESS_INST_ID,omitempty"`
+	TaskID        string `json:"TASK_ID" xml:"TASK_ID,omitempty"`
+	PcsAvyNm      string `json:"PCS_AVY_NM" xml:"PCS_AVY_NM,omitempty"`
+	WfExtrID      string `json:"WF_EXTR_ID" xml:"WF_EXTR_ID,omitempty"`
+	WfExtrNm      string `json:"WF_EXTR_NM" xml:"WF_EXTR_NM,omitempty"`
+	TodoStartTm   string `json:"TO_START_TM" xml:"TO_START_TM,omitempty"`
+	TemplateID    string `json:"TEMPLATE_ID" xml:"TEMPLATE_ID,omitempty"`
+	PcsAvyStatus  string `json:"PCS_AVY_STATUS" xml:"PCS_AVY_STATUS,omitempty"`
+	PcsStatus     string `json:"PCS_STATUS" xml:"PCS_STATUS,omitempty"`
+	BlngInstID    string `json:"BLNG_INST_ID" xml:"BLNG_INST_ID,omitempty"`
+	SourceType    string `json:"SOURCE_TYPE" xml:"SOURCE_TYPE,omitempty"`
+	FormEdit      string `json:"FORM_EDIT" xml:"FORM_EDIT,omitempty"`
+	TodoSN        string `json:"TODO_SN" xml:"TODO_SN,omitempty"`
+	PrjID         string `json:"PRJ_ID" xml:"PRJ_ID,omitempty"`
+	PrjSN         string `json:"PRJ_SN" xml:"PRJ_SN,omitempty"`
+	PrjNM         string `json:"PRJ_NM" xml:"PRJ_NM,omitempty"`
+	PrjType       string `json:"PRJ_TYPE" xml:"PRJ_TYPE,omitempty"`
+	DmnGrpID      string `json:"DMN_GRP_ID" xml:"DMN_GRP_ID,omitempty"`
+	AgentType     string `json:"AGENT_TYPE" xml:"AGENT_TYPE,omitempty"`
+	PrjBelongType string `json:"PRJ_BELONG_TYPE" xml:"PRJ_BELONG_TYPE,omitempty"`
+	SkipPcsAvyID  string `json:"SKIP_PCS_AVY_ID" xml:"SKIP_PCS_AVY_ID,omitempty"`
+	URL           string `json:"URL" xml:"URL,omitempty"`
+}
+
+type TXHasDoneResponseBodyEntity struct {
+	HasDoneInfo []*TXHasDoneResponseBodyEntityHasDoneInfo `json:"HASDONE_INFO" xml:"HASDONE_INFO,omitempty"`
+}
+
+type TXHasDoneResponseBody struct {
+	Common *TXBodyCommon                `json:"COMMON" xml:"COMMON,omitempty"`
+	Entity *TXHasDoneResponseBodyEntity `json:"ENTITY" xml:"ENTITY,omitempty"`
+}
+
+type WfeHasDoneResponse struct {
+	XMLName  xml.Name             `json:"TX" xml:"TX"`
+	TXHeader *TXHeader            `json:"TX_HEADER" xml:"TX_HEADER"`
+	TXBody   *TXTodosResponseBody `json:"TX_BODY" xml:"TX_BODY"`
+	TXEmb    *TXEmb               `json:"TX_EMB" xml:"TX_EMB"`
+}
+
+func (s *wfeService) HasDone(u *uic.User, timeStart string, timeEnd string, prjID string, prjTypeList string,
+	prjNm string, wfExtrNm string, sortFields []*SortField, page string, limit string) (*WfeHasDoneResponse, error) {
+	if sortFields == nil {
+		sortFields = append(sortFields, &SortField{
+			Type:     "G",
+			FieldNm:  "pcsAvyEfdt",
+			FieldAsc: "desc",
+		})
+	}
+	if page == "" {
+		page = "1"
+	}
+	if limit == "" {
+		limit = "10"
+	}
+	request := &WfeHasDoneRequest{
+		TXHeader: WfeService.GenTXHeader("A0902S120"),
+		TXBody: &TXHasDoneBody{
+			Common: WfeService.GenTXBodyCommonPro(u, page, limit),
+			Entity: &TXHasDoneBodyEntity{
+				ComSortEntity: &TXHasDoneBodyEntityComSortEntity{
+					SortFields: sortFields,
+				},
+				AppEntity: &TXHasDoneBodyEntityAppEntity{
+					TimeStart:   timeStart,
+					TimeEnd:     timeEnd,
+					PrjID:       prjID,
+					PrjTypeList: prjTypeList,
+					PrjNm:       prjNm,
+					WfExtrNm:    wfExtrNm,
+					HistType:    "2",
+				},
+			},
+		},
+	}
+	return s.hasDone(request)
+}
+
+func (s *wfeService) hasDone(inputs *WfeHasDoneRequest) (*WfeHasDoneResponse, error) {
+	response, err := wfeRequest(inputs)
+	if err != nil {
+		return nil, err
+	}
+
+	var wfeResponse WfeHasDoneResponse
+	err = xml.Unmarshal(response, &wfeResponse)
+	if err != nil {
+		return nil, err
+	}
+	return &wfeResponse, err
+}
+
 func newWfeService() *wfeService {
 	return &wfeService{}
 }
