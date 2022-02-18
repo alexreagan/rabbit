@@ -275,7 +275,7 @@ type APIPostHasDoneListInputs struct {
 // @Failure 417 "internal error"
 // @Router /api/v1/wfe/hasDone [post]
 func HasDone(c *gin.Context) {
-	var inputs APIPostTodoListInputs
+	var inputs APIPostHasDoneListInputs
 
 	if err := c.Bind(&inputs); err != nil {
 		h.JSONR(c, h.BadStatus, err)
