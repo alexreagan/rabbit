@@ -810,11 +810,11 @@ func (s *wfeService) todo2Doing(inputs *WfeTodo2DoingRequest) (*WfeTodo2DoingRes
 	return &wfeResponse, err
 }
 
-type TXHasDoneBodyEntityComSortEntity struct {
+type TXHistInfoBodyEntityComSortEntity struct {
 	SortFields []*SortField `json:"SORT_FIELDS" xml:"SORT_FIELDS,omitempty"`
 }
 
-type TXHasDoneBodyEntityAppEntity struct {
+type TXHistInfoBodyEntityAppEntity struct {
 	TimeStart   string `json:"TIME_START" xml:"TIME_START,omitempty"`
 	TimeEnd     string `json:"TIME_END" xml:"TIME_END,omitempty"`
 	PrjID       string `json:"PRJ_ID" xml:"PRJ_ID,omitempty"`
@@ -824,23 +824,23 @@ type TXHasDoneBodyEntityAppEntity struct {
 	HistType    string `json:"HIST_TYPE" xml:"HIST_TYPE"`
 }
 
-type TXHasDoneBodyEntity struct {
-	ComSortEntity *TXHasDoneBodyEntityComSortEntity `json:"COM_SORT_ENTITY" xml:"COM_SORT_ENTITY,omitempty"`
-	AppEntity     *TXHasDoneBodyEntityAppEntity     `json:"APP_ENTITY" xml:"APP_ENTITY,omitempty"`
+type TXHistInfoBodyEntity struct {
+	ComSortEntity *TXHistInfoBodyEntityComSortEntity `json:"COM_SORT_ENTITY" xml:"COM_SORT_ENTITY,omitempty"`
+	AppEntity     *TXHistInfoBodyEntityAppEntity     `json:"APP_ENTITY" xml:"APP_ENTITY,omitempty"`
 }
 
-type TXHasDoneBody struct {
-	Common *TXBodyCommon        `json:"COMMON" xml:"COMMON,omitempty"`
-	Entity *TXHasDoneBodyEntity `json:"ENTITY" xml:"ENTITY,omitempty"`
+type TXHistInfoBody struct {
+	Common *TXBodyCommon         `json:"COMMON" xml:"COMMON,omitempty"`
+	Entity *TXHistInfoBodyEntity `json:"ENTITY" xml:"ENTITY,omitempty"`
 }
 
-type WfeHasDoneRequest struct {
-	XMLName  xml.Name       `xml:"TX"`
-	TXHeader *TXHeader      `json:"TX_HEADER" xml:"TX_HEADER"`
-	TXBody   *TXHasDoneBody `json:"TX_BODY" xml:"TX_BODY"`
+type WfeHistInfoRequest struct {
+	XMLName  xml.Name        `xml:"TX"`
+	TXHeader *TXHeader       `json:"TX_HEADER" xml:"TX_HEADER"`
+	TXBody   *TXHistInfoBody `json:"TX_BODY" xml:"TX_BODY"`
 }
 
-type TXHasDoneResponseBodyEntityHasDoneInfo struct {
+type TXHistInfoResponseBodyEntityHistInfo struct {
 	Type          string `json:"type" xml:"type,attr,omitempty"`
 	ProcessInstID string `json:"PROCESS_INST_ID" xml:"PROCESS_INST_ID,omitempty"`
 	TaskID        string `json:"TASK_ID" xml:"TASK_ID,omitempty"`
@@ -866,24 +866,24 @@ type TXHasDoneResponseBodyEntityHasDoneInfo struct {
 	URL           string `json:"URL" xml:"URL,omitempty"`
 }
 
-type TXHasDoneResponseBodyEntity struct {
-	HasDoneInfo []*TXHasDoneResponseBodyEntityHasDoneInfo `json:"HASDONE_INFO" xml:"HASDONE_INFO,omitempty"`
+type TXHistInfoResponseBodyEntity struct {
+	HistInfo []*TXHistInfoResponseBodyEntityHistInfo `json:"DIST_INFO" xml:"DIST_INFO,omitempty"`
 }
 
-type TXHasDoneResponseBody struct {
-	Common *TXBodyCommon                `json:"COMMON" xml:"COMMON,omitempty"`
-	Entity *TXHasDoneResponseBodyEntity `json:"ENTITY" xml:"ENTITY,omitempty"`
+type TXHistInfoResponseBody struct {
+	Common *TXBodyCommon                 `json:"COMMON" xml:"COMMON,omitempty"`
+	Entity *TXHistInfoResponseBodyEntity `json:"ENTITY" xml:"ENTITY,omitempty"`
 }
 
-type WfeHasDoneResponse struct {
-	XMLName  xml.Name               `jsons:"TX" xml:"TX"`
-	TXHeader *TXHeader              `json:"TX_HEADER" xml:"TX_HEADER"`
-	TXBody   *TXHasDoneResponseBody `json:"TX_BODY" xml:"TX_BODY"`
-	TXEmb    *TXEmb                 `json:"TX_EMB" xml:"TX_EMB"`
+type WfeHistInfoResponse struct {
+	XMLName  xml.Name                `jsons:"TX" xml:"TX"`
+	TXHeader *TXHeader               `json:"TX_HEADER" xml:"TX_HEADER"`
+	TXBody   *TXHistInfoResponseBody `json:"TX_BODY" xml:"TX_BODY"`
+	TXEmb    *TXEmb                  `json:"TX_EMB" xml:"TX_EMB"`
 }
 
-func (s *wfeService) HasDone(u *uic.User, timeStart string, timeEnd string, prjID string, prjTypeList string,
-	prjNm string, wfExtrNm string, sortFields []*SortField, page string, limit string) (*WfeHasDoneResponse, error) {
+func (s *wfeService) Hists(u *uic.User, timeStart string, timeEnd string, prjID string, prjTypeList string,
+	prjNm string, wfExtrNm string, sortFields []*SortField, page string, limit string) (*WfeHistInfoResponse, error) {
 	if sortFields == nil {
 		sortFields = append(sortFields, &SortField{
 			Type:     "G",
@@ -897,15 +897,15 @@ func (s *wfeService) HasDone(u *uic.User, timeStart string, timeEnd string, prjI
 	if limit == "" {
 		limit = "10"
 	}
-	request := &WfeHasDoneRequest{
+	request := &WfeHistInfoRequest{
 		TXHeader: WfeService.GenTXHeader("A0902S120"),
-		TXBody: &TXHasDoneBody{
+		TXBody: &TXHistInfoBody{
 			Common: WfeService.GenTXBodyCommonPro(u, page, limit),
-			Entity: &TXHasDoneBodyEntity{
-				ComSortEntity: &TXHasDoneBodyEntityComSortEntity{
+			Entity: &TXHistInfoBodyEntity{
+				ComSortEntity: &TXHistInfoBodyEntityComSortEntity{
 					SortFields: sortFields,
 				},
-				AppEntity: &TXHasDoneBodyEntityAppEntity{
+				AppEntity: &TXHistInfoBodyEntityAppEntity{
 					TimeStart:   timeStart,
 					TimeEnd:     timeEnd,
 					PrjID:       prjID,
@@ -917,16 +917,16 @@ func (s *wfeService) HasDone(u *uic.User, timeStart string, timeEnd string, prjI
 			},
 		},
 	}
-	return s.hasDone(request)
+	return s.hists(request)
 }
 
-func (s *wfeService) hasDone(inputs *WfeHasDoneRequest) (*WfeHasDoneResponse, error) {
+func (s *wfeService) hists(inputs *WfeHistInfoRequest) (*WfeHistInfoResponse, error) {
 	response, err := wfeRequest(inputs)
 	if err != nil {
 		return nil, err
 	}
 
-	var wfeResponse WfeHasDoneResponse
+	var wfeResponse WfeHistInfoResponse
 	err = xml.Unmarshal(response, &wfeResponse)
 	if err != nil {
 		return nil, err

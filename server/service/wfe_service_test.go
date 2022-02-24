@@ -177,3 +177,13 @@ func TestWfeTodoList(t *testing.T) {
 
 	log.Printf("resp: %+v", resp)
 }
+
+func TestWfeHists(t *testing.T) {
+	u := uic.User{
+		JgygUserID: "23598915",
+	}
+	resp, _ := WfeService.Hists(&u, "", "", "",
+		"", "", "", nil, "1", "10")
+
+	log.Printf("resp: %+v", resp)
+}

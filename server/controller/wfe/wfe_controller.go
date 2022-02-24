@@ -254,7 +254,7 @@ func Todo2Doing(c *gin.Context) {
 	return
 }
 
-type APIPostHasDoneListInputs struct {
+type APIPostHistInfoListInputs struct {
 	SortFields  []*service.SortField `json:"sortFields" form:"sortFields"`
 	TimeStart   string               `json:"timeStart" form:"timeStart"`
 	TimeEnd     string               `json:"timeEnd" form:"timeEnd"`
@@ -269,13 +269,13 @@ type APIPostHasDoneListInputs struct {
 // @Summary 已办A0902S120
 // @Description
 // @Produce json
-// @Param APIPostHasDoneListInputs body APIPostHasDoneListInputs true "已办A0902S120"
-// @Success 200 {object} service.WfeHasDoneResponse
+// @Param APIPostHistInfoListInputs body APIPostHistInfoListInputs true "已办A0902S120"
+// @Success 200 {object} service.WfeHistInfoResponse
 // @Failure 400 "bad arguments"
 // @Failure 417 "internal error"
-// @Router /api/v1/wfe/hasDone [post]
-func HasDone(c *gin.Context) {
-	var inputs APIPostHasDoneListInputs
+// @Router /api/v1/wfe/hists [post]
+func Hists(c *gin.Context) {
+	var inputs APIPostHistInfoListInputs
 
 	if err := c.Bind(&inputs); err != nil {
 		h.JSONR(c, h.BadStatus, err)
@@ -283,7 +283,7 @@ func HasDone(c *gin.Context) {
 	}
 
 	u, _ := h.GetUser(c)
-	resp, err := service.WfeService.HasDone(&u, inputs.TimeStart, inputs.TimeEnd, inputs.PrjID,
+	resp, err := service.WfeService.Hists(&u, inputs.TimeStart, inputs.TimeEnd, inputs.PrjID,
 		inputs.PrjTypeList, inputs.PrjNm, inputs.WfExtrNm, inputs.SortFields, inputs.Page, inputs.Limit)
 	if err != nil {
 		h.JSONR(c, h.ExpecStatus, err)
